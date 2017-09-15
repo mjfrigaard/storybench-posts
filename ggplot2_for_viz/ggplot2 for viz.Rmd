@@ -1,0 +1,607 @@
+---
+title: "ggplot2 for visualizations"
+author: "Martin Frigaard"
+date: "5/1/2017"
+output: 
+  html_document: 
+    highlight: pygments
+    theme: united
+    toc: yes
+  word_document: 
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "/Users/martinfrigaard/Dropbox/writing/storybenchR/ggplot2_4_viz")
+```
+
+
+# Loading the packages 
+
+```{r sessionInfo, message=FALSE, warning=FALSE, echo=FALSE}
+dir("./")
+source("load_packages.R")
+```
+
+First, load the `tidyverse`.
+
+```{r packages}
+suppressWarnings(suppressMessages(library(tidyverse)))
+suppressWarnings(suppressMessages(library(magrittr)))
+```
+
+The [`tidyverse`](http://tidyverse.org/) is a collection of R packages developed by RStudio's Chief Scientist [Hadley Wickham](http://hadley.nz/). These packages work well together as part of larger data analysis pipeline. To learn more about these tools and how they work together, read [R for data science](http://r4ds.had.co.nz/). 
+
+<!--
+![tidyverse](https://github.com/mjfrigaard/my_r_projects/blob/master/storybench_R/images/tidyverse2.1.png?raw=true)
+-->
+
+![the tidyverse](/Users/martinfrigaard/Dropbox/writing/storybenchR/images/tidyverse2.1.png)
+
+***
+
+# Building graphics with ggplot2
+
+Creating a customized graph that communicates your ideas effectively can be challenging. This tutorial will introduce you to the popular R package `ggplot2`, it's underlying grammar of graphics, and show you how to create stylish yet simple graphs quickly. We will also go over some basic principles of data visualization. 
+
+Spending some time thinking about the structure/arrangement of your data set will help you produce a better visualization, and we have covered some common data wrangling tasks in these previous tutorials:  
+
+1. [RStudio Notebooks](http://www.storybench.org/getting-started-r-rstudio-notebooks/) for reproducible reporting     
+2. [Tidying data](http://www.storybench.org/getting-started-with-tidyverse-in-r/) and the tidyverse    
+3. [Exploring local data](http://www.storybench.org/how-to-explore-a-dataset-from-the-fivethirtyeight-package-in-r/) from the `fivethirtyeightpackage`      
+4. [Manipulating data](http://www.storybench.org/how-to-explore-a-dataset-from-the-fivethirtyeight-package-in-r/) using the `dplyr` package  
+5. []
+
+## Data Visualizations
+
+The best place to start with any visualization is with a pen and paper sketch.  By removing the confines of any particular software or tool I've found brainstorming with paper and pencil is extremely helpful to get those first couple bad ideas out of the way quickly. After I get an outline or sketch of the visualization I want to create, I figure out the details within whatever computer/software environment I'm using. I find this much more helpful than jumping in and starting from scratch--it's much harder to end up in the right place if you have no idea where you are going. 
+
+## Graphs and comedy
+
+My goal when I create a graph or visualization is to communicate an idea or some information about the underlying data (i.e., the differences, patterns, etc.) with a minimal amount additional explanation. In many ways, good graphics are a bit like well-written jokes; if I have to explain my joke, it loses the desired intent. You've heard the phrase, "a picture is worth a thousand words." Well, if I want the picture (visualization) I create to be worth 1,000 words, any additional explanation I have to provide diminishes that word-value. 
+
+Graphs are also similar to jokes in that you should know your audience before delivering either. Thanksgiving dinner at your in-law's house probably isn't the place for Redd Foxx's, ["What's the difference between a pickpocket and a peeping tom?"](http://scomedy.com/quotes/9282), but you might get away with Abbott & Costello's, ["Who's on first?"](http://www.psu.edu/dept/inart10_110/inart10/whos.html). Telling a joke to the wrong audience can be awkward (or even volatile) because 1) the joke failed to make the material presented in the joke relevant and funny, or 2) unknowingly encroached on a sensitive topic. Showing a visualization to the wrong audience is more akin to the first mistake (resulting in crickets, blank stares, or just being overlooked), but the second isn't impossible. After all, data is information, so it's a good idea to think about how a visualization you're sharing will fit into your audience's world view. 
+
+The comedian/actor/musician Jamie Foxx recently [said](https://www.youtube.com/watch?v=A_7RmheFRz0&list=LL8EBM5U0GKbF9dl1ZQR1t1A) he tests out his new stand-up material on his family before using it on stage. The reason? Beta testing rough jokes on an audience you trust enough to give you honest feedback is a great way to refine your work. That is also an excellent way to improve the reception of your data visualizations. By sending early drafts to friends and colleagues, you're getting a fresh set of eyes on the graphs you've created to see if they're communicating the ideas you intended. 
+
+The final similarity between jokes and data visualizations is their ability to influence their audience. Data visualizations from journalists like Alberto Cairo, Mona Chalabi, and Jeremy Singer-Vine have incited countless readers to demand that evidence accompanies journalism.  The current media technology landscape continues to create opportunities for people to be *influenced by data*.  
+
+Many jokes are funny because they present the truth in a new and entertaining way, which brings me to the lesson I repeat to myself often: "it doesn't matter if my visualizations look beautiful, gets published, goes viral, or even gets read by everyone on the planet. It only matters that the reader understands what truth I was trying to tell." After all, the goal here is **communication**, so anything short of comprehension by the intended audience is a failure. 
+
+> Three goals for your data visualization or graph: 1) your audience sees your finished work (so you truly have to do it), 2) everyone in the intended audience understands the ideas or information you're trying to convey, and 3) the audience is influenced by the data you've presented.
+
+**NOTE ON TERMINOLOGY:** A visualization can comprise one or more figure, chart or graph.
+
+What makes a great graph or visualization? Producing high-quality displays is as much an art as it is a science. Building expertise in data visualization takes time, practice, and attention to details. However, there are a few data presentation 'best practices' we can follow to at least make sure our visualizations are communicating the message we want.
+
+## Communicating numbers with graphs (a quick background)
+
+In 1985, two scientists at Bell Laboratories (William Cleveland and Robert McGill) published a [paper](http://www.jstor.org/stable/1695272) on "*visual decoding of elementary graphical-perception tasks*" (i.e., which graph elements convey statistical concepts with minimal mental effort). The authors identified ten commonly used graphing elements for representing numerical data. Then they ran some experiments that tested people's ability to quickly and easily see the relevant information that graph was supposed to convey. The authors used the results from these tests to rank the graphing elements according to how accurately the patterns in the data were perceived. The ranking is below: 
+
+
+| Rank          | Aspect                                      |
+| ------------- | -------------                               |
+| 1             | Position along a common scale               |
+| 2             | Position on identical but nonaligned scales |
+| 3             | Length                                      |
+| 4             | Angle                                       |
+| 5             | Slope                                       |
+| 6             | Area, Volume, Density, Color saturation     |
+| 7             | Color hue                                   |
+
+The point to notice here is that people could see the information and ideas in the graphs easiest when they were displayed using positions and geometric shapes (positioning, length, and angles). For example, the graphs below are presenting values in *positions* on a horizontal scale, easing our ability to make a comparison because the location of these values is on identical (but not aligned) scales. 
+
+<!--
+![position](/Users/martinfrigaard/Dropbox/writing/storybenchR/images/position_graph.png)
+-->
+
+![position](https://github.com/mjfrigaard/my_r_projects/blob/master/storybench_R/images/position_graph.png?raw=true)
+
+Nathan Yau from [Flowing Data](http://flowingdata.com/) refers to this list of elements (but also includes 'shape') as the *visual cues* in a graph or visualization. Below is a visual ranking of each item (adapted from Yau's text, [data points](https://www.amazon.com/Data-Points-Visualization-Means-Something/dp/111846219X)). These elements are one of four visualization components he covers (the other three being a coordinate system, scale, and context).  
+
+<!--
+![graph_elements](/Users/martinfrigaard/Dropbox/writing/storybenchR/images/graph_elements.png)
+-->
+
+![graph_elements](https://github.com/mjfrigaard/my_r_projects/blob/master/storybench_R/images/graph_elements.png?raw=true)
+
+Leland Wilkinson's [Grammar of Graphics](https://www.amazon.com/Grammar-Graphics-Statistics-Computing/dp/0387245448) presents a unique system for creating graphics in a distributed computing environment (this was implemented in SPSS as GPL). Hadley Wickham expanded and adapted Wilkinson's grammar to the R language in the `ggplot2` package. 
+
+## Why have a "grammar of graphics"?
+
+Having a grammar of graphics allows us to build graphs using an official syntax. The individual components of each graph are like parts of a well-written sentence. Composing clear, well-structured sentences isn't easy. To quote Stephen Pinker, 
+
+>  ***" appreciating the engineering design behind a sentence—a linear ordering of phrases which conveys a gnarly network of ideas—is the key to understanding what you are trying to accomplish when you compose a sentence."*** 
+
+The `ggplot2` syntax uses layers as a "*linear ordering of phrases*" to build graphs "*which convey a gnarly network of ideas*." Stated simply--the underlying grammar provides a framework for an analyst to build each graph one part at a time in a sequential order (or *layers*).   
+
+The composition of `ggplot2` calls have five parts:
+
+1. a data set   
+2. the aesthetic mapping ( `aes()` )    
+3. A statistical transformation (`stat = ` )    
+4. A geometric object (`geom_`)    
+5. A position adjustment  (`position = `)    
+
+
+## Univariate plots
+
+Many times you will just be interested in seeing the distribution of a single variable. There are a few ways to do this, but the most common are histograms (a kind of bar-chart), and density plots. 
+
+### Histograms
+
+A [histogram](http://ggplot2.tidyverse.org/reference/geom_histogram.html) breaks up the whole range of values in a variable into bins or classes. Each bar in the graph represents an interval or range for the value of a variable ("bins"), and the graph counts the number of observations whose values that fall into each bin.
+
+Recall above we said each graph in `ggplot2` needs the data, an aesthetic, a statistical transformation, a geometric object, and a position adjustment. We are going to create a histogram of `Height` by specifying each component. 
+
+#### The data set
+
+We will use a variety of data sets throughout this tutorial, starting with data from the National Health and Nutrition Examination Survey, in the [NHANES](https://cran.r-project.org/web/packages/NHANES/index.html) package. It is important to note that `ggplot2` (and other packages in the tidyverse) are designed to work with [tidy](https://www.jstatsoft.org/article/view/v059i10) data. 
+
+```{r}
+library(NHANES)
+nhanes <- NHANES::NHANES %>% tbl_df()
+nhanes %>% glimpse()
+```
+
+Let's get a quick summary of the `Height` variable from our `nhanes` data set using the `dplyr` functions. The help info on `Height` tells us: 
+
+"*Standing height in cm. Reported for participants aged 2 years or older.*"
+
+```{r height}
+nhanes %>% 
+     dplyr::select(Height) %>% 
+     summarise(
+          min = min(Height, na.rm = TRUE),
+          max = max(Height, na.rm = TRUE),
+          mean = mean(Height, na.rm = TRUE),
+          median = median(Height, na.rm = TRUE),
+          iqr = IQR(Height, na.rm = TRUE),
+          sd = sd(Height, na.rm = TRUE),
+          missing = sum(is.na(Height)),
+          total_non_miss = sum(!is.na(Height)),
+          total = n()
+     )
+```
+
+Specificity is what makes the `dplyr` functions so flexible. Unfortunately, this specificity comes at the expense of a lot of typing for a basic numerical summary. If I had to do this for every variable in my data set, it would 1) get tiring and 2) increase the chances of error. 
+
+But we can also get a quick number summary using the `favstats` function from the `mosaic` package. We will add some formatting from the `knitr` package to make the output look prettier, too.
+
+```{r favstats}
+knitr::kable(
+favstats(nhanes$Height)
+)
+```
+
+#### The aesthetic layer
+
+The pipe (`%>%`) operator makes the `ggplot` calls easier to read because it allows the layers of the graph to specified like the parts of a sentence (`data %>% aesthetic + geom`). Knowing this, we can create a histogram of the `Height` variable using the `layer()` function:
+
+```{r layer}
+# assign data and variable to aesthetic
+nhanes %>% 
+     ggplot(mapping = aes(x = Height)) +
+# add the necessary layers
+     layer(
+          stat = "bin",
+          geom = "bar",
+          position = "identity")
+```
+
+***AH! What are these warnings and messages?***
+
+`ggplot2` is pretty good about warning you whenever data are missing. This doesn't surprise us because we had 353 missing values in our summary above (why do you think these data are missing?). 
+
+The message is telling us how many `"bins"` our data has been divied up into. The default is set to 30.
+
+#### A statistic for a geom
+
+The `stat = "bin"` is a default setting for histograms, and we can adjust the `binwidth` values by specifying the `params = list(binwidth = 1)`. The simplest way to understand `bins` is by setting it to extreme values. We will set the `binwidth` value to a small and large value to demonstrate how bins influence the histogram. 
+
+If I use a low bin number (`binwidth = 1`), then I can see the numbers of bars in my histogram has increased. Also we can see there is a dip in the number of `Height` values around `170`.
+```{r few bins}
+# assign data and variable to aesthetic
+nhanes %>% 
+     ggplot(mapping = aes(x = Height)) +
+# add the necessary layers
+          layer(
+               stat = "bin",
+                    params = list(binwidth = 1),
+               geom = "bar",
+               position = "identity")
+```
+
+ 
+If I set the `binwidth` to a larger number (like `35`), I get fewer bars, and some of the nuanced aspects of the distribution are lost. 
+```{r many bins}
+# assign data and variable to aesthetic
+nhanes %>% 
+     ggplot(mapping = aes(x = Height)) +
+# add the necessary layers
+          layer(
+               stat = "bin",
+                    params = list(binwidth = 35),
+               geom = "bar",
+               position = "identity")
+```
+***NOTE:*** Small number of `bins` means many bars, large number of `bins` means fewer bars. 
+
+Finding the best setting for `binwidth` depends on the data set, but the goal is to give the viewer an idea of the underlying distribution of the variable.
+
+#### A geom for a statistic
+
+We said earlier that a histogram was a *kind of* bar chart, so the geometric object for this graph is the `"bar"` (not histogram). The bars in this case are the predetermined `bins`. 
+
+#### The positions for everyone
+
+The `position = identity` doesn't make any changes to the data on this geometric object (because the bars don't need to be adjusted).
+
+### Putting it all together 
+
+We just specified all five components for a simple histogram graph (the data, the aesthetic mapping, the stat, the geometric object, and the position) using the `layer` function. This is a lot to remember (and type!) for every graph we want to make with `ggplot2`. The beauty of `ggplot2` is that we don't *have* to explicitly state every component explicitly. Each geometric object (`geom`) comes with a default statistic (`stat`). The converse is also true (every `stat` belongs to a default `geom`). This lightens the mental load when we want to use the grammar to build a graph (because we don't have to remember what `stat` goes with each `geom`). 
+ 
+For example, we can get a basic histogram by using `geom_histogram()`
+```{r geom_histogram}
+nhanes %>% ggplot(aes(x = Height)) + 
+     geom_histogram()
+```
+
+
+We can also specify the `binwidth` inside the `geom_histogram()` function (along with the `na.rm = TRUE` argument to remove that pesky message).
+```{r}
+nhanes %>% ggplot(aes(x = Height)) + 
+     geom_histogram(binwidth = 3,
+                    na.rm = TRUE)
+```
+
+There you have it--this is how `ggplot2` builds a graph by layers. After you've identified data set, the variables get set to aesthetics (i.e. the plotting position along the x axis), then geoms (the bars, points, lines, etc.) get added to build the graph. As we move forward, you will see that additional variables can be set to different aesthetics (color, size) and additional geoms can be added to enhance the graph. 
+
+Now that we have a handle on the grammar, lets look at the other two univariate plots.
+
+### Density plots
+
+The `geom_density()` plot works a lot like the histogram, but draws a line instead of the bars. 
+
+```{r geom_density}
+nhanes %>% ggplot(aes(x = Height)) +
+          geom_density(na.rm = TRUE)
+```
+
+This distribution looks close to the histogram, but not identical. That's because the default stat for the `geom_density()` is `stat = "density"`. The underlying math in `"density"` produces a slightly different visual representation on of the distribution. However, we *can* specify the same `stat = "bin"` and set `binwidth` to get a distribution that almost identical to the histogram. 
+
+```{r}
+nhanes %>% ggplot(aes(x = Height)) + 
+     geom_density(
+          stat = "bin",
+          binwidth = 3,
+          na.rm = TRUE)
+```
+
+As we stated earlier, the great thing about the `ggplot2` is how easily you can combine different `geom`s in the same plot. For example, if I want to layer the `geom_histogram()` and `geom_density()` I can just us the `+` symbol to combine them.
+
+```{r}
+nhanes %>% ggplot(aes(x = Height)) + 
+     geom_histogram(
+          binwidth = 3,
+          na.rm = TRUE) +
+     geom_density(
+          stat = "bin",
+          binwidth = 3,
+          na.rm = TRUE) 
+```
+
+This is a little hard to see because both distributions are black/gray. I can use the `color`, `fill`, and `size` aesthetics to make it easier to see the two distributions. 
+
+```{r}
+nhanes %>% ggplot(aes(x = Height)) + 
+     geom_histogram(
+          binwidth = 3,
+          fill = "white",
+          color = "steelblue",
+          na.rm = TRUE) +
+     geom_density(
+          stat = "bin",
+          binwidth = 3,
+          size = .7,
+          color = "red",
+          na.rm = TRUE)
+```
+
+Is this graph more clear than simply using either the `geom_density()` or `geom_histogram()`? I tend to think one representation of a distribution is enough for one graph, but this example illustrates how each function works with their statistic (and how to modify them).
+
+### Bar charts
+
+The final univariate plot we will look at is the bar chart(`geom_bar()`). A bar chart is like a histogram, but instead of binning the data, the observations get counted (`stat = "count"`). This means every observation contributes one unit of height for each bar. We will remove the missing `Height` values using `filter` before we create the bar chart.   
+
+```{r geom_bar}
+nhanes %>% 
+     filter(!is.na(Height)) %>% 
+     ggplot(aes(x = Height)) +
+     geom_bar()
+```
+
+The `stat = "count"` is why you can have gaps between the bars (not possible when using `stat = "bin"`). The gaps are values along the `x` axis that were not represented in the data. Which graph is better? A bar chart gives us a very granular picture of the data, and the histogram and density plot do a better job of displaying the underlying distribution of the `Height` variable. Each graph serves its own purpose.
+
+## Multivariate plots
+
+Now that we have applied the `ggplot2` grammar to a single variable, we can explore visualizing two variables in the same graph. Generally speaking, more variables in the same plot means more options for graphing, but this comes with a height cost of complexity. Some common multivariate plots are scatter plots, line-plots, box-plots, or point-plots. We will start by graphing two continuous variables. 
+
+### Scatter plots  
+
+Scatter plots are great if you have two variables that are measured on continuous numerical scales (i.e. dollars, kilograms, etc.). Whenever I am considering visualizing multiple variables, I find it helpful to think about what I'm expecting to see before I start building graphs. We will look at the relationship between `weight` and `height` in Major League Baseball players from the `Master` data set in the `Lahman` package. First we will get a summary for each variable:
+
+```{r}
+bb_df <- Lahman::Master %>% tbl_df
+fav_stats(bb_df$height)
+```
+
+```{r}
+fav_stats(bb_df$weight)
+```
+
+Then we will filter the missing variables and get a scatter plot using `geom_point()`
+```{r}
+bb_df %>% 
+     ggplot(aes(x = height, y = weight)) +
+     geom_point(na.rm = TRUE)
+```
+
+What can we see here? I looks like that one tiny player is all alone out there. I want to be able to identify this person--do you have any ideas about how to do that? We know how to `select` and `filter` observations based on their values, so why don't we start there. 
+
+```{r}
+tiny_player <- bb_df %>% 
+     dplyr::select(weight,
+                   height, 
+                   nameGiven) %>% 
+     filter(height < 50 & weight < 70)
+```
+
+#### Identify and label outliers (`geom_text`)
+
+Now we can go back to our original scatter plot to add another layer. However, this time we specify the data **within** the `geom_text()`, tell it what `size` to make the text, and add the `label` aesthetic for the player's name (`nameGiven`).
+
+```{r}
+bb_df %>% 
+     ggplot(aes(x = height, y = weight)) +
+     geom_point(na.rm = TRUE) + 
+          geom_text(data = tiny_player, 
+                    size = 2.5, 
+                    aes(label = nameGiven))
+```
+
+Ok now I want to look at the relationship between `Metacritic` and `Rotten Tomatoes` scores for films in the `fandango` data set from the `fivethirtyeight` package. These data were used in the story [Be Suspicious Of Online Movie Ratings, Especially Fandango's](http://fivethirtyeight.com/features/fandango-movies-ratings/)
+
+First we will get the summary stats for the website scores from Metacritic and Fandango:
+```{r}
+fan_df <- fivethirtyeight::fandango %>% tbl_df()
+knitr::kable(
+favstats(fan_df$rottentomatoes)
+)
+```
+
+```{r}
+knitr::kable(
+favstats(fan_df$metacritic)
+)
+```
+
+And now we will get a scatter plot of these variables, but use the `fill` aesthetic to identify them by color. 
+```{r}
+fan_df %>% 
+     ggplot(aes(rottentomatoes, metacritic)) + 
+     geom_point()
+```
+
+These two variables seem fairly well correlated, but what if I want to also see the relationship between the user scores from each site?
+
+The summaries for user scores:
+
+```{r}
+knitr::kable(
+fav_stats(fan_df$rottentomatoes_user)
+)
+```
+
+```{r}
+knitr::kable(
+fav_stats(fan_df$metacritic_user)
+)
+```
+
+#### Layer scatter plots on a common scale
+
+```{r}
+user_df <- fan_df %>% 
+     dplyr::select(rottentomatoes_user, 
+                   metacritic_user)
+fan_df %>% 
+     ggplot(aes(rottentomatoes, metacritic)) + 
+     geom_point(color = "red") + 
+     geom_point(data = user_df,
+                aes(rottentomatoes_user, 
+                    metacritic_user), 
+                color = "blue")
+```
+
+Wow, what is going on here? In case you didn't catch it, the user ratings for Metacritic have different scales (1-10), so this scatter plot is uninterpretable with these two `geom_point` layers. This should serve as a lesson for you: **just because the code worked, doesn't mean the graph makes sense!**
+
+If we want to plot two `geom_point()` layers, they need to be on the same measurement scale. That is what the `metacritic_norm`, `metacritic_user_nom`, `rt_norm` and `rt_user_norm` variables have been created for (they are normalized to a 0 - 5 scale).
+
+```{r}
+meta_df <- fan_df %>% 
+     dplyr::select(metacritic_norm,
+                   metacritic_user_nom)
+fan_df %>% 
+     ggplot(aes(rt_norm, rt_user_norm)) + 
+     geom_point(color = "tomato2") + 
+     geom_point(data = meta_df,
+                aes(metacritic_norm, 
+                    metacritic_user_nom), 
+                color = "steelblue1")
+```
+
+Does this relationship look linear?
+
+### Line plots
+
+Line plots are great if you have a numerical quantity that you want to see over levels of a categorical variable. We will use data from the [World Bank Open Data](https://data.worldbank.org/) that has data on what percentage of each countries GDP is contributed by three sectors in their economy: agriculture, the service sector, and industry.  
+
+First we will load the data sets:
+
+```{r message=FALSE, warning=FALSE}
+ag_gdp_df <- read_csv("https://raw.githubusercontent.com/mjfrigaard/my_r_projects/master/storybench_R/data/aggdp_worldbank.csv")
+ind_gdp_df <- read_csv("https://raw.githubusercontent.com/mjfrigaard/my_r_projects/master/storybench_R/data/indgdp_worldbank.csv")
+serv_gdp_df <- read_csv("https://raw.githubusercontent.com/mjfrigaard/my_r_projects/master/storybench_R/data/servgdp_worldbank.csv")
+```
+
+
+```{r}
+# tidy
+ag_gdp_df <- ag_gdp_df %>%  gather(key = year, value = ag_prec_gdp, -Country)
+ind_gdp_df <- ind_gdp_df %>% gather(key = year, value = ind_perc_gdp, -Country)
+serv_gdp_df <- serv_gdp_df %>%  gather(key = year, value = serv_perc_gdp, -Country)
+```
+
+
+First we will look at the percent contribution from agriculture to GDP. 
+
+```{r}
+# ag_gdp_df %>% glimpse()
+ag_gdp_df$year <- as.numeric(ag_gdp_df$year)
+ag_gdp_df %>% 
+     ggplot(aes(x = year, y = ag_prec_gdp, group = Country)) +
+     geom_line(aes(color = Country), na.rm = TRUE) 
+```
+
+This looks like there has been a drop in the contributions from agriculture, but I can't see the dates very well. I can adjust this with the `scale_fill_continuous()` function and set a `breaks` and `labels` vector. 
+
+```{r}
+fav_stats(ag_gdp_df$year)
+```
+
+
+```{r}
+ag_gdp_df %>% 
+     ggplot(aes(x = year, y = ag_prec_gdp, group = Country)) +
+     geom_line(aes(color = Country), na.rm = TRUE) + 
+     labs(x = NULL) +
+     scale_x_continuous(breaks = c(1960, 1965, 1970, 1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015), 
+                    labels = c("1960", "1965", "1970", '1975', '1980', '1985', '1990', '1995', '2000', "2005", "2010", '2015'))
+```
+
+This looks good, but I think I want to add a `geom_point()` to make the values stand out more for each year. 
+
+```{r}
+ag_gdp_df %>% 
+     ggplot(aes(x = year, y = ag_prec_gdp, group = Country)) +
+     geom_line(aes(color = Country), na.rm = TRUE) + 
+     geom_point(aes(color = Country), size = 2, na.rm = TRUE) +
+     labs(x = NULL) +
+     scale_x_continuous(breaks = c(1960, 1965, 1970, 1975, 1980, 1985, 1990,1995, 2000, 2005, 2010, 2015), 
+                    labels = c("1960", "1965","1970","1975","1980","1985","1990", "1995","2000","2005","2010","2015"))
+
+```
+
+That looks like agriculture has been contributing less to GDP over the last 50+ years. Let's see how it looks for the other two sectors.
+
+Summary for the contribution from services sector
+```{r}
+serv_gdp_df$year <- as.numeric(serv_gdp_df$year)
+fav_stats(serv_gdp_df$serv_perc_gdp)
+```
+
+Line plot for services sector. 
+```{r service}
+serv_gdp_df %>% 
+     ggplot(aes(x = year, y = serv_perc_gdp, group = Country)) +
+     geom_line(aes(color = Country), na.rm = TRUE) + 
+     geom_point(aes(color = Country), size = 2, na.rm = TRUE) +
+     labs(x = NULL) +
+     scale_x_continuous(breaks = c(1960, 1965, 1970, 1975, 1980, 1985, 1990,1995, 2000, 2005, 2010, 2015), 
+                    labels = c("1960", "1965","1970","1975","1980","1985","1990", "1995","2000","2005","2010","2015"))
+```
+
+
+Summary for the contribution from industry sector
+```{r}
+ind_gdp_df$year <- as.numeric(ind_gdp_df$year)
+fav_stats(ind_gdp_df$ind_perc_gdp)
+```
+
+Line plot for industry sector. 
+```{r industry}
+ind_gdp_df %>% 
+     ggplot(aes(x = year, y = ind_perc_gdp, group = Country)) +
+     geom_line(aes(color = Country), na.rm = TRUE) + 
+     geom_point(aes(color = Country), size = 2, na.rm = TRUE) +
+     labs(x = NULL) +
+     scale_x_continuous(breaks = c(1960, 1965, 1970, 1975, 1980, 1985, 1990,1995, 2000, 2005, 2010, 2015), 
+                    labels = c("1960", "1965","1970","1975","1980","1985","1990", "1995","2000","2005","2010","2015"))
+```
+
+As we can see, agriculture has contributed less to GDP, the service sector has started to contribute more, and the industry sector does not have a straightforward trend. Note that India has seen an increase in industry contribution to GDP, while most of the other countries have seen industry fall over the last 2-3 decades.
+
+### Stacked bar charts
+
+
+
+We can use the stacked bar charts to show relative proportions of numerical variables across categories or stratified by other variables in the data set. We are going to use the data from, ["Where People Go To Check The Weather"](http://fivethirtyeight.com/datalab/weather-forecast-news-app-habits/)
+
+```{r}
+weather <- fivethirtyeight::weather_check %>% tbl_df()
+weather %>% glimpse()
+```
+
+As you can see, these are all logical `lgl`, character `chr`, or factor `fctr` variables. These are best summarized using the `count()` or `distinct()` functions. 
+
+```{r}
+weather %>% count(hhold_income)
+```
+
+
+We will check the responses to the question, "If you had a smartwatch (like the Apple Watch), how likely or unlikely would you be to check the weather on that device?"
+```{r}
+weather %>% count(ck_weather_watch)
+```
+
+Now we can create a bar chart with these data using color (`fill`) to represent the proportions of people stating `TRUE` or `FALSE` to, "Do you typically check a daily weather report?"
+```{r}
+weather %>%
+     ggplot(aes(x = ck_weather_watch, fill = ck_weather)) +
+     geom_bar()
+```
+
+What do we see? More people checking the weather are apparently also more likely to check a hypothetical weather watch app. 
+Still, many people who stated they were `Very unlikely` to check a watch weather app also said they checked the weather report daily (maybe they like the meteorologist?)
+
+Maybe checking your weather is a regional phenomenon? Lets look at the bar chart by `x = region`:
+```{r}
+weather %>%
+     ggplot(aes(x = region, fill = ck_weather)) +
+     geom_bar()
+```
+
+Hmmm...we can't really see the `x` axis very well. I can adjust this with a `theme(axis.text.x)` function. I also want to `position` the bars next to each other instead of stacked. 
+
+#### theme for axis labels and ticks
+
+```{r}
+weather %>%
+     ggplot(aes(x = region, fill = ck_weather)) +
+          geom_bar(position = "dodge") + 
+               theme(axis.text.x = element_text(angle = 45, 
+                                                hjust = 1))
+```
+
+Maybe the willingness to check the phone has to do with the household income reported by the respondents?
+
+<!--
+insert box plot section
+-->
+
+**NOTE:** You can do this using `count()`, `distinct()` from the `dplyr` package, or you can use `unique()` from the `memisc()` package. Recall that the functions in `dplyr` take a data frame (or tibble) and return a data frame. The `unique()` function prints a little cleaner in the `.Rmd` files, so I will occasionally use it. 
+
+
+This was a very brief tutorial of the `ggplot2` package, so I recommend learning more about the package by typing `library(help = "ggplot2")` into your R console, checking out the [ggplot2](http://ggplot2.tidyverse.org/reference/ggplot2-package.html) tidyverse page, or purchasing the [ggplot2 book](https://www.amazon.com/ggplot2-Elegant-Graphics-Data-Analysis/dp/331924275X/ref=sr_1_1?s=books&ie=UTF8&qid=1504615645&sr=1-1&keywords=ggplot2). 
