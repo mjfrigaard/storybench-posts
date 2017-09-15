@@ -1,0 +1,395 @@
+---
+title: "dplyr_4_summaries - storybench"
+author: "Martin Frigaard"
+date: "8/23/2017"
+output: 
+  html_document: 
+    highlight: tango
+    theme: cerulean
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# knitr::opts_knit$set(root.dir = "/Users/martinfrigaard/Dropbox/writing/storybenchR")
+knitr::opts_knit$set(root.dir = "W:\\working\\storybenchR")
+```
+
+```{r load_packages, message=FALSE, warning=FALSE}
+source("load_packages.R")
+```
+
+
+# Intro
+
+Now that we're familiar with the [tidyverse](http://www.storybench.org/getting-started-with-tidyverse-in-r/), what [tidy data](https://www.jstatsoft.org/article/view/v059i10) looks like, how to get our data into shape using the [tidyr](http://www.storybench.org/how-to-explore-a-dataset-from-the-fivethirtyeight-package-in-r/) package, and manipulating our data using [dplyr](), we can start computing numerical summaries of our data by grouping and using some of dplyr's more advanced manipulation capabilities. 
+
+A key characteristic of the functions in the `dplyr` package is that they take a data frame and return a data frame. This removes some of the confusing subsetting syntax (`$`), and when `dplyr` commands are combined with the pipe (`%>%`), it makes it much easier to read each data manipulation step. 
+
+We'll start with the data from the [fivethirtyeight](https://cran.r-project.org/web/packages/fivethirtyeight/index.html) package but then get into some actual data that needs some cleaning. 
+
+# Load the packages
+
+```{r load tidyverse}
+library(tidyverse)
+library(magrittr)
+library(fivethirtyeight)
+```
+
+
+For these exercises, we start by using the `drinks` data set from the article, "The raw data behind the story "Dear Mona Followup: Where Do People Drink The Most Beer, Wine And Spirits?" available [here](http://www.fivethirtyeight.com/datalab/dear-mona-followup-where-do-people-drink-the-most-beer-wine-and-spirits/).
+
+```{r drinks}
+# data(package = "fivethirtyeight")
+drinks538 <- tbl_df(fivethirtyeight::drinks) 
+```
+
+# Data shape
+
+The first thing we are going to do (and should always do with any data set) is get an idea for the shape of the data. We can do this using a variety of commands. 
+
+`head()` shows you the top of the data (and you can specify how many observations)
+
+```{r head}
+drinks538 %>% head(3)
+```
+
+`tail()` will show you the bottom (again, specify the number of rows)
+
+```{r tail}
+drinks538 %>% tail(3)
+```
+
+`str` will give you the data `structure`
+
+```{r}
+drinks538 %>% str()
+```
+
+I personally use `glimpse()` because it prints cleaner and shows the most data
+
+```{r}
+drinks538 %>% glimpse()
+```
+
+Each of these commands can be used to subset a particular variable, too. To do this we use the `$` symbol.
+
+```{r}
+drinks538$spirit_servings %>% glimpse()
+```
+
+# Groups & Summaries
+
+We know the `dplyr` grammar has five verbs that are used for working with data frames and building data manipulation pipelines. 
+
+We've already covered `arrange()` (to sort variables), `select()` (to return specific variables), `filter()` (to return specific observations), and `mutate()` (to return new variables we create). These functions take a data frame or `tbl_df` as the first argument, then return (or print) the first ten rows as a `tbl_df`. The `tbl_df` doesn't print all columns, which also makes it easy to keep a constant set of eyes on your data. 
+
+The next `dplyr` verbs we'll be using for manipulating data are `summarize()`, `group_by()`, and `case_which()`. 
+
+***
+
+## summarise()
+
+Now that we have a bit of an understanding of the underlying `drinks` data shape, we can start summarizing some of the data. Before we move forward, it is important to note the following functions are built in the same vain as SQL, the common relational database querying syntax. Any familiarity you have with SQL will make `dplyr` easier to learn (and vice versa). 
+
+From the help file, we learn that `summarise()`,
+
+> Reduces multiple values down to a single value
+
+What if we wanted to know the breakdown of the answer to the question, *What is the average beer, wine, and spirit servings in Argentina, Brazil, and Chile?*. 
+
+We want the output grouped by the average of three observations in `country`, and the mean for each variable (`beer_servings`, `spirit_servings`, `wine_servings`). We can combine `filter()` and `summarise()` to get this output.
+
+```{r summarise}
+drinks538 %>% 
+     filter(country %in% c("Argentina", "Brazil", "Chile")) %>% 
+     summarise(
+          avg_beer = mean(beer_servings),
+          avg_spirit = mean(spirit_servings),
+          avg_wine = mean(wine_servings),
+          n = n()
+     )
+```
+**NOTE**: always include an `n = n()` in summaries so you know you are getting the `tbl` you expected!
+
+On its own, `summarise()` will return a single row of whatever summary statistics you've asked for. 
+
+But we often want summaries of some variables *across levels* of other variables. See the documentation from the help file below:
+
+> `summarise()` is typically used on grouped data created by `group_by()`. The output will have one row for each group.
+
+And for `group_by()`
+
+> `group_by()` takes an existing tbl and converts it into a grouped tbl where operations are performed "by group". `ungroup()` removes grouping. 
+
+This seems a little abstract, but we will try a few test cases to get a better understanding.
+
+I will apply `group_by()` to the `country` variable in the `drinks` data frame.
+
+```{r group_country}
+drinks538 %>% group_by(country) 
+```
+
+Note that this doesn't really tell us anything new. But if you think about it, we *shouldn't* see anything different--all we did was tell R to return the data frame grouped by `country`. If all 193 observations in this data frame have a unique value for `country`, then it makes sense that we should get 193 observations back (and we did). 
+
+***`group_by` and `summarise()` work by reduction***
+
+`group_by()` and `summarise()` make more sense when we add summary functions. We need to ask ourselves, *how do we want to reduce our variables into a single observation in a table (i.e. and what is that single value we to represent the original variable)?*.
+
+## group_by()
+
+Ok lets get a new data set to really explore how `group_by()` works. We will look at the data behind, "Joining The Avengers Is As Deadly As Jumping Off A Four-Story Building" [here](http://www.fivethirtyeight.com/features/avengers-death-comics-age-of-ultron/).
+
+Load the data set and check the shape:
+
+```{r avengers}
+avengers538 <- tbl_df(fivethirtyeight::avengers)
+avengers538 %>% glimpse()
+```
+
+Another way to check your data is with the use of the `dplyr` function, `sample_n()`. This randomly samples a few observations and lets you see them. 
+
+```{r sample_n}
+set.seed(2)
+avengers538 %>% sample_n(10) %>% glimpse()
+```
+
+In the last tutorial we introduced the `count()` function. I like to use `count()` as a way to think of the `group_by` function. The help file tells us the following information about `count()`: 
+
+> "calls `group_by()` before and `ungroup()` after."
+
+The `count()` function works by grouping, tallying, and ungrouping. 
+```{r}
+avengers538 %>% 
+     group_by(honorary) %>% 
+     tally() %>% 
+     ungroup(honorary)
+```
+
+The output above is identical to: 
+```{r}
+avengers538 %>% count(honorary)
+```
+
+A typical function pipeline might be needed to see the *`gender`* breakdown by each characters *`Avenger status`* (i.e. *The status of the avenger, if they were given "Honorary" Avenger status, if they are simply in the "Academy," or "Full" otherwise*).
+
+```{r avengers_group_by}
+avengers538 %>% 
+     group_by(honorary, gender) %>% 
+     tally(sort = TRUE) %>% 
+     spread(gender, n)
+```
+
+Once again, we can see the `group_by()`, `tally()`, `spread()` can be reduced with the `count()` command. 
+```{r avengers_xtab}
+avengers538 %>% 
+     count(gender, honorary, sort = TRUE) %>% 
+     spread(gender, n)
+```
+***NOTE:*** best to use `sort = TRUE` consistently (i.e. all the time or not at all). 
+
+Both `group_by()` + `tally()` or `count()` will work with the `spread()` function, the main benefit being less key strokes.  
+
+Now that we have a feel for `group_by()`, `count()`, and `tally()`, we can move into numerical summaries by groups. We will use a different data set for these functions. But first, we should address some basic housekeeping. 
+
+## workflow tip: keeping a clean working environment
+
+RStudio keeps all of our working data frames in the **working environment**, which you can access by using the `ls()` command.
+```{r}
+ls()
+```
+
+Personally, I get a little crazy about how things print to my screen, so I'll add a `writeLines()` function, too. 
+
+```{r}
+ls() %>% writeLines()
+```
+
+We can see our two data frames `avengers538` and `drinks538`, and the vectors/functions I used to install the packages (`com_pkg`, `inst_com`, `inst_tidy`, `tidy_pkg`). It is a good habit to clean out your working environment before loading another data set. This keeps you from overwriting any intermediate data frames and confusing data manipulation pipelines.  
+
+There are a few options for doing this:
+
+1. remove objects by name: `rm(com_pkg, inst_com, inst_tidy, tidy_pkg)`     
+2. remove all objects: `rm(list = ls())`    
+3. remove objects based on a pattern: `rm(list=ls(pattern="temp"))`    
+
+I recommend using the pattern option because it forces a little forethought in naming the objects. For example, if I keep to a strict naming convention and only name functions, vectors and lists using `_`, I can remove everything with a pattern match. 
+
+```{r}
+rm(list = ls(pattern = "538"))
+ls()
+```
+
+Now we can continue working with a fresh environment. 
+
+## summarise() & group_by
+
+These two functions work well together for producing numerical summaries across groups (or levels of variables). 
+
+To keep learning the `summarise()` and `group_by()` functions together, we will use the data from, "Be Suspicious Of Online Movie Ratings, Especially Fandango's", available [here](http://fivethirtyeight.com/features/fandango-movies-ratings/) 
+
+```{r}
+fandango538 <- fivethirtyeight::fandango
+fandango538 %>% glimpse()
+```
+
+This data set is ideal for summaries because it is full of numbers (`dbl` & `int`) and one character (`chr`) variable. 
+
+First lets get an idea for the movies in this data frame. I can use the `distinct()` function.
+
+```{r distinct}
+fandango538 %>% distinct(film)
+```
+
+This is similar to the `unique()` or `!duplicated()` functions, but it returns a data frame (`tibble`).  
+
+```{r unique}
+# fandango$film %>% unique()
+# !duplicated(fandango$film)
+```
+
+I want to see how the films from `2014` did on Rotten Tomatoes. First we will `group_by()` the `year`, and then add the `summarise()` functions. 
+
+```{r}
+fandango538 %>% 
+     group_by(year) %>% 
+     summarise(
+          min = min(rt_norm),
+          max = max(rt_norm),
+          mean = mean(rt_norm),
+          median = median(rt_norm),
+          n = n()
+     )
+```
+
+We can see the Rotten Tomatoes score (normalized to a 0 to 5 point system) looks pretty different between 2014 and 2015. Any ideas why that might be? 
+
+What if I wanted to add some percentiles to this table (the 25th and 75th)? Well I can do this with the `quantile(x, probs)` function.
+
+
+```{r percentiles}
+fandango538 %>% 
+     group_by(year) %>%
+   summarise(
+          min = min(rt_norm),
+          `25%` = quantile(rt_norm, probs = 0.25),
+          `75%` = quantile(rt_norm, probs = 0.75),
+          mean = mean(rt_norm),
+          median = median(rt_norm),
+          max = max(rt_norm),
+          n = n()
+)
+```
+
+
+We can also make this table look prettier with the `kable()` function from `knitr`.
+
+```{r kable}
+knitr::kable(
+fandango538 %>% 
+     group_by(year) %>%
+   summarise(
+          min = min(rt_norm),
+          `25%` = quantile(rt_norm, probs = 0.25),
+          `75%` = quantile(rt_norm, probs = 0.75),
+          mean = mean(rt_norm),
+          median = median(rt_norm),
+          max = max(rt_norm),
+          n = n()
+))
+```
+***NOTE:*** You can make table nice with many options in the `knitr` package. Check out the webiste [here](https://yihui.name/knitr/).  
+
+Now we are going to load some data into our working environment and introduce some of the more advanced functions in `dplyr` 0.7.0,
+
+***
+
+## loading data with `readr`
+
+We are going to look at some data from the 10K top stories from the top 500 news web publishers. 
+
+<!---
+need more background on data 
+-->
+
+Whenever you are getting data from a url, it's best to store the hyperlink in an object. 
+
+```{r data_path}
+data_path <- "https://raw.githubusercontent.com/mjfrigaard/my_r_projects/master/storybench_R/data/top500.csv"
+```
+
+
+### read_csv()
+
+Now we can ingest these data from the web and load them into our working environment using the `read_csv()` function. 
+
+```{r read_csv}
+top500 <- read_csv(file = data_path)
+```
+
+Now we can take a look at these data and see what we have:
+
+```{r top500}
+top500 %>% glimpse()
+```
+
+This data frame is pretty large, so lets just take a sample to practice the data manipulation techniques. 
+
+```{r sample}
+small_top500 <- top500 %>% sample_n(500)
+small_top500 %>% glimpse()
+```
+
+Now we can clean out some of the previous objects in our working envirnment. 
+
+```{r clean_up}
+ls()
+rm(list = ls(pattern = "fandango"))
+rm(top500)
+ls()
+```
+
+## case_when
+
+So `case_when()` is a new addition to `dplyr` 0.7.0. It is a nice alternative to writing complicated `if_else()` statements when your goal is to create a variable based on multiple conditions.  
+
+We can use this function along with `select()` and `mutate()` to generate a variable based on the number of likes/shares, the word "Trump" in the headline, and whether the article has a headline. 
+
+```{r}
+small_top500 %>% 
+     dplyr::select(
+               Publisher,
+               Headline,
+               Facebook,
+               Twitter) %>% 
+          mutate(
+               popular = 
+          case_when(
+                    Facebook >= 5000 & Twitter >= 1500 ~ "popular on fb & twt",
+                    str_detect(Headline, "Trump") ~ "Trump",
+                    hasVideo = TRUE ~ "video"
+               )) %>% 
+          count(popular)
+```
+
+
+If I want to create this variable and assign it to the data frame, I can take a quick look at it using `pull()`
+
+```{r pull}
+pop_trump_vid <- small_top500 %>% 
+     dplyr::select(
+               Publisher,
+               Headline,
+               Facebook,
+               Twitter) %>% 
+          mutate(
+               popular = 
+          case_when(
+                    Facebook >= 5000 & Twitter >= 1500 ~ "popular on fb & twt",
+                    str_detect(Headline, "Trump") ~ "Trump",
+                    hasVideo = TRUE ~ "video"
+               ))
+pop_trump_vid %>% pull() %>% head(50)
+```
+
+
