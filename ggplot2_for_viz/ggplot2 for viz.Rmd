@@ -382,10 +382,11 @@ gg_bb_wt_ht +
                 na.rm = TRUE) + 
      geom_text(data = tiny_player_df, 
                aes(label = nameGiven),
-               size = 2.5)
+               size = 2.5, 
+               nudge_x = 2)
 ```
 
-Using `geom_text()` is great for clearly labeling data points and outliers, but use it sparingly. Too many words on a graph makes it difficult to read the text and know what to focus on. Adjusting the `alpha` is a great way to show where many data points cluster or overlap. 
+The `size = 2.5` and `nudge_x = 2` inside the `geom_text()` are helpful for adjusting the name to the right of the point so it's easier to read. Using `geom_text()` is great for clearly labeling data points and outliers, but use it sparingly. Too many words on a graph makes it difficult to read the text and know what to focus on. Adjusting the `alpha` is a great way to show where many data points cluster or overlap. 
 
 We are going to move onto a new set of variables from a different data set to continue exploring scatter plots. Lets see the relationship between `Metacritic` and `Rotten Tomatoes` movie critic scores for films in the `fandango` data set from the `fivethirtyeight` package. These data were used in the story [Be Suspicious Of Online Movie Ratings, Especially Fandango's](http://fivethirtyeight.com/features/fandango-movies-ratings/)
 
