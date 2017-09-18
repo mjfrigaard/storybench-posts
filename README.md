@@ -7,7 +7,7 @@ The [`tidyverse`](http://tidyverse.org/) is a collection of R packages developed
 ![the tidyverse](https://github.com/mjfrigaard/storybenchR/blob/master/images/tidyverse2.1.png?raw=true) 
 
 This is a series of tutorials on data tidying, manipulation, and visualization for storybench.org. 
-
+1. Getting started in [R with RStudio notebooks](https://github.com/mjfrigaard/storybenchR/blob/master/RMarkdown_4_code/getting_started_rstudio_notebooks.Rmd) 
 1. tidying data with [tidyr part 1 and 2](https://github.com/mjfrigaard/storybenchR/tree/master/tidyr_2_shape)
 2. [manipulating data with dplyr part 1](https://github.com/mjfrigaard/storybenchR/tree/master/dplyr_4_wrangling) and [summarising data with dplyr part 2](https://github.com/mjfrigaard/storybenchR/tree/master/dplyr_4_summaries)
 3. [creating graphs with ggplot2](https://github.com/mjfrigaard/storybenchR/tree/master/ggplot2_for_viz) 
