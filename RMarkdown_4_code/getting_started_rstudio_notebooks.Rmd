@@ -7,7 +7,6 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = "C:\\Users\\VHASFCFRIGAM\\Desktop\\R_library\\R_PROJECTS\\storybenchR\\rmarkdown_with_notebooks")
 ```
 
 
