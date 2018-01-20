@@ -27,7 +27,7 @@ suppressWarnings(suppressMessages(library(magrittr)))
 
 The [`tidyverse`](http://tidyverse.org/) is a collection of R packages developed by RStudio's Chief Scientist [Hadley Wickham](http://hadley.nz/). These packages work well together as part of larger data analysis pipeline. To learn more about these tools and how they work together, read [R for data science](http://r4ds.had.co.nz/). 
 
-![the tidyverse](/Users/martinfrigaard/Dropbox/writing/storybenchR/images/tidyverse2.1.png)
+![the tidyverse](https://raw.githubusercontent.com/mjfrigaard/storybenchR/master/images/tidyverse2.1.png)
 
 We will be using the `bad_drivers` data set from ["Dear Mona, Which State Has The Worst Drivers?"](http://fivethirtyeight.com/datalab/which-state-has-the-worst-drivers/). We load it into out working environment and give it a `_df` to identify that this object is the data frame.
 
