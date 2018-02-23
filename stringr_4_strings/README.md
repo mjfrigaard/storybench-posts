@@ -709,7 +709,7 @@ NewsDataTeaserClevelandPlot <- NewsData %>%
 NewsDataTeaserClevelandPlot
 ```
 
-![](002.1-string_manipulation_in_r_files/figure-gfm/NewsDataTeaserClevelandPlot-1.png)<!-- -->
+![NewsDataTeaserClevelandPlot](https://github.com/mjfrigaard/storybenchR/blob/master/stringr_4_strings/images/NewsDataTeaserClevelandPlot.png?raw=true)
 
 ``` r
 ggsave("./image/NewsDataTeaserClevelandPlot.png", width = 7, height = 5, units = "in")
@@ -1838,7 +1838,7 @@ MapNewsData_Prop_Plot <- MapNewsLinePlot +
 MapNewsData_Prop_Plot
 ```
 
-![](002.1-string_manipulation_in_r_files/figure-gfm/MapNewsData_Prop_Plot-1.png)<!-- -->
+![MapNewsData_Prop_Plot](https://github.com/mjfrigaard/storybenchR/blob/master/stringr_4_strings/images/MapNewsData_Prop_Plot.png?raw=true)
 
 ``` r
 ggsave("./image/MapNewsData_Prop_Plot.png", width = 7, height = 5, units = "in")
