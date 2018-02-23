@@ -1765,7 +1765,7 @@ MapNewsLinePlot <- MapNewsData_Prop_Data %>%
 MapNewsLinePlot
 ```
 
-![](002.1-string_manipulation_in_r_files/figure-gfm/MapNewsLinePlotData-1.png)<!-- -->
+![MapNewsLinePlotData-1](https://github.com/mjfrigaard/storybenchR/blob/master/stringr_4_strings/images/MapNewsLinePlotData-1.png?raw=true)
 
 I want to know what the specific colors are in this plot. It turns out,
 all that information is stored in a data frame I can access using
