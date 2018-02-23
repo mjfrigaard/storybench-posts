@@ -83,11 +83,15 @@ introduce the `stringr` package from the
 
 ``` r
 tidyverse::tidyverse_logo()
+```
+
+```
 ⬢ __  _    __   .    ⬡           ⬢  . 
  / /_(_)__/ /_ ___  _____ _______ ___ 
 / __/ / _  / // / |/ / -_) __(_-</ -_)
 \__/_/\_,_/\_, /|___/\__/_/ /___/\__/ 
      ⬢  . /___/      ⬡      .       ⬢
+
 ```
 
 ### Load the Packages
