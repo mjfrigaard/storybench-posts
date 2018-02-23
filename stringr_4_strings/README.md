@@ -174,7 +174,7 @@ But if I want to combine data frames together **side-by-side**, they
 will be matched on their row position (so I would need to make sure the
 same number of rows are in each data frame).
 
-![](./image/dplyr_binds.png)
+![dplyr_binds](https://github.com/mjfrigaard/storybenchR/blob/master/stringr_4_strings/images/dplyr_binds.png?raw=true)
 
 **NOTE:** The tiny object in the rows are chairs, because for some
 reason, whenever I think of rows, I think of a row of chairs. The same
@@ -467,7 +467,7 @@ string manipulations. You can find it on the `tidyverse`
 `stringr` (like other packages in the `tidyverse`) is very convenient
 because all of the functions have a common prefix, `str_`
 
-![str\_.png](./image/stringr_str_.png)
+![str.png](https://github.com/mjfrigaard/storybenchR/blob/master/stringr_4_strings/images/stringr_str_.png?raw=true)
 
 Everything we just did with base R is possible with `stringr`, so I’m
 going to go through some of this package’s lesser-known functions.
@@ -751,7 +751,6 @@ If I want to look at the `headline` or `teaser` data by location, I have
 to join it to a data frame that has data I can map. This information is
 found in the `maps` and `ggplot2` packages.
 
-<!-- add citation for maps -->
 
 ### Create State level data
 
@@ -1106,7 +1105,7 @@ I want to match on `allen` (not
 stringr::str_view_all(string = "woody allen from allendale and Jimmy Fallen", pattern = "allen")
 ```
 
-![](002.1-string_manipulation_in_r_files/figure-gfm/stringr::str_view-1.png)<!-- -->
+![stringr_str_view-1](https://github.com/mjfrigaard/storybenchR/blob/master/stringr_4_strings/images/stringr_str_view-1.png?raw=true)
 
 I need to tweak this
 slightly.
@@ -1115,7 +1114,7 @@ slightly.
 stringr::str_view_all(string = "woody allen from allendale", pattern = "\\ballen\\b")
 ```
 
-![](002.1-string_manipulation_in_r_files/figure-gfm/stringr::str_view_all-1.png)<!-- -->
+![stringr_str_view_all-1](https://github.com/mjfrigaard/storybenchR/blob/master/stringr_4_strings/images/stringr_str_view_all-1.png?raw=true)
 
 We can see what `headline` matches the regular expression and look to
 see if the first three words in the `teaser` match the `city_id` and
