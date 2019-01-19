@@ -2,11 +2,17 @@
 title: "Getting Started in RStudio Notebooks"
 author: "Martin Frigaard"
 date: "9/10/2017"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE,
+                      tidy = FALSE,
+                      fig.path = "images/",
+                      size = "small")
+library(tidyverse)
+library(magrittr)
+library(markdowntemplates)
 ```
 
 
@@ -28,12 +34,11 @@ If you need help installing R or RStudio, please see [this installation guide](h
 
 The IDE environment has four panes (seen below), 
 
-<!--
-![four_panes](/Users/martinfrigaard/Dropbox/writing/storybenchR/images/RStudio_setup.png)
--->
 
+```{r 01-studio-setup, echo=FALSE}
+knitr::include_graphics(path = "01-rstudio_setup.png")
+```
 
-![four_panes](https://github.com/mjfrigaard/storybenchR/blob/master/images/RStudio_setup.png?raw=true)
 
 As you can see, the upper-left pane is the **editor**. The pane in the upper-right, where it says "*Environment is empty*," will show the working dataset. The lower-left pane is called the **console**, which runs the R code. And the pane in the bottom-right will display my **results**.
 
@@ -44,19 +49,16 @@ To get a better understanding of the RStudio IDE, check out this tutorial from [
 To get started, click on "**File**" > "**New File**" > "**R Notebook**". R Notebooks automatically start off with a title and some sample code. The header is written in [YAML](https://en.wikipedia.org/wiki/YAML), which stands is used to configure the R markdown document. The rest of the file is written in R Markdown, an R-flavored version of the markdown [language](https://en.wikipedia.org/wiki/Markdown). To see how the code snippets is woven into the .html, save the file and click on the small "Play" arrow button right above "Run Current Chunk." 
 
 
-<!--
-![play](/Users/martinfrigaard/Dropbox/writing/storybenchR/rmarkdown_with_notebooks/images/play_button.png)
--->
 
-![play](https://github.com/mjfrigaard/storybenchR/blob/master/images/play%20button.png?raw=true)
-
+```{r 02-play-button, echo=FALSE}
+knitr::include_graphics(path = "02-play-button.png")
+```
 
 
-<!--
-![preview_button](/Users/martinfrigaard/Dropbox/writing/storybenchR/rmarkdown_with_notebooks/images/preview_button.png)
--->
-
-![preview_button](https://github.com/mjfrigaard/storybenchR/blob/master/images/preview%20button.png?raw=true)
+```{r 03-preview-button, echo=FALSE}
+# fs::dir_ls(".")
+knitr::include_graphics(path = "03-preview-button.png")
+```
 
 
 R Notebook, as you can see, can generate an Html preview of your R Notebook file that does a great job of combining markdown text, R code, and results in a clean, crisp, easy-to-share finished product.
@@ -65,7 +67,7 @@ R Notebook, as you can see, can generate an Html preview of your R Notebook file
 
 You can use RStudio as a calculator. Type 2 + 2 directly into the console and press enter. You should see this:
 
-```{r}
+```{r ex-1}
 2 + 2
 ```
 
@@ -77,7 +79,7 @@ Now, put the same `2 + 2` up in the upper-left editor pane. Notice that all R co
 
 You're probably hoping to use RStudio for something slightly more advanced than simple arithmetic. Fortunately, R can calculate and store multiple values in **variables** to reference later. This is done with the `<-` assignment operator. Type the following and hit enter. 
 
-```{r}
+```{r ex-2}
 x <- 2 + 2
 ```
 
@@ -85,20 +87,20 @@ Notice the a Values table appear in the **working environment** – or workspace
 
 To see the contents of `x`, enter it into the console and press enter. You'll see:
 
-```{r x}
+```{r ex-3}
 x
 ```
 
 You can also perform mathematical operations with variables. Store `4 + 4` in a variable called `y` and add it the variable `x`
 
-```{r y and x}
+```{r y-and-x}
 y <- 4 + 4
 y + x
 ```
 
 R identifies numbers and text – or "string" - characters. Text can also be stored into variables using the `<-` symbol and quotations.  
 
-```{r a and b}
+```{r a-and-b}
 a <- "human"
 b <- "error"
 ```
@@ -169,38 +171,38 @@ Why did the combination of a numerical and integer vector end up being numeric? 
 In R, character vectors contain text strings. We can use character vectors to construct a sentence using a combination of `c()` and `<-` functions.
 We will start with a *preposition*:
 
-```{r}
+```{r prep_vect}
 prep_vect <- c("In")
 ```
 
 then include a *noun*
 
-```{r}
+```{r noun_vect}
 noun_vect <- c("the Brothers Karamazov,")
 ```
 
 throw in a *subject*, 
 
-```{r}
+```{r sub_vect}
 sub_vect <- c("Dmitri")
 ```
 
 sprinkle in a *verb*, 
 
-```{r}
+```{r verb_vect}
 verb_vect <- c("kills")
 ```
 
 and finish with an *object*
 
-```{r}
+```{r obj_vect}
 obj_vect <- c("his father")
 ```
 
 
 Sentence construction can be a great way to learn how vector objects are structured in R. **Atomic** **vectors** are always flat, so you can nest them all…
 
-```{r}
+```{r sent_vect}
 sent_vect <- c("In",c("the Brothers Karamazov,",c("Dmitri",c("kills",c("his father")))))
 sent_vect
 ```
@@ -208,7 +210,7 @@ sent_vect
 
 Or enter them directly:
 
-```{r}
+```{r directly}
 c("In","the Brothers Karamazov", "Dmitri", "kills", "his father")
 ```
 
@@ -217,7 +219,7 @@ Both return the same result.
 
 Finally, we can combine each part of the sentence together using `paste`:
 
-```{r}
+```{r paste-sent_vect}
 sent_vect <- paste(prep_vect, noun_vect, sub_vect, verb_vect, obj_vect)
 sent_vect
 ```
@@ -228,17 +230,17 @@ Unlike vectors – which only contain elements of a single type – lists can co
 
 We will create a list that includes an integer vector (`even_vect`) a logical vector (`TRUE`, `FALSE`), a full sentence (`sent_vect`), and a numeric vector (`odd_vect`) and we will call it `my_list`
 
-```{r}
+```{r my_list}
 my_list <- list(even_vect, c(TRUE, FALSE), c(sent_vect), c(odd_vect))
 ```
 
-```{r}
+```{r str-my_list}
 str(my_list)
 ```
 
 Lists can even contain other lists.
 
-```{r}
+```{r list-lists_on}
 lists_on <- list(list(list(list())))
 str(lists_on)
 ```
