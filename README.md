@@ -1,19 +1,28 @@
-## Exploring tidy tools with `fivethirtyeight` (storybench)
+# Welcome to `StorybenchR`
 
-### *Welcome to the `tidyverse`*
-
-The [`tidyverse`](http://tidyverse.org/) is a collection of R packages developed by RStudio's Chief Scientist [Hadley Wickham](http://hadley.nz/). These packages work well together as part of larger data analysis pipeline. To learn more about these tools and how they work together, read [R for data science](http://r4ds.had.co.nz/). 
-
-![the tidyverse](https://github.com/mjfrigaard/storybenchR/blob/master/images/tidyverse2.1.png?raw=true) 
-
-This is a series of tutorials on data tidying, manipulation, and visualization for storybench.org. 
-1. Getting started in [R with RStudio notebooks](https://github.com/mjfrigaard/storybenchR/blob/master/RMarkdown_4_code/getting_started_rstudio_notebooks.Rmd) 
-2. tidying data with [tidyr part 1 and 2](https://github.com/mjfrigaard/storybenchR/tree/master/tidyr_2_shape)
-3. [manipulating data with dplyr part 1](https://github.com/mjfrigaard/storybenchR/tree/master/dplyr_4_wrangling) and [summarising data with dplyr part 2](https://github.com/mjfrigaard/storybenchR/tree/master/dplyr_4_summaries)
-4. [creating graphs with ggplot2](https://github.com/mjfrigaard/storybenchR/tree/master/ggplot2_for_viz) 
-5. [stringr for words](https://github.com/mjfrigaard/storybenchR/blob/master/stringr_4_strings/README.md)
-6. lubridate for dates and times
-7. tidytext for text analysis
-8. sharing visualizations with shiny
+This is a series of tutorials from Data Journalism in R from [Storybench.org](http://www.storybench.org/category/data-journalism-in-r/)
 
 
+## Outline
+
+Below is the general outline for these tutorials. More lessons are added as new packages come out or better workflows/methods are discovered. 
+
+```
+├── 01-r-markdown-4-code
+    ├──01.1-rstudio-ide-options
+├── 02-getting-started-with-the-tidyverse
+    ├── 02.1-data-visualization-ggplot2-qplot
+    ├── 02.2-importing-data-with-rstudio
+├── 03-tidyr-2-shape
+    ├── 03.1-separate-rows-ggplot2-geoms
+├── 03-quickly-visualize-data-with-ggplot2
+├── 04-manipulate-data-with-dplyr
+├── 05-ggolot2-visualizations-part-2
+├── 06-for-loops-iterate-function-intro
+├── 07-getting-started-with-stringr
+├── 08-web-data-collection
+├── 08-twitter-data-animated-maps
+├── 09-twitter-api
+├── 10-install-r-jupyter
+├── 11-scraping-data-iteration-with-purrr
+```

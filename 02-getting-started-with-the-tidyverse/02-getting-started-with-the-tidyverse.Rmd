@@ -177,7 +177,7 @@ knitr::include_graphics(path = "images/tibble1.png")
 ```
 
 
-Notice the structure:
+Notice the new structure:
 
 * The new `key` column is now 9 rows, with the values from the three former `key1`, `key2`, and `key3` columns.
 
