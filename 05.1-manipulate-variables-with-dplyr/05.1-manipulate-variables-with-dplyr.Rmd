@@ -301,12 +301,29 @@ This method requires that I know 1) the number and 2) the name of the variables 
 
 Which brings me to the option #2: I can match on a specific pattern (like `"q0004_"`), and I can preserve the original variables order (by adding `dplyr::everything()`).
 
-```{r rename-helpers-1}
+```{r rename-helpers-1, eval=FALSE}
 MascSurveyData %>%
   dplyr::select(
       dplyr::everything(), 
       gmis_ = starts_with("q0004_")) %>% 
     dplyr::glimpse(78)
+```
+
+```{r rename-helpers-1-out, eval=FALSE}
+# Observations: 1,615
+# Variables: 98
+# $ id          <dbl> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, …
+# $ start_date  <chr> "5/10/18 4:01", "5/10/18 6:30", "5/10/18 7:02", "5/10/1…
+# $ end_date    <chr> "5/10/18 4:06", "5/10/18 6:53", "5/10/18 7:09", "5/10/1…
+# $ q0001       <chr> "Somewhat masculine", "Somewhat masculine", "Very mascu…
+# $ q0002       <chr> "Somewhat important", "Somewhat important", "Not too im…
+# $ gmis_1      <chr> "Not selected", "Father or father figure(s)", "Father o…
+# $ gmis_2      <chr> "Not selected", "Not selected", "Not selected", "Mother…
+# $ gmis_3      <chr> "Not selected", "Not selected", "Not selected", "Other …
+# $ gmis_4      <chr> "Pop culture", "Not selected", "Not selected", "Not sel…
+# $ gmis_5      <chr> "Not selected", "Not selected", "Not selected", "Not se…
+# $ gmis_6      <chr> "Not selected", "Not selected", "Other (please specify)…
+# ...omitted output
 ```
 
 Neat huh?
@@ -315,13 +332,19 @@ Neat huh?
 
 ## Counting responses
 
-The responses to each variable tell me a lot about the original question. For example, I can pass `q0001` to `dplyr::count()` and see what it contains. `count` is an essential tool from the `dplyr` package because [data science is mostly counting things](https://twitter.com/joelgrus/status/833691273873600512). 
+ `dplyr::count()` is an essential tool from the `tidyverse` because [data science is mostly counting things](https://twitter.com/joelgrus/status/833691273873600512). It is also very versatile. By passing the entire data frame (`MascSurveyData`) to `count()` I get the number of rows.
+ 
+```{r count-1}
+MascSurveyData %>% dplyr::count()
+```
 
-```{r q0001, eval=FALSE}
+The individual responses to each variable tell me a lot about the original question. For example, I can pass `q0001` to `dplyr::count()` and see what it contains. 
+
+```{r q0001, eval=TRUE}
 MascSurveyData %>% dplyr::count(q0001)
 ```
 
-```{r count-1-out, eval=FALSE}
+```{r count-1-out, echo=FALSE}
 # # A tibble: 5 x 2
 #   q0001                    n
 #   <chr>                <int>
@@ -378,7 +401,7 @@ The output for each `dplyr::count()` contains two numbers: the total answers to 
 
 ## Change an existing variable
 
-Often I need to change the format of an exisitng variable in a data frame. This can be done using `dplyr::mutate()` and the equals sign `=`. For example, I notice the `id` variable is formatted as a double, but I want it to be an integer. I can do this with `dplyr::mutate()` and `as.integer()`
+Often I need to change the format of an existing variable in a data frame. This can be done using `dplyr::mutate()` and the equals sign `=`. For example, I notice the `id` variable is formatted as a double, but I want it to be an integer. I can do this with `dplyr::mutate()` and `as.integer()`
 
 ```{r as.integer-id}
 MascSurveyData <- MascSurveyData %>% 
@@ -417,7 +440,7 @@ If I want to create a new variable that has only two possible responses (`TRUE` 
 
 I also have a tool at my disposal to verify this variable has been created correctly (i.e. `dplyr::count()`). By passing the new variable (`masc_ind`) and old variable (`how_masc`) I can check the count to see if the totals make sense. I can also use the `tidyr::spread()` function to see a cross-tabulation of each response.
 
-```{r if-else-example, results='hide', eval=FALSE}
+```{r if-else-example, eval=TRUE}
 MascSurveyData %>% 
     dplyr::mutate(masc_ind = 
         dplyr::if_else(
@@ -430,7 +453,7 @@ MascSurveyData %>%
     tidyr::spread(masc_ind, n)
 ```
 
-```{r if-else-example-out, eval=FALSE}
+```{r if-else-example-out, echo=FALSE, include=FALSE}
 # # A tibble: 5 x 3
 #   how_masc             `FALSE` `TRUE`
 #   <chr>                  <int>  <int>
@@ -577,11 +600,29 @@ I can also change only a few variables in a data frame and leave the others unch
 
 For example, if I decided all the elements in question four (`q0004_0001` through `q0004_0006`) needed to be factors (read more about factors [here](https://r4ds.had.co.nz/factors.html)), I could pass the data frame to `dplyr::mutate_at()` and include a string in the  `vars(matches())` helpers to identify question four variables.
 
-```{r mutate_at-as.factor}
+```{r mutate_at-as.factor, eval=FALSE}
 MascSurveyData %>% 
     dplyr::mutate_at(vars(matches("q0004_")), as.factor) %>% 
     dplyr::glimpse(78)
 ```
+
+```{r mutate_at-as.factor-out, eval=FALSE}
+# Observations: 1,615
+# Variables: 100
+# $ id            <int> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16…
+# $ start_date    <dttm> 2018-05-10 04:01:00, 2018-05-10 06:30:00, 2018-05-10…
+# $ end_date      <dttm> 2018-05-10 04:06:00, 2018-05-10 06:53:00, 2018-05-10…
+# $ how_masc      <chr> "Somewhat masculine", "Somewhat masculine", "Very mas…
+# $ how_important <chr> "Somewhat important", "Somewhat important", "Not too …
+# $ q0004_0001    <fct> Not selected, Father or father figure(s), Father or f…
+# $ q0004_0002    <fct> Not selected, Not selected, Not selected, Mother or m…
+# $ q0004_0003    <fct> Not selected, Not selected, Not selected, Other famil…
+# $ q0004_0004    <fct> Pop culture, Not selected, Not selected, Not selected…
+# $ q0004_0005    <fct> Not selected, Not selected, Not selected, Not selecte…
+# $ q0004_0006    <fct> Not selected, Not selected, Other (please specify), N…
+# $ q0005         <chr> "Yes", "Yes", "No", "No", "Yes", "Yes", "No", "Yes", …
+```
+
 
 ### Change variables selected based on a condition (function)
 
