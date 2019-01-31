@@ -1,0 +1,113 @@
+/* ======================================
+ * https://github.com/adamdehaven/perfect-pullquotes
+ * version 1.7.3
+ *
+ * Adam DeHaven ( @adamdehaven )
+ * http://adamdehaven.com/
+ *
+ * perfect-pullquotes.css
+ *
+ * ======================================
+*/
+.perfect-pullquote blockquote, .perfect-pullquote blockquote p { /* Reset <blockquote> element */
+    margin:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    outline:0 !important;
+    font-size:100% !important;
+    text-align: left !important;
+    vertical-align:baseline !important;
+    background:transparent !important;
+    quotes:none !important;
+}
+
+.perfect-pullquote blockquote:before, 
+.perfect-pullquote blockquote:after,
+.perfect-pullquote blockquote p:before, 
+.perfect-pullquote blockquote p:after { 
+  content:'' !important;
+  content:none !important;
+}
+
+.perfect-pullquote blockquote footer:before {
+    content:'\2014 \00A0' !important;
+}
+
+.perfect-pullquote blockquote footer {
+    margin-top:4px;
+}
+
+.perfect-pullquote blockquote footer cite {
+    font-style: italic;
+}
+
+.perfect-pullquote blockquote footer cite a {
+    display: inline-block;
+    font-style: italic;
+}
+
+.perfect-pullquote {
+    color:#363636;
+    font-size:21px;
+    line-height: 1.5;
+    display: block;
+    width: 30%;
+    padding: 0.5em 1em;
+    margin: 24px 0px;
+}
+
+.perfect-pullquote.pullquote-align-full {
+    width:95%;
+}
+
+.perfect-pullquote blockquote p {
+    color:#363636;
+    font-size:21px;
+    line-height: 1.5;
+}
+
+.pullquote-align-left {
+    text-align: left;
+    margin: 0.5em 1.5em 1em 0;
+    padding-left: 0;
+    float: left;
+    border-right: 5px solid #eeeeee;
+}
+
+.pullquote-align-right {
+    text-align: left;
+    margin: 0.5em 0 1em 1.5em;
+    padding-right: 0;
+    float: right;
+    border-left: 5px solid #eeeeee;
+}
+
+.pullquote-align-full {
+    text-align: left;
+    margin: 0.5em 0 1em 1.5em;
+    padding-right: 0;
+    float: none;
+    border-left: 5px solid #eeeeee;
+}
+
+@media screen and (min-width: 769px) and (max-width: 992px) {
+    .perfect-pullquote {
+        width:50% !important;
+    }
+    .perfect-pullquote.pullquote-align-full {
+        margin: 0.5em 0 1em 0.5em;
+        width:95% !important;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .perfect-pullquote {
+        margin: 0.5em 0 1em 0.5em !important;
+        padding: 0.5em 1em;
+        padding-right: 0;
+        width:95% !important;
+        border-left: 5px solid #eeeeee;
+        border-right: none !important;
+        float:none;
+    }
+}

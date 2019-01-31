@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<!-- saved from url=(0065)http://www.storybench.org/how-to-manipulate-data-with-dplyr-in-r/ -->
+<html lang="en-US" prefix="og: http://ogp.me/ns#"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="profile" href="http://gmpg.org/xfn/11">
+<link rel="pingback" href="http://www.storybench.org/xmlrpc.php">
+
+<script id="twitter-wjs" src="./How to manipulate data with dplyr in R - Storybench_files/widgets.js"></script><script id="facebook-jssdk" src="./How to manipulate data with dplyr in R - Storybench_files/sdk.js"></script><script async="" src="./How to manipulate data with dplyr in R - Storybench_files/analytics.js"></script><script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-55650055-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+<title>How to manipulate data with dplyr in R - Storybench</title>
+
+<!-- This site is optimized with the Yoast SEO plugin v4.6 - https://yoast.com/wordpress/plugins/seo/ -->
+<link rel="canonical" href="http://www.storybench.org/how-to-manipulate-data-with-dplyr-in-r/">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="How to manipulate data with dplyr in R - Storybench">
+<meta property="og:description" content="In the last tutorial we introduced the concept of tidy data, which is characterized by having one observation per row, and one variable per column. We also went over how to change to shape of our data set with tidyr using data sets …">
+<meta property="og:url" content="http://www.storybench.org/how-to-manipulate-data-with-dplyr-in-r/">
+<meta property="og:site_name" content="Storybench">
+<meta property="article:publisher" content="https://www.facebook.com/storybench">
+<meta property="article:tag" content="data journalism">
+<meta property="article:tag" content="dplyr">
+<meta property="article:tag" content="dplyr tutorial">
+<meta property="article:tag" content="R">
+<meta property="article:tag" content="r for journalism">
+<meta property="article:tag" content="rstats">
+<meta property="article:section" content="How to">
+<meta property="article:published_time" content="2017-08-30T04:05:36-05:00">
+<meta property="article:modified_time" content="2018-03-23T10:42:25-05:00">
+<meta property="og:updated_time" content="2018-03-23T10:42:25-05:00">
+<meta property="og:image" content="http://www.storybench.org/wp-content/uploads/2017/08/dplyr_pliers_1.png">
+<meta property="og:image:width" content="642">
+<meta property="og:image:height" content="439">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:description" content="In the last tutorial we introduced the concept of tidy data, which is characterized by having one observation per row, and one variable per column. We also went over how to change to shape of our data set with tidyr using data sets […]">
+<meta name="twitter:title" content="How to manipulate data with dplyr in R - Storybench">
+<meta name="twitter:site" content="@storybench">
+<meta name="twitter:image" content="http://www.storybench.org/wp-content/uploads/2017/08/dplyr_pliers_1.png">
+<meta name="twitter:creator" content="@storybench">
+<!-- / Yoast SEO plugin. -->
+
+<link rel="dns-prefetch" href="http://www.storybench.org/">
+<link rel="dns-prefetch" href="http://w.sharethis.com/">
+<link rel="dns-prefetch" href="http://ajax.googleapis.com/">
+<link rel="dns-prefetch" href="http://fonts.googleapis.com/">
+<link rel="dns-prefetch" href="http://netdna.bootstrapcdn.com/">
+<link rel="dns-prefetch" href="http://s.w.org/">
+<link rel="alternate" type="application/rss+xml" title="Storybench » Feed" href="http://www.storybench.org/feed/">
+<link rel="alternate" type="application/rss+xml" title="Storybench » Comments Feed" href="http://www.storybench.org/comments/feed/">
+<link rel="alternate" type="application/rss+xml" title="Storybench » How to manipulate data with dplyr in R Comments Feed" href="http://www.storybench.org/how-to-manipulate-data-with-dplyr-in-r/feed/">
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/11\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/11\/svg\/","svgExt":".svg","source":{"concatemoji":"http:\/\/www.storybench.org\/wp-includes\/js\/wp-emoji-release.min.js?ver=5.0.3"}};
+			!function(a,b,c){function d(a,b){var c=String.fromCharCode;l.clearRect(0,0,k.width,k.height),l.fillText(c.apply(this,a),0,0);var d=k.toDataURL();l.clearRect(0,0,k.width,k.height),l.fillText(c.apply(this,b),0,0);var e=k.toDataURL();return d===e}function e(a){var b;if(!l||!l.fillText)return!1;switch(l.textBaseline="top",l.font="600 32px Arial",a){case"flag":return!(b=d([55356,56826,55356,56819],[55356,56826,8203,55356,56819]))&&(b=d([55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447],[55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447]),!b);case"emoji":return b=d([55358,56760,9792,65039],[55358,56760,8203,9792,65039]),!b}return!1}function f(a){var c=b.createElement("script");c.src=a,c.defer=c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var g,h,i,j,k=b.createElement("canvas"),l=k.getContext&&k.getContext("2d");for(j=Array("flag","emoji"),c.supports={everything:!0,everythingExceptFlag:!0},i=0;i<j.length;i++)c.supports[j[i]]=e(j[i]),c.supports.everything=c.supports.everything&&c.supports[j[i]],"flag"!==j[i]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[j[i]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(h=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",h,!1),a.addEventListener("load",h,!1)):(a.attachEvent("onload",h),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),g=c.source||{},g.concatemoji?f(g.concatemoji):g.wpemoji&&g.twemoji&&(f(g.twemoji),f(g.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script><script src="./How to manipulate data with dplyr in R - Storybench_files/wp-emoji-release.min.js" type="text/javascript" defer=""></script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<link rel="stylesheet" id="dashicons-css" href="./How to manipulate data with dplyr in R - Storybench_files/dashicons.min.css" type="text/css" media="all">
+<link rel="stylesheet" id="admin-bar-css" href="./How to manipulate data with dplyr in R - Storybench_files/admin-bar.min.css" type="text/css" media="all">
+<link rel="stylesheet" id="newsanchor-bootstrap-css" href="./How to manipulate data with dplyr in R - Storybench_files/bootstrap.min.css" type="text/css" media="all">
+<link rel="stylesheet" id="wp-block-library-css" href="./How to manipulate data with dplyr in R - Storybench_files/style.min.css" type="text/css" media="all">
+<link rel="stylesheet" id="inline-tweet-sharer-style-css" href="./How to manipulate data with dplyr in R - Storybench_files/inline-tweet-sharer.css" type="text/css" media="all">
+<link rel="stylesheet" id="jquery-ui-standard-css-css" href="./How to manipulate data with dplyr in R - Storybench_files/jquery-ui.css" type="text/css" media="all">
+<link rel="stylesheet" id="perfect-pullquotes-styles-css" href="./How to manipulate data with dplyr in R - Storybench_files/perfect-pullquotes.css" type="text/css" media="all">
+<link rel="stylesheet" id="sab-plugin-css" href="./How to manipulate data with dplyr in R - Storybench_files/simple-author-box.min.css" type="text/css" media="all">
+<link rel="stylesheet" id="sab-author-name-font-css" href="./How to manipulate data with dplyr in R - Storybench_files/css" type="text/css" media="all">
+<link rel="stylesheet" id="sab-author-desc-font-css" href="./How to manipulate data with dplyr in R - Storybench_files/css" type="text/css" media="all">
+<link rel="stylesheet" id="ssbaFont-css" href="./How to manipulate data with dplyr in R - Storybench_files/css(1)" type="text/css" media="all">
+<link rel="stylesheet" id="yoast-seo-adminbar-css" href="./How to manipulate data with dplyr in R - Storybench_files/adminbar-460.min.css" type="text/css" media="all">
+<link rel="stylesheet" id="newsanchor-body-fonts-css" href="./How to manipulate data with dplyr in R - Storybench_files/css(2)" type="text/css" media="all">
+<link rel="stylesheet" id="newsanchor-headings-fonts-css" href="./How to manipulate data with dplyr in R - Storybench_files/css(3)" type="text/css" media="all">
+<link rel="stylesheet" id="newsanchor-style-css" href="./How to manipulate data with dplyr in R - Storybench_files/style.css" type="text/css" media="all">
+<style id="newsanchor-style-inline-css" type="text/css">
+body, .roll-title { font-family:Baskerville, Baskerville Old Face, Hoefler Text, Garamond, Times New Roman, serif;}
+h1, h2, h3, h4, h5, h6, .widget-categories li a, .roll-posts-carousel .item .text-over a, blockquote, .newsanchor_recent_comments .comment, .tabs .comments .comment { font-family:'Andale Mono', 'courier new', sans-serif;}
+.site-title { font-size:26px; }
+.site-description { font-size:16px; }
+h1 { font-size:28px; }
+h2 { font-size:28px; }
+h3 { font-size:25px; }
+h4 { font-size:22px; }
+h5 { font-size:20px; }
+h6 { font-size:18px; }
+body { font-size:18px; }
+.site-title a,.site-title a:hover,.roll-title a:hover,.lastest-posts .content-left h3 a:hover,.lastest-posts .content-right h3 a:hover,.activity span a:hover,.activity span a:hover:before,.recent_posts_b .post h3 a:hover,.recent_posts_b .sub-post .content h3 a:hover,.recent_posts_b .sub-post .date a:hover,.recent_posts_b.type2 .sub-post h3 a:hover,.video-post .content h3 a:hover,.social-navigation li a:hover,a,.btn-menu:hover:before,.post-item .content-entry h3 a:hover,.site-main .content-entry h3 a:hover,.newsanchor_recent_posts_widget ul h3 a:hover,.newsanchor_recent_posts_widget ul .date a:hover,.tabs .comments p a:hover,.tabs .pop-posts .text h3 a:hover,.tabs .pop-posts .text .date a:hover,.widget-socials .socials li a:hover,.widget-most-popular h3 a:hover,.widget-categories li a:hover,.single .meta-post span a:hover,.single .meta-post span a:hover:before,.single .related-posts .content h3 a:hover,.single .related-posts .date a:hover,.comments-list .comment-text .author a:hover,.footer-widgets .widget-list li a:hover,.top-header .toplink li a:hover { color:#dd6600}
+.roll-posts-carousel .item:hover .text-over,.roll-posts-carousel .owl-nav [class*=owl-],.roll-contact-form .send-wrap input,.roll-title:after,#mainnav ul .top-menu-item-1:hover,button,input[type="button"],input[type="reset"],input[type="submit"],.preloader .pre-bounce1,.preloader .pre-bounce2,#mainnav > ul > li:first-of-type,#login-modal .submit-login input,#signup-modal .submit-login input,.sidebar .widget-title:before,.tabs .menu-tab li.active a:after,.widget-subscribe #subscribe-button,.single .tags-post a:hover,.single .share-post .socials a,.comment-respond .submit-comment input,.footer-widgets .widget-social .social-list a:hover,.tagcloud a:hover,.go-top,.search-header .mobi-searchform { background-color:#dd6600}
+blockquote,.tagcloud a:hover { border-color:#dd6600}
+.site-description { color:#ffffff}
+.top-header,.main-header { background-color:#ffffff}
+.bottom-header .header-nav { background-color:#2b2b2b;}
+#mainnav ul .top-menu-item-2:hover { background-color:#9b9b9b;}
+#mainnav ul .top-menu-item-3:hover { background-color:#9b9b9b;}
+#mainnav ul .top-menu-item-4:hover { background-color:#9b9b9b;}
+#mainnav ul .top-menu-item-5:hover { background-color:#9b9b9b;}
+#mainnav ul .top-menu-item-0:hover { background-color:#9b9b9b;}
+body { color:#666666}
+.site-info { background-color:#000000}
+.footer-widgets.widget-area,.footer-widgets.widget-area a { color:#949494}
+.footer-widgets { background-color:#ffffff}
+
+</style>
+<link rel="stylesheet" id="newsanchor-font-awesome-css" href="./How to manipulate data with dplyr in R - Storybench_files/font-awesome.min.css" type="text/css" media="all">
+<link rel="stylesheet" id="font-awesome-css" href="./How to manipulate data with dplyr in R - Storybench_files/font-awesome.min(1).css" type="text/css" media="all">
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/inline-tweet-sharer.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/jquery.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/jquery-migrate.min.js"></script>
+<script id="st_insights_js" type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/st_insights.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/owl.carousel.min.js"></script>
+<link rel="https://api.w.org/" href="http://www.storybench.org/wp-json/">
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.storybench.org/xmlrpc.php?rsd">
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.storybench.org/wp-includes/wlwmanifest.xml"> 
+<meta name="generator" content="WordPress 5.0.3">
+<link rel="shortlink" href="http://www.storybench.org/?p=7009">
+<link rel="alternate" type="application/json+oembed" href="http://www.storybench.org/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fwww.storybench.org%2Fhow-to-manipulate-data-with-dplyr-in-r%2F">
+<link rel="alternate" type="text/xml+oembed" href="http://www.storybench.org/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fwww.storybench.org%2Fhow-to-manipulate-data-with-dplyr-in-r%2F&amp;format=xml">
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+  $( document ).tooltip({
+    items: "[data-tooltip]",
+    content: function() {
+      var element = $( this );  
+      var text = element.text();
+      var url = element.attr('data-tooltip');
+      return "<img class='map' alt='" + text +
+        "' src='" + url + "'>";
+    }
+  });
+});
+</script>
+<style type="text/css">
+.ui-widget {
+font-family: inherit;
+font-size: inherit;
+}
+</style>
+<script>(function(d, s, id){
+                 var js, fjs = d.getElementsByTagName(s)[0];
+                 if (d.getElementById(id)) {return;}
+                 js = d.createElement(s); js.id = id;
+                 js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.6";
+                 fjs.parentNode.insertBefore(js, fjs);
+               }(document, 'script', 'facebook-jssdk'));</script><style type="text/css">	.ssba {
+									
+									
+									
+									
+								}
+								.ssba img
+								{
+									width: 35px !important;
+									padding: 6px;
+									border:  0;
+									box-shadow: none !important;
+									display: inline !important;
+									vertical-align: middle;
+								}
+								.ssba, .ssba a
+								{
+									text-decoration:none;
+									border:0;
+									background: none;
+									font-family: Indie Flower;
+									font-size: 	20px;
+									
+									font-weight: bold;
+								}
+								</style><!--[if lt IE 9]>
+<script src="http://www.storybench.org/wp-content/themes/newsanchor/js/html5shiv.js"></script>
+<![endif]-->
+<style type="text/css" media="print">#wpadminbar { display:none; }</style>
+<style type="text/css" media="screen">
+	html { margin-top: 32px !important; }
+	* html body { margin-top: 32px !important; }
+	@media screen and ( max-width: 782px ) {
+		html { margin-top: 46px !important; }
+		* html body { margin-top: 46px !important; }
+	}
+</style>
+<style type="text/css">.saboxplugin-wrap .saboxplugin-authorname {font-family:"";}.saboxplugin-wrap .saboxplugin-desc {font-family:;}.saboxplugin-wrap {margin-top:0px;}.saboxplugin-wrap {margin-bottom:0px;}.saboxplugin-wrap .saboxplugin-authorname {font-size:18px; line-height:25px;}.saboxplugin-wrap .saboxplugin-desc {font-size:14px; line-height:21px;}.saboxplugin-wrap .saboxplugin-web {font-size:14px;}.saboxplugin-wrap .saboxplugin-socials .saboxplugin-icon-color {font-size:17px;}.saboxplugin-wrap .saboxplugin-socials .saboxplugin-icon-color:before {width:28px; height:28px; line-height:29px; }.saboxplugin-wrap .saboxplugin-socials .saboxplugin-icon-grey {font-size:14px;}</style>		<style type="text/css" id="wp-custom-css">
+			/*
+You can add your own CSS here.
+
+Click the help icon above to learn more.
+*/
+
+		</style>
+	<style id="fit-vids-style">.fluid-width-video-wrapper{width:100%;position:relative;padding:0;}.fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}</style><style type="text/css">
+:root #header + #content > #left > #rlblock_left
+{ display: none !important; }</style><script charset="utf-8" src="./How to manipulate data with dplyr in R - Storybench_files/grid_moment_timeline_tweet.e6c6c9e1c7f05a1ab5b34fc90a421fbc.js"></script><script charset="utf-8" src="./How to manipulate data with dplyr in R - Storybench_files/moment_timeline_tweet.50bff1a04f1f37b6a41fa15859518e07.js"></script><script charset="utf-8" src="./How to manipulate data with dplyr in R - Storybench_files/timeline.22fdefc8a1f3f94678ca69d826d1e193.js"></script><style type="text/css">.fb_hidden{position:absolute;top:-10000px;z-index:10001}.fb_reposition{overflow:hidden;position:relative}.fb_invisible{display:none}.fb_reset{background:none;border:0;border-spacing:0;color:#000;cursor:auto;direction:ltr;font-family:"lucida grande", tahoma, verdana, arial, sans-serif;font-size:11px;font-style:normal;font-variant:normal;font-weight:normal;letter-spacing:normal;line-height:1;margin:0;overflow:visible;padding:0;text-align:left;text-decoration:none;text-indent:0;text-shadow:none;text-transform:none;visibility:visible;white-space:normal;word-spacing:normal}.fb_reset>div{overflow:hidden}@keyframes fb_transform{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}.fb_animate{animation:fb_transform .3s forwards}
+.fb_dialog{background:rgba(82, 82, 82, .7);position:absolute;top:-10000px;z-index:10001}.fb_dialog_advanced{border-radius:8px;padding:10px}.fb_dialog_content{background:#fff;color:#373737}.fb_dialog_close_icon{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/yq/r/IE9JII6Z1Ys.png) no-repeat scroll 0 0 transparent;cursor:pointer;display:block;height:15px;position:absolute;right:18px;top:17px;width:15px}.fb_dialog_mobile .fb_dialog_close_icon{left:5px;right:auto;top:5px}.fb_dialog_padding{background-color:transparent;position:absolute;width:1px;z-index:-1}.fb_dialog_close_icon:hover{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/yq/r/IE9JII6Z1Ys.png) no-repeat scroll 0 -15px transparent}.fb_dialog_close_icon:active{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/yq/r/IE9JII6Z1Ys.png) no-repeat scroll 0 -30px transparent}.fb_dialog_iframe{line-height:0}.fb_dialog_content .dialog_title{background:#6d84b4;border:1px solid #365899;color:#fff;font-size:14px;font-weight:bold;margin:0}.fb_dialog_content .dialog_title>span{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/yd/r/Cou7n-nqK52.gif) no-repeat 5px 50%;float:left;padding:5px 0 7px 26px}body.fb_hidden{height:100%;left:0;margin:0;overflow:visible;position:absolute;top:-10000px;transform:none;width:100%}.fb_dialog.fb_dialog_mobile.loading{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/ya/r/3rhSv5V8j3o.gif) white no-repeat 50% 50%;min-height:100%;min-width:100%;overflow:hidden;position:absolute;top:0;z-index:10001}.fb_dialog.fb_dialog_mobile.loading.centered{background:none;height:auto;min-height:initial;min-width:initial;width:auto}.fb_dialog.fb_dialog_mobile.loading.centered #fb_dialog_loader_spinner{width:100%}.fb_dialog.fb_dialog_mobile.loading.centered .fb_dialog_content{background:none}.loading.centered #fb_dialog_loader_close{clear:both;color:#fff;display:block;font-size:18px;padding-top:20px}#fb-root #fb_dialog_ipad_overlay{background:rgba(0, 0, 0, .4);bottom:0;left:0;min-height:100%;position:absolute;right:0;top:0;width:100%;z-index:10000}#fb-root #fb_dialog_ipad_overlay.hidden{display:none}.fb_dialog.fb_dialog_mobile.loading iframe{visibility:hidden}.fb_dialog_mobile .fb_dialog_iframe{position:sticky;top:0}.fb_dialog_content .dialog_header{background:linear-gradient(from(#738aba), to(#2c4987));border-bottom:1px solid;border-color:#1d3c78;box-shadow:white 0 1px 1px -1px inset;color:#fff;font:bold 14px Helvetica, sans-serif;text-overflow:ellipsis;text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0;vertical-align:middle;white-space:nowrap}.fb_dialog_content .dialog_header table{height:43px;width:100%}.fb_dialog_content .dialog_header td.header_left{font-size:12px;padding-left:5px;vertical-align:middle;width:60px}.fb_dialog_content .dialog_header td.header_right{font-size:12px;padding-right:5px;vertical-align:middle;width:60px}.fb_dialog_content .touchable_button{background:linear-gradient(from(#4267B2), to(#2a4887));background-clip:padding-box;border:1px solid #29487d;border-radius:3px;display:inline-block;line-height:18px;margin-top:3px;max-width:85px;padding:4px 12px;position:relative}.fb_dialog_content .dialog_header .touchable_button input{background:none;border:none;color:#fff;font:bold 12px Helvetica, sans-serif;margin:2px -12px;padding:2px 6px 3px 6px;text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0}.fb_dialog_content .dialog_header .header_center{color:#fff;font-size:16px;font-weight:bold;line-height:18px;text-align:center;vertical-align:middle}.fb_dialog_content .dialog_content{background:url(https://static.xx.fbcdn.net/rsrc.php/v3/y9/r/jKEcVPZFk-2.gif) no-repeat 50% 50%;border:1px solid #4a4a4a;border-bottom:0;border-top:0;height:150px}.fb_dialog_content .dialog_footer{background:#f5f6f7;border:1px solid #4a4a4a;border-top-color:#ccc;height:40px}#fb_dialog_loader_close{float:left}.fb_dialog.fb_dialog_mobile .fb_dialog_close_button{text-shadow:rgba(0, 30, 84, .296875) 0 -1px 0}.fb_dialog.fb_dialog_mobile .fb_dialog_close_icon{visibility:hidden}#fb_dialog_loader_spinner{animation:rotateSpinner 1.2s linear infinite;background-color:transparent;background-image:url(https://static.xx.fbcdn.net/rsrc.php/v3/yD/r/t-wz8gw1xG1.png);background-position:50% 50%;background-repeat:no-repeat;height:24px;width:24px}@keyframes rotateSpinner{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.fb_iframe_widget{display:inline-block;position:relative}.fb_iframe_widget span{display:inline-block;position:relative;text-align:justify}.fb_iframe_widget iframe{position:absolute}.fb_iframe_widget_fluid_desktop,.fb_iframe_widget_fluid_desktop span,.fb_iframe_widget_fluid_desktop iframe{max-width:100%}.fb_iframe_widget_fluid_desktop iframe{min-width:220px;position:relative}.fb_iframe_widget_lift{z-index:1}.fb_iframe_widget_fluid{display:inline}.fb_iframe_widget_fluid span{width:100%}</style></head>
+
+<body class="post-template-default single single-post postid-7009 single-format-standard logged-in admin-bar no-customize-support group-blog">
+<div class="preloader" style="opacity: 0; display: none;">
+    <div class="spinner">
+        <div class="pre-bounce1"></div>
+        <div class="pre-bounce2"></div>
+    </div>
+</div>
+<div id="page" class="hfeed site">
+	<a class="skip-link screen-reader-text" href="http://www.storybench.org/how-to-manipulate-data-with-dplyr-in-r/#content">Skip to content</a>
+
+   	<header id="header" class="header">
+	   	<div class="top-header">
+	   		<div class="container">
+									<nav class="social-navigation clearfix">
+						<div class="menu-main-navigation-container"><ul id="menu-main-navigation" class="menu clearfix"><li id="menu-item-6062" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6062"><a href="http://twitter.com/storybench"><span class="screen-reader-text">Twitter</span></a></li>
+<li id="menu-item-6063" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6063"><a href="http://facebook.com/storybench"><span class="screen-reader-text">Facebook</span></a></li>
+<li id="menu-item-6064" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6064"><a href="http://instagram.com/story_bench"><span class="screen-reader-text">Instagram</span></a></li>
+<li id="menu-item-6068" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6068"><a href="http://tinyletter.com/storybench"><span class="screen-reader-text">Email</span></a></li>
+</ul></div>					</nav>
+						   					
+			</div>
+	   	</div><!-- /.top-header -->
+
+	   	<div class="main-header">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-4">
+		              	<div id="logo" class="logo">
+				        							<a href="http://www.storybench.org/" title="Storybench"><img class="site-logo" src="./How to manipulate data with dplyr in R - Storybench_files/logo-sb2.png" alt="Storybench"></a>
+				        					
+		            	</div>
+		            </div>
+
+		            	            </div>
+	         </div>
+	   	</div><!-- /.main-header -->
+
+		<div class="bottom-header">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="header-nav clearfix">
+							<div class="btn-menu"></div><!-- //mobile menu button -->
+							<nav id="mainnav" class="mainnav">
+								<ul id="primary-menu" class="clearfix"><li id="menu-item-21" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-21 top-menu-item-1"><a href="http://www.storybench.org/about-storybench/">About</a>
+<ul class="sub-menu">
+	<li id="menu-item-571" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-571"><a href="http://www.tinyletter.com/storybench">Newsletter</a></li>
+</ul>
+</li>
+<li id="menu-item-6051" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-6051 top-menu-item-2"><a>Articles</a>
+<ul class="sub-menu">
+	<li id="menu-item-6019" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6019"><a href="http://www.storybench.org/category/behind-the-scenes/">Behind the scenes</a></li>
+	<li id="menu-item-6010" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6010"><a href="http://www.storybench.org/category/vision/">Insights</a></li>
+	<li id="menu-item-6053" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6053"><a href="http://www.storybench.org/category/northeastern/">Research</a></li>
+	<li id="menu-item-6018" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6018"><a href="http://www.storybench.org/category/interviews/">Interviews</a></li>
+	<li id="menu-item-6163" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6163"><a href="http://www.storybench.org/category/ochre/">Longform</a></li>
+	<li id="menu-item-6050" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6050"><a href="http://www.storybench.org/category/clickworthy/">Roundups</a></li>
+	<li id="menu-item-4522" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4522"><a href="http://www.storybench.org/for-educators/">For Educators</a></li>
+</ul>
+</li>
+<li id="menu-item-6007" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor current-menu-parent current-post-parent menu-item-6007 top-menu-item-3"><a href="http://www.storybench.org/category/how-to/">Tutorials</a></li>
+<li id="menu-item-6459" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6459 top-menu-item-4"><a href="http://www.storybench.org/category/tvnews/">Reinventing TV</a></li>
+<li id="menu-item-9282" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-9282 top-menu-item-5"><a href="http://www.storybench.org/category/climate-journalism-lab/">Climate Journalism Lab</a></li>
+<li id="menu-item-7986" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-7986 top-menu-item-0"><a href="http://www.storybench.org/category/data-journalism-in-r/">Data Journalism in R</a></li>
+</ul>							</nav><!-- /nav -->
+							<div class="search-header">
+								<form role="search" method="get" class="search-form" action="http://www.storybench.org/">
+				<label>
+					<span class="screen-reader-text">Search for:</span>
+					<input type="search" class="search-field" placeholder="Search …" value="" name="s">
+				</label>
+				<input type="submit" class="search-submit" value="Search">
+			</form>							</div>
+						</div>
+					</div><!-- /.col-md-12 -->
+				</div><!-- /.row -->
+			</div><!-- /.container -->
+		</div><!-- /.bottom-header -->
+	</header>
+
+	<div class="page-content">
+		<div class="container content-wrapper">
+			<div class="row">
+				
+	<div id="primary" class="content-area col-md-8 ">
+		<main id="main" class="site-main" role="main">
+
+		
+			
+<article id="post-7009" class="post-7009 post type-post status-publish format-standard has-post-thumbnail hentry category-how-to tag-data-journalism tag-dplyr tag-dplyr-tutorial tag-r tag-r-for-journalism tag-rstats clearfix">
+
+			<div class="entry-thumb">
+			<img width="642" height="439" src="./How to manipulate data with dplyr in R - Storybench_files/dplyr_pliers_1.png" class="attachment-newsanchor-large-thumb size-newsanchor-large-thumb wp-post-image" alt="" srcset="http://www.storybench.org/wp-content/uploads/2017/08/dplyr_pliers_1.png 642w, http://www.storybench.org/wp-content/uploads/2017/08/dplyr_pliers_1-500x342.png 500w, http://www.storybench.org/wp-content/uploads/2017/08/dplyr_pliers_1-435x297.png 435w" sizes="(max-width: 642px) 100vw, 642px">		</div>
+	
+	<header class="entry-header">
+		<h1 class="single-title">How to manipulate data with dplyr in R</h1>
+				<div class="meta-post">
+			<span class="posted-on date"><a href="http://www.storybench.org/how-to-manipulate-data-with-dplyr-in-r/" rel="bookmark"><time class="entry-date published" datetime="2017-08-30T04:05:36+00:00">August 30, 2017</time><time class="updated" datetime="2018-03-23T10:42:25+00:00">March 23, 2018</time></a></span><span class="byline"> <span class="author vcard"><a class="url fn n" href="http://www.storybench.org/author/martinfri/">Martin Frigaard</a></span></span><span class="categories"> <a href="http://www.storybench.org/category/how-to/" rel="category tag">How to</a></span>		</div>
+				
+	</header><!-- .entry-header -->
+
+	<div class="entry-content">
+		<!-- Simple Share Buttons Adder (6.3.6) simplesharebuttons.com --><div class="ssba ssba-wrap"><div style="text-align:left"><a data-site="" class="ssba_facebook_share" href="http://www.facebook.com/sharer.php?u=http://www.storybench.org/how-to-manipulate-data-with-dplyr-in-r/" target="_blank"><img src="./How to manipulate data with dplyr in R - Storybench_files/facebook.png" title="Facebook" class="ssba ssba-img" alt="Share on Facebook"></a><a data-site="" class="ssba_google_share" href="https://plus.google.com/share?url=http://www.storybench.org/how-to-manipulate-data-with-dplyr-in-r/" target="_blank"><img src="./How to manipulate data with dplyr in R - Storybench_files/google.png" title="Google+" class="ssba ssba-img" alt="Share on Google+"></a><a data-site="" class="ssba_twitter_share" href="http://twitter.com/share?url=http://www.storybench.org/how-to-manipulate-data-with-dplyr-in-r/&amp;text=How+to+manipulate+data+with+dplyr+in+R+" target="_blank"><img src="./How to manipulate data with dplyr in R - Storybench_files/twitter.png" title="Twitter" class="ssba ssba-img" alt="Tweet about this on Twitter"></a><a data-site="pinterest" class="ssba_pinterest_share" href="javascript:void((function()%7Bvar%20e=document.createElement(&#39;script&#39;);e.setAttribute(&#39;type&#39;,&#39;text/javascript&#39;);e.setAttribute(&#39;charset&#39;,&#39;UTF-8&#39;);e.setAttribute(&#39;src&#39;,&#39;//assets.pinterest.com/js/pinmarklet.js?r=&#39;+Math.random()*99999999);document.body.appendChild(e)%7D)());"><img src="./How to manipulate data with dplyr in R - Storybench_files/pinterest.png" title="Pinterest" class="ssba ssba-img" alt="Pin on Pinterest"></a><a data-site="linkedin" class="ssba_linkedin_share ssba_share_link" href="http://www.linkedin.com/shareArticle?mini=true&amp;url=http://www.storybench.org/how-to-manipulate-data-with-dplyr-in-r/" target="_blank"><img src="./How to manipulate data with dplyr in R - Storybench_files/linkedin.png" title="LinkedIn" class="ssba ssba-img" alt="Share on LinkedIn"></a><a data-site="email" class="ssba_email_share" href="mailto:?subject=How%20to%20manipulate%20data%20with%20dplyr%20in%20R&amp;body=%20http://www.storybench.org/how-to-manipulate-data-with-dplyr-in-r/"><img src="./How to manipulate data with dplyr in R - Storybench_files/email.png" title="Email" class="ssba ssba-img" alt="Email this to someone"></a></div></div><p>In the last&nbsp;<a href="http://www.storybench.org/getting-started-with-tidyverse-in-r/">tutorial</a>&nbsp;we introduced the concept of&nbsp;<a href="https://www.jstatsoft.org/article/view/v059i10">tidy data</a>, which is characterized by having one observation per row, and one variable per column. We also went over how to change to shape of our data set with&nbsp;<a href="http://www.storybench.org/how-to-explore-a-dataset-from-the-fivethirtyeight-package-in-r/">tidyr</a>&nbsp;using data sets from the&nbsp;<a href="https://cran.r-project.org/web/packages/fivethirtyeight/index.html">fivethirtyeight</a>&nbsp;package.</p>
+<p>For newcomers to R, check out my introductory tutorial for <em>Storybench</em><a href="http://www.storybench.org/getting-started-r-rstudio-notebooks/">&nbsp;here</a>.</p>
+<h2><a id="user-content-data-manipulation" class="anchor" href="https://github.com/mjfrigaard/my_r_projects/blob/master/storybench_R/dplyr_4_wrangling/data%20manipulation%20with%20dplyr.Rmd#data-manipulation" aria-hidden="true"></a>Data manipulation</h2>
+<p>In this tutorial we will dive a little deeper into data manipulation to focus on processing and creating variables. Most of the time you’ll need to do some manipulation in order to get your data into a structure/arrangement to suit your needs; whether you’re building models, creating visualizations, or just passing a processed dataset onto another analyst.</p>
+<p>The clearest example of this fact is the paper survey or data collection form, which has to be re-entered into a separate software environment or spreadsheet for analysis. Web-based collection tools like&nbsp;<a href="https://www.surveymonkey.com/">Survey Monkey</a>&nbsp;and&nbsp;<a href="https://www.qualtrics.com/">Qualtrics</a>&nbsp;has made the process easier, but not perfect. There might be occasions when the data management is arranged in such a way that allows for a seamless transition between data collection and analysis, but I think these cases are rare.</p>
+<h2><a id="user-content-a-quick-note-on-terminology" class="anchor" href="https://github.com/mjfrigaard/my_r_projects/blob/master/storybench_R/dplyr_4_wrangling/data%20manipulation%20with%20dplyr.Rmd#a-quick-note-on-terminology" aria-hidden="true"></a>A quick note on terminology</h2>
+<p>The preparation work for a dataset before analysis or modeling has many names:&nbsp;<em>munging</em>,&nbsp;<em>wrangling</em>,&nbsp;<em>cleaning</em>, etc. As you can see by the general theme of these terms, this process is often viewed as the “grunt-work” of any analysis/modeling project. I prefer the term “Data Carpentry” from&nbsp;<a href="http://www.mimno.org/articles/carpentry/">David Mimno</a>. I suggest not thinking of any data set as “dirty.” This implies there is an immaculate version underneath the grime and that isn’t necessarily true.</p>
+<div class="perfect-pullquote vcard pullquote-align-right"><blockquote><p>“Looking at data carpentry as a fundamental data skill transforms these burdensome, monotonous tasks into a set of bedrock competencies”</p></blockquote></div>
+<p>For example, say you have a dataset with a variable containing date information from the&nbsp;<code>year</code>&nbsp;down to the&nbsp;<code>millisecond</code>, but all you need is the&nbsp;<code>month</code>. The other information is not ‘dirt’ – in fact, you might later decide you need&nbsp;<code>month</code>&nbsp;and&nbsp;<code>year</code>.</p>
+<p>Every bit in your data set is telling you&nbsp;<em>something</em>, but the information you need might not be accessible in it’s current state. The carpentry skills take the data from its current form into a something you can use to gain insight.</p>
+<p>The process doesn’t have to be painful, either! I’ve found looking at data carpentry as a fundamental data skill transforms these burdensome, monotonous tasks into a set of bedrock competencies to take pride in. As the famous coach John Wooden wrote, “These seemingly trivial matters, taken together and added to many, many other so-called trivial matters build into something very big: namely, your success.” Data analysis isn’t different than college basketball in this sense–mastering the fundamentals is essential to success.</p>
+<h2><a id="user-content-thinking-in-verbs" class="anchor" href="https://github.com/mjfrigaard/my_r_projects/blob/master/storybench_R/dplyr_4_wrangling/data%20manipulation%20with%20dplyr.Rmd#thinking-in-verbs" aria-hidden="true"></a>Thinking in verbs</h2>
+<p>The&nbsp;<a href="https://www.tidyverse.org/">tidyverse</a>&nbsp;package for manipulating data is&nbsp;<a href="http://dplyr.tidyverse.org/">dplyr</a>&nbsp;(pronounced “d-plier”” where “plier” is pronounced just like the tool). The&nbsp;<code>dplyr</code>&nbsp;package comes with an entire grammar for data manipulation, which uses a small set of verbs to accomplish an array of data processing tasks. There is a different verb – or “plier” – for each different data manipulation task. Read about all the different types of pliers&nbsp;<a href="https://en.wikipedia.org/wiki/Pliers">here</a></p>
+<p>When you combine&nbsp;<code>dplyr</code>&nbsp;with&nbsp;<code>magrittr</code>, you’ll be able to create data carpentry pipelines that are efficient and easy to read.</p>
+<pre lang="{r"><code>library(tidyverse)
+library(dplyr)
+library(magrittr)
+</code></pre>
+<pre lang="{r"><code>library(fivethirtyeight)
+# data(package = "fivethirtyeight")
+</code></pre>
+<p>The first data set we will be using from the&nbsp;<a href="https://cran.r-project.org/web/packages/fivethirtyeight/index.html"><code>fivethirtyeight</code></a>&nbsp;package is from the article titled, “<a href="https://projects.fivethirtyeight.com/clinton-trump-hip-hop-lyrics/">Every mention of the 2016 primary candidates in hip-hop songs</a>“.</p>
+<p>To view the status of each data set in the&nbsp;<code>fivethiryeight</code>&nbsp;package, you can look at the Google sheet available&nbsp;<a href="https://goo.gl/S2QMkS">here</a>.</p>
+<p>First we will use the&nbsp;<code>tbl_df</code>&nbsp;function from the&nbsp;<a href="http://tibble.tidyverse.org/">tibble</a>&nbsp;package to put the data set into the working environment.</p>
+<p><strong>Quick tip</strong>: 1) to use a particular function within a package you can use the syntax&nbsp;<code>package::function</code></p>
+<pre lang="{r}"><code>hiphop_cand_lyrics &lt;- fivethirtyeight::hiphop_cand_lyrics %&gt;% tbl_df
+hiphop_cand_lyrics
+</code></pre>
+<p>The first verb we will use to explore this data set is&nbsp;<code>select()</code>.</p>
+<h3><a id="user-content-select" class="anchor" href="https://github.com/mjfrigaard/my_r_projects/blob/master/storybench_R/dplyr_4_wrangling/data%20manipulation%20with%20dplyr.Rmd#select" aria-hidden="true"></a><code>select()</code></h3>
+<p><code>select()</code>&nbsp;works on variables (columns). For example, we can use it to pick out a single column, like the candidate’s name (<code>candidate</code>):</p>
+<pre lang="{r"><code>hiphop_cand_lyrics %&gt;% 
+    dplyr::select(candidate) %&gt;% 
+    glimpse()
+</code></pre>
+<p><strong>Quick tip</strong>: The&nbsp;<code>glimpse()</code>&nbsp;function is also from the&nbsp;<code>tibble</code>&nbsp;package and is very handy for viewing data frames (or tibbles). The result prints out the variables transposed as rows, the variable class (<code>&lt;chr&gt;</code>&nbsp;in this case), and as much of the data as that will fit on the screen.</p>
+<p>Let’s assume for our current purpose, we don’t need the&nbsp;<code>url</code>. There are a few ways we can remove this variable.</p>
+<p>First, we can use the&nbsp;<code>select()</code>&nbsp;function to name the variables we want explicitly. We can also use this opportunity to reorder the variables in our data set and rename the&nbsp;<code>album_release_date</code>&nbsp;to something a little easier to write, like&nbsp;<code>date</code>.</p>
+<pre lang="{r"><code>hiphop_cand_lyrics %&gt;% 
+    dplyr::select(
+        candidate,
+        date = album_release_date,
+        song,
+        artist,
+        sentiment,
+        theme,
+        line) %&gt;% glimpse()
+</code></pre>
+<p>But if our data set has a ton of variables, we can always just select the variables we want to remove using a&nbsp;<code>-</code>symbol.</p>
+<pre lang="{r"><code>hiphop_cand_lyrics %&gt;% 
+    dplyr::select(
+        -(url),
+        date = album_release_date) %&gt;% 
+    glimpse()
+</code></pre>
+<p>We also need to explicitly assign these variables to a new data frame with the variables we’ve selected.</p>
+<pre lang="{r"><code>(hiphop &lt;- hiphop_cand_lyrics %&gt;% 
+    dplyr::select(
+        candidate,
+        date = album_release_date,
+        song,
+        artist,
+        sentiment,
+        theme,
+        line))
+</code></pre>
+<p><strong>Quick Tip</strong>: In RStudio, you can get the command to print in a notebook or R Markdown file by enclosing the call in parentheses&nbsp;<code>()</code>.</p>
+<p><code>select()</code>&nbsp;also comes with a lot of handy pattern matching abilities on column names. For example, we can use the&nbsp;<code>matches</code>&nbsp;function to look for variables that contain a specific character.</p>
+<p>Say we only wanted variables that had the letter&nbsp;<code>t</code>&nbsp;in them.</p>
+<pre lang="{r}"><code>hiphop %&gt;% 
+    dplyr::select(matches("t")) %&gt;% 
+    glimpse()
+</code></pre>
+<p>You can also use periods as placeholders (as in regular expressions) to select variables that only have a&nbsp;<code>t</code>&nbsp;in the third position or after, but not in the first or second (i.e. omitting the&nbsp;<code>theme</code>&nbsp;variable).</p>
+<pre lang="{r}"><code>hiphop %&gt;% 
+    dplyr::select(matches(".t")) %&gt;% 
+    #                      candidate
+    #                      artist
+    #                      date
+    #                      sentiment
+    #                      but not 'theme'
+    glimpse()
+</code></pre>
+<p>There are different ways to pick columns based on the column names:</p>
+<h3><a id="user-content-filter" class="anchor" href="https://github.com/mjfrigaard/my_r_projects/blob/master/storybench_R/dplyr_4_wrangling/data%20manipulation%20with%20dplyr.Rmd#filter" aria-hidden="true"></a><code>filter()</code></h3>
+<p>The&nbsp;<code>filter()</code>&nbsp;command works on observations the same way&nbsp;<code>select()</code>&nbsp;works on variables. Lets say we are looking for observations that contain song lyrics that were only referring to “Jeb Bush”. We can do this using the double equal symbol&nbsp;<code>==</code>:</p>
+<pre lang="{r"><code>hiphop %&gt;% filter(candidate == "Jeb Bush") %&gt;% glimpse()
+</code></pre>
+<p>We can also&nbsp;<code>filter()</code>&nbsp;with multiple criteria. We can use the&nbsp;<code>%in%</code>&nbsp;to identify lyrics referring to “Jeb Bush” or “Chris Christie”.</p>
+<pre lang="{r"><code>hiphop %&gt;% 
+    filter(candidate %in% c("Jeb Bush", 
+                            "Chris Christie")) %&gt;% 
+    glimpse()
+</code></pre>
+<p>We can also use logical operators (<code>&gt;</code>,&nbsp;<code>&gt;=</code>,&nbsp;<code>&lt;</code>,&nbsp;<code>&lt;=</code>,&nbsp;<code>!=</code>,&nbsp;<code>==</code>) to filter any numerical variables.</p>
+<pre lang="{r"><code>hiphop %&gt;% 
+    filter(date &gt; 2005 &amp; date &lt;= 2014) %&gt;% # all observations after 2005 and before or on 2014
+    glimpse() 
+</code></pre>
+<p><code>filter()</code>&nbsp;also comes with three&nbsp;<a href="http://dplyr.tidyverse.org/reference/filter_all.html">scoped</a>&nbsp;variations. For example, we can use&nbsp;<code>filter_all</code>&nbsp;to return all variables and observations that are greater than&nbsp;<code>2005</code>.</p>
+<pre lang="{r}"><code>hiphop %&gt;% filter_all(any_vars(. &gt; 2005)) %&gt;% glimpse()
+</code></pre>
+<p>Because&nbsp;<code>date</code>&nbsp;is the only variable with numeric values, we know this new data frame only contains observations after&nbsp;<code>2005</code>.</p>
+<h3><a id="user-content-mutate" class="anchor" href="https://github.com/mjfrigaard/my_r_projects/blob/master/storybench_R/dplyr_4_wrangling/data%20manipulation%20with%20dplyr.Rmd#mutate" aria-hidden="true"></a><code>mutate()</code></h3>
+<p>Often times you’ll want to create a new variable based on existing variables. We will create a new variable called (<code>new_2010</code>) and base it on songs that were released before or after&nbsp;<code>2010</code>. A song will be considered new if it was released on or after 2010, and not new if it was before 2010. In order to do this we will need to introduce another handy tool for creating new variables,&nbsp;<code>if_else</code>.</p>
+<p>The components to this function are pretty straightforward.</p>
+<div class="highlight highlight-source-r">
+<pre>if_else(<span class="pl-smi">condition</span>, <span class="pl-smi">true</span>, <span class="pl-smi">false</span>, <span class="pl-v">missing</span> <span class="pl-k">=</span> <span class="pl-c1">NULL</span>)</pre>
+</div>
+<p>It takes a condition, evaluates it, then returns a value based on it being true or false.</p>
+<pre lang="{r"><code>hiphop %&gt;% 
+    mutate(new_2010 = 
+       if_else(date &gt;= 2010, "new song", "not new")) %&gt;% 
+    glimpse()
+</code></pre>
+<p><em><strong>NOTE</strong></em>: Avoid using periods (<code>.</code>) in the names of variables (or anything in R, really) because it can mess with R’s programming model. Either use&nbsp;<code>snake_case</code>&nbsp;or&nbsp;<code>CamelCase</code>, but try to pick one and stick with it so its easier for people to follow.</p>
+<p>This is helpful, but most of these data are text. The article categorized the mentions of candidates by their&nbsp;<code>sentiment</code>&nbsp;(“negative”, “neutral”, “positive”), but what if we also wanted to see if the lyrics contained obscenities (specifically, the word “fuck.”).</p>
+<p>This isn’t just out of a juvenile interest in vulgar and lewd language. The use of obscene language has been used as a reason for certain albums to be censored or receive a “Parental Advisory: Explicit Content” label (see&nbsp;<a href="https://www.washingtonpost.com/news/the-fix/wp/2015/06/11/25-years-ago-2-live-crew-were-arrested-for-obscenity-heres-the-fascinating-back-story/?utm_term=.55be8ee13725">2 Live Crew</a>).</p>
+<p>I want to know how the use of the word “fuck” relates to the three categories of&nbsp;<code>sentiment</code>. I can do this by creating a new variable called&nbsp;<code>lewd_lang</code>&nbsp;that has the values “fucks” and “zero fucks”.</p>
+<p>We will use the&nbsp;<code>mutate()</code>&nbsp;function, and also introduce the&nbsp;<code>grepl</code>&nbsp;function for dealing with text variables. Read about&nbsp;<code>grepl</code>.</p>
+<div class="highlight highlight-source-r">
+<pre>grepl(<span class="pl-smi">pattern</span>, <span class="pl-smi">x</span>, <span class="pl-v">ignore.case</span> <span class="pl-k">=</span> <span class="pl-c1">FALSE</span>, <span class="pl-v">perl</span> <span class="pl-k">=</span> <span class="pl-c1">FALSE</span>,
+      <span class="pl-v">fixed</span> <span class="pl-k">=</span> <span class="pl-c1">FALSE</span>, <span class="pl-v">useBytes</span> <span class="pl-k">=</span> <span class="pl-c1">FALSE</span>)</pre>
+</div>
+<p>“search for matches to argument&nbsp;<code>pattern</code>&nbsp;within each element of a character vector”</p>
+<p>We will use the&nbsp;<code>grepl</code>&nbsp;command with&nbsp;<code>if_else</code>, but also use the&nbsp;<code>filter</code>&nbsp;function to return the observations with lewd language.</p>
+<pre lang="{r"><code>hiphop %&gt;% 
+    mutate(lewd_lang = 
+               if_else(grepl("fuck", line), 
+                            "fucks", "zero fucks")) %&gt;% 
+                filter(lewd_lang == "fucks") %&gt;% glimpse()
+</code></pre>
+<p>Now, the final command we will use can give us a cross-tabulation of how many songs contained lewd language by their sentiment (i.e “negative”, “neutral”, or “positive”).</p>
+<h3><a id="user-content-count" class="anchor" href="https://github.com/mjfrigaard/my_r_projects/blob/master/storybench_R/dplyr_4_wrangling/data%20manipulation%20with%20dplyr.Rmd#count" aria-hidden="true"></a><code>count()</code></h3>
+<p>The&nbsp;<code>count()</code>&nbsp;function is one you’ll use constantly if you deal with categorical or nominal variables (i.e. non-numeric values).&nbsp;<code>count()</code>&nbsp;actually combines three functions,&nbsp;<code>group_by()</code>,&nbsp;<code>tally()</code>, and&nbsp;<code>ungroup()</code>.</p>
+<p>When we use&nbsp;<code>count()</code>&nbsp;with one variable, we get the relative distribution in each value (or level) of the variable. We can test this new function out on the&nbsp;<code>theme</code>&nbsp;variable.</p>
+<p><code>theme</code>&nbsp;= “Theme of lyric”</p>
+<pre lang="{r"><code>hiphop %&gt;% 
+    count(theme)
+</code></pre>
+<p><a href="https://twitter.com/JennyBryan">Jenny Bryan</a>&nbsp;was nice enough to compile a list of methods from a&nbsp;<a href="https://twitter.com/JennyBryan/status/599379158452416512">tweet</a>&nbsp;for creating cross tabulations. Feel free to experiment with all of them (found&nbsp;<a href="https://gist.github.com/jennybc/04b71bfaaf0f88d9d2eb">here</a>)</p>
+<p>For example, we can get a cross tabulation using a function from the&nbsp;<code>tidyr</code>&nbsp;function (<code>spread()</code>) we covered in the last tutorial.</p>
+<pre lang="{r"><code>hiphop %&gt;% 
+    mutate(lewd_lang = 
+    if_else(grepl("fuck", line), 
+                  "fucks", "zero fucks")) %&gt;% 
+    count(sentiment, lewd_lang) %&gt;% 
+    spread(sentiment, n)
+</code></pre>
+<p>We can extend this further and use&nbsp;<code>mutate()</code>&nbsp;with the&nbsp;<code>prop.table</code>&nbsp;function to get relative the percentages in each category.</p>
+<pre lang="{r"><code>hiphop %&gt;% 
+    mutate(lewd_lang = 
+    if_else(grepl("fuck", line), 
+                  "fucks", "zero fucks")) %&gt;% 
+    count(sentiment, lewd_lang) %&gt;% 
+    mutate(prop = prop.table(n)) %&gt;% 
+    spread(sentiment, n)</code></pre>
+<div class="saboxplugin-wrap">
+<div class="saboxplugin-gravatar"><img src="./How to manipulate data with dplyr in R - Storybench_files/mf-final-e1547782943752-150x150.jpg" width="100" height="100" alt="Martin Frigaard" class="avatar avatar-100 wp-user-avatar wp-user-avatar-100 alignnone photo"></div>
+<div class="saboxplugin-authorname"><a href="http://www.storybench.org/author/martinfri/">Martin Frigaard</a></div>
+<div class="saboxplugin-desc">
+<div class="vcard author"><span class="fn">Martin Frigaard is a tidyverse/R trainer in Oakland, CA. Find him on <a href="https://twitter.com/mjfrigaard">Twitter</a>.</span></div>
+</div>
+<div class="clearfix"></div>
+<div class="saboxplugin-socials "></div>
+</div>
+			</div><!-- .entry-content -->
+
+	<footer class="entry-footer">
+		<span class="tags-post">Tagged <a href="http://www.storybench.org/tag/data-journalism/" rel="tag">data journalism</a> <a href="http://www.storybench.org/tag/dplyr/" rel="tag">dplyr</a> <a href="http://www.storybench.org/tag/dplyr-tutorial/" rel="tag">dplyr tutorial</a> <a href="http://www.storybench.org/tag/r/" rel="tag">R</a> <a href="http://www.storybench.org/tag/r-for-journalism/" rel="tag">r for journalism</a> <a href="http://www.storybench.org/tag/rstats/" rel="tag">rstats</a></span>	</footer><!-- .entry-footer -->
+</article><!-- #post-## -->
+
+			
+	<nav class="navigation post-navigation" role="navigation">
+		<h2 class="screen-reader-text">Post navigation</h2>
+		<div class="nav-links"><div class="nav-previous"><a href="http://www.storybench.org/5-digital-practices-every-local-tv-station-should-be-thinking-about/" rel="prev">5 digital practices every local TV station should be thinking about</a></div><div class="nav-next"><a href="http://www.storybench.org/marshall-project-revealed-racial-disparities-justifiable-homicides/" rel="next">How The Marshall Project revealed racial disparities in “justifiable” homicides</a></div></div>
+	</nav>
+			
+<div id="comments" class="comments-area comment-post">
+
+	
+	
+	
+		<div id="respond" class="comment-respond">
+		<h3 id="reply-title" class="comment-reply-title">Leave a Reply <small><a rel="nofollow" id="cancel-comment-reply-link" href="http://www.storybench.org/how-to-manipulate-data-with-dplyr-in-r/#respond" style="display:none;">Cancel reply</a></small></h3>			<form action="http://www.storybench.org/wp-comments-post.php" method="post" id="commentform" class="comment-form" novalidate="">
+				<p class="logged-in-as"><a href="http://www.storybench.org/wp-admin/profile.php" aria-label="Logged in as Martin Frigaard. Edit your profile.">Logged in as Martin Frigaard</a>. <a href="http://www.storybench.org/storybenchr?action=logout&amp;redirect_to=http%3A%2F%2Fwww.storybench.org%2Fhow-to-manipulate-data-with-dplyr-in-r%2F&amp;_wpnonce=2ab49c227d">Log out?</a></p><p class="comment-form-comment"><label for="comment">Comment</label> <textarea id="comment" name="comment" cols="45" rows="8" maxlength="65525" required="required"></textarea></p><p class="form-submit"><input name="submit" type="submit" id="submit" class="submit" value="Post Comment"> <input type="hidden" name="comment_post_ID" value="7009" id="comment_post_ID">
+<input type="hidden" name="comment_parent" id="comment_parent" value="0">
+</p><p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="eec09120c6"></p><p style="display: none;"></p>			<input type="hidden" id="ak_js" name="ak_js" value="1547897764767"></form>
+			</div><!-- #respond -->
+	
+</div><!-- #comments -->
+
+		
+		</main><!-- #main -->
+	</div><!-- #primary -->
+
+
+<div id="secondary" class="sidebar col-md-4" role="complementary">
+	<aside id="text-35" class="widget widget_text"><h5 class="widget-title">Join us at Northeastern!</h5>			<div class="textwidget"><p><img class="aligncenter size-medium wp-image-10069" src="./How to manipulate data with dplyr in R - Storybench_files/poster_mi2_v2-386x500.jpeg" alt="" width="386" height="500"></p>
+<p>Want to write for <em>Storybench</em> and probe the frontiers of media innovation? <a href="https://www.northeastern.edu/graduate/program/master-of-arts-in-journalism-media-innovation-track-5228/">Apply</a> for one of our graduate programs at Northeastern University’s <a href="http://camd.northeastern.edu/journalism/">School of Journalism</a>.</p>
+<p>Rolling admissions, no GREs required and financial aid available. Email <a href="mailto:a.bajak@neu.edu">here</a>.</p>
+</div>
+		</aside><aside id="text-12" class="widget widget_text"><h5 class="widget-title">Subscribe to our newsletter</h5>			<div class="textwidget"><form style="border:0px solid #ccc;padding:3px;text-align:center;" action="https://tinyletter.com/storybench" method="post" target="popupwindow" onsubmit="window.open(&#39;https://tinyletter.com/storybench&#39;, &#39;popupwindow&#39;, &#39;scrollbars=yes,width=800,height=600&#39;);return true"><p><label for="tlemail" style="font-family: &#39;Open Sans&#39;, sans-serif;"></label></p><p><input type="text" style="width:250px; height: 20px; " name="email" id="tlemail"></p><input type="hidden" value="1" name="embed"><br><input type="submit" value="Subscribe" style="margin: 0 auto;"></form></div>
+		</aside><aside id="text-13" class="widget widget_text"><h5 class="widget-title">Storybench on Twitter</h5>			<div class="textwidget"><iframe id="twitter-widget-0" scrolling="no" frameborder="0" allowtransparency="true" allowfullscreen="true" class="twitter-timeline twitter-timeline-rendered" style="position: static; visibility: visible; display: inline-block; width: 520px; height: 600px; padding: 0px; border: none; max-width: 100%; min-width: 180px; margin-top: 0px; margin-bottom: 0px; min-height: 200px;" data-widget-id="profile:storybench" title="Twitter Timeline" src="./How to manipulate data with dplyr in R - Storybench_files/saved_resource.html"></iframe> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+         
+</div>
+		</aside><aside id="text-24" class="widget widget_text"><h5 class="widget-title">Collaborative, Open, Mobile</h5>			<div class="textwidget"><p>Over the last three years, <em>Storybench</em>&nbsp;has interviewed <a href="https://docs.google.com/spreadsheets/d/12STyymd0aWSzMlksCHmhmMqUkNConUFHXDaUV-oydIg/pubhtml">72</a> data journalists, web developers, interactive graphics editors, and project managers from around the world to provide an “under the hood” look at the ingredients and best practices that go into today’s most compelling digital storytelling projects.</p>
+<p>They boil down to three key areas of emphasis: 1) highly networked, team-based collaboration; 2) an ethos of open-source sharing, both within and between newsrooms; 3) and mobile-driven story presentation. Read our paper&nbsp;<a href="http://www.storybench.org/learned-three-years-interviews-data-journalists-web-developers-interactive-editors-leading-digital-newsrooms/">here</a>.</p>
+<p><a href="http://www.storybench.org/learned-three-years-interviews-data-journalists-web-developers-interactive-editors-leading-digital-newsrooms/"><img src="./How to manipulate data with dplyr in R - Storybench_files/collabopenmobile.png" style="padding: 15px 15px 15px 15px;"></a></p>
+</div>
+		</aside><aside id="text-15" class="widget widget_text"><h5 class="widget-title">What is Storybench?</h5>			<div class="textwidget"><em>Storybench</em> takes an “under the hood” look at the latest in digital storytelling, from data viz and investigative journalism to VR and digital humanities. In addition to in-depth interviews with industry practitioners, we offer hands-on tutorials that can be “downloaded” right into the classroom or newsroom.
+<br><br>
+Want to contribute to <em>Storybench</em>?  <a href="mailto:storybench@gmail.com">Pitch us</a> or join us for a graduate degree in the <a href="http://northeastern.edu/mi" target="_blank">Media Innovation</a> program at Northeastern University’s School of Journalism.</div>
+		</aside><aside id="text-20" class="widget widget_text">			<div class="textwidget"><a href="http://www.storybench.org/category/tvnews/"><img src="./How to manipulate data with dplyr in R - Storybench_files/reinventingTV-1.png" style="margin-bottom: 15px;"></a>
+The <a href="http://www.storybench.org/category/tvnews/" target="_blank">Reinventing Local TV News Project</a>, from Northeastern's School of Journalism, is looking hard at the formats and practices of local news stations, and suggesting new ways of telling stories that can better engage diverse audiences. Read our inaugural post <a href="http://www.storybench.org/reinventing-local-tv-news-video-storytelling-kicking-off-new-northeastern-research-project/" target="_blank">here</a>.</div>
+		</aside><aside id="tag_cloud-3" class="widget widget_tag_cloud"><h5 class="widget-title">Tags</h5><div class="tagcloud"><a href="http://www.storybench.org/tag/360-video/" class="tag-cloud-link tag-link-616 tag-link-position-1" style="font-size: 9.0888888888889pt;" aria-label="360 video (6 items)">360 video</a>
+<a href="http://www.storybench.org/tag/audience-engagement/" class="tag-cloud-link tag-link-516 tag-link-position-2" style="font-size: 8pt;" aria-label="audience engagement (5 items)">audience engagement</a>
+<a href="http://www.storybench.org/tag/augmented-reality/" class="tag-cloud-link tag-link-1083 tag-link-position-3" style="font-size: 10.644444444444pt;" aria-label="Augmented Reality (8 items)">Augmented Reality</a>
+<a href="http://www.storybench.org/tag/boston-globe/" class="tag-cloud-link tag-link-446 tag-link-position-4" style="font-size: 12.666666666667pt;" aria-label="boston globe (11 items)">boston globe</a>
+<a href="http://www.storybench.org/tag/climate-change/" class="tag-cloud-link tag-link-868 tag-link-position-5" style="font-size: 11.422222222222pt;" aria-label="climate change (9 items)">climate change</a>
+<a href="http://www.storybench.org/tag/d3/" class="tag-cloud-link tag-link-393 tag-link-position-6" style="font-size: 8pt;" aria-label="D3 (5 items)">D3</a>
+<a href="http://www.storybench.org/tag/data/" class="tag-cloud-link tag-link-649 tag-link-position-7" style="font-size: 12.666666666667pt;" aria-label="data (11 items)">data</a>
+<a href="http://www.storybench.org/tag/data-journalism/" class="tag-cloud-link tag-link-566 tag-link-position-8" style="font-size: 16.711111111111pt;" aria-label="data journalism (21 items)">data journalism</a>
+<a href="http://www.storybench.org/tag/data-visualization/" class="tag-cloud-link tag-link-158 tag-link-position-9" style="font-size: 22pt;" aria-label="data visualization (47 items)">data visualization</a>
+<a href="http://www.storybench.org/tag/dataviz/" class="tag-cloud-link tag-link-51 tag-link-position-10" style="font-size: 13.755555555556pt;" aria-label="dataviz (13 items)">dataviz</a>
+<a href="http://www.storybench.org/tag/design/" class="tag-cloud-link tag-link-9 tag-link-position-11" style="font-size: 9.0888888888889pt;" aria-label="design (6 items)">design</a>
+<a href="http://www.storybench.org/tag/digital-humanities/" class="tag-cloud-link tag-link-347 tag-link-position-12" style="font-size: 8pt;" aria-label="digital humanities (5 items)">digital humanities</a>
+<a href="http://www.storybench.org/tag/documentary/" class="tag-cloud-link tag-link-712 tag-link-position-13" style="font-size: 10.644444444444pt;" aria-label="documentary (8 items)">documentary</a>
+<a href="http://www.storybench.org/tag/donald-trump/" class="tag-cloud-link tag-link-662 tag-link-position-14" style="font-size: 12.666666666667pt;" aria-label="Donald Trump (11 items)">Donald Trump</a>
+<a href="http://www.storybench.org/tag/fivethirtyeight/" class="tag-cloud-link tag-link-1521 tag-link-position-15" style="font-size: 9.0888888888889pt;" aria-label="FiveThirtyEight (6 items)">FiveThirtyEight</a>
+<a href="http://www.storybench.org/tag/hackathon/" class="tag-cloud-link tag-link-363 tag-link-position-16" style="font-size: 8pt;" aria-label="hackathon (5 items)">hackathon</a>
+<a href="http://www.storybench.org/tag/interactive/" class="tag-cloud-link tag-link-761 tag-link-position-17" style="font-size: 9.0888888888889pt;" aria-label="interactive (6 items)">interactive</a>
+<a href="http://www.storybench.org/tag/journalism/" class="tag-cloud-link tag-link-10 tag-link-position-18" style="font-size: 19.822222222222pt;" aria-label="journalism (34 items)">journalism</a>
+<a href="http://www.storybench.org/tag/journalism-school/" class="tag-cloud-link tag-link-375 tag-link-position-19" style="font-size: 8pt;" aria-label="journalism school (5 items)">journalism school</a>
+<a href="http://www.storybench.org/tag/local-tv-news/" class="tag-cloud-link tag-link-1108 tag-link-position-20" style="font-size: 11.422222222222pt;" aria-label="local tv news (9 items)">local tv news</a>
+<a href="http://www.storybench.org/tag/map/" class="tag-cloud-link tag-link-394 tag-link-position-21" style="font-size: 8pt;" aria-label="map (5 items)">map</a>
+<a href="http://www.storybench.org/tag/media-innovation/" class="tag-cloud-link tag-link-207 tag-link-position-22" style="font-size: 9.0888888888889pt;" aria-label="media innovation (6 items)">media innovation</a>
+<a href="http://www.storybench.org/tag/media-watch/" class="tag-cloud-link tag-link-1251 tag-link-position-23" style="font-size: 10.644444444444pt;" aria-label="media watch (8 items)">media watch</a>
+<a href="http://www.storybench.org/tag/new-york-times/" class="tag-cloud-link tag-link-657 tag-link-position-24" style="font-size: 15.777777777778pt;" aria-label="New York Times (18 items)">New York Times</a>
+<a href="http://www.storybench.org/tag/northeastern/" class="tag-cloud-link tag-link-801 tag-link-position-25" style="font-size: 15pt;" aria-label="northeastern (16 items)">northeastern</a>
+<a href="http://www.storybench.org/tag/northeastern-journalism/" class="tag-cloud-link tag-link-17 tag-link-position-26" style="font-size: 12.044444444444pt;" aria-label="northeastern journalism (10 items)">northeastern journalism</a>
+<a href="http://www.storybench.org/tag/northeastern-school-of-journalism/" class="tag-cloud-link tag-link-1253 tag-link-position-27" style="font-size: 12.044444444444pt;" aria-label="northeastern school of journalism (10 items)">northeastern school of journalism</a>
+<a href="http://www.storybench.org/tag/northeastern-university/" class="tag-cloud-link tag-link-28 tag-link-position-28" style="font-size: 10.644444444444pt;" aria-label="northeastern university (8 items)">northeastern university</a>
+<a href="http://www.storybench.org/tag/nuvis/" class="tag-cloud-link tag-link-805 tag-link-position-29" style="font-size: 10.644444444444pt;" aria-label="nuvis (8 items)">nuvis</a>
+<a href="http://www.storybench.org/tag/photography/" class="tag-cloud-link tag-link-418 tag-link-position-30" style="font-size: 9.0888888888889pt;" aria-label="photography (6 items)">photography</a>
+<a href="http://www.storybench.org/tag/photojournalism/" class="tag-cloud-link tag-link-334 tag-link-position-31" style="font-size: 9.0888888888889pt;" aria-label="photojournalism (6 items)">photojournalism</a>
+<a href="http://www.storybench.org/tag/pizzapress/" class="tag-cloud-link tag-link-1865 tag-link-position-32" style="font-size: 10.644444444444pt;" aria-label="pizzapress (8 items)">pizzapress</a>
+<a href="http://www.storybench.org/tag/pizzapresspolitics/" class="tag-cloud-link tag-link-1892 tag-link-position-33" style="font-size: 12.044444444444pt;" aria-label="pizzapresspolitics (10 items)">pizzapresspolitics</a>
+<a href="http://www.storybench.org/tag/podcasting/" class="tag-cloud-link tag-link-608 tag-link-position-34" style="font-size: 9.8666666666667pt;" aria-label="podcasting (7 items)">podcasting</a>
+<a href="http://www.storybench.org/tag/propublica/" class="tag-cloud-link tag-link-619 tag-link-position-35" style="font-size: 12.044444444444pt;" aria-label="propublica (10 items)">propublica</a>
+<a href="http://www.storybench.org/tag/python/" class="tag-cloud-link tag-link-739 tag-link-position-36" style="font-size: 9.8666666666667pt;" aria-label="python (7 items)">python</a>
+<a href="http://www.storybench.org/tag/r/" class="tag-cloud-link tag-link-1126 tag-link-position-37" style="font-size: 16.088888888889pt;" aria-label="R (19 items)">R</a>
+<a href="http://www.storybench.org/tag/reinventing-local-tv-news/" class="tag-cloud-link tag-link-994 tag-link-position-38" style="font-size: 9.0888888888889pt;" aria-label="reinventing local tv news (6 items)">reinventing local tv news</a>
+<a href="http://www.storybench.org/tag/rstats/" class="tag-cloud-link tag-link-991 tag-link-position-39" style="font-size: 13.755555555556pt;" aria-label="rstats (13 items)">rstats</a>
+<a href="http://www.storybench.org/tag/social-media/" class="tag-cloud-link tag-link-941 tag-link-position-40" style="font-size: 9.0888888888889pt;" aria-label="Social Media (6 items)">Social Media</a>
+<a href="http://www.storybench.org/tag/sxsw/" class="tag-cloud-link tag-link-815 tag-link-position-41" style="font-size: 13.755555555556pt;" aria-label="SXSW (13 items)">SXSW</a>
+<a href="http://www.storybench.org/tag/testingground/" class="tag-cloud-link tag-link-1636 tag-link-position-42" style="font-size: 10.644444444444pt;" aria-label="TestingGround (8 items)">TestingGround</a>
+<a href="http://www.storybench.org/tag/virtual-reality/" class="tag-cloud-link tag-link-870 tag-link-position-43" style="font-size: 12.044444444444pt;" aria-label="virtual reality (10 items)">virtual reality</a>
+<a href="http://www.storybench.org/tag/visualization/" class="tag-cloud-link tag-link-655 tag-link-position-44" style="font-size: 10.644444444444pt;" aria-label="visualization (8 items)">visualization</a>
+<a href="http://www.storybench.org/tag/vr/" class="tag-cloud-link tag-link-826 tag-link-position-45" style="font-size: 11.422222222222pt;" aria-label="VR (9 items)">VR</a></div>
+</aside><aside id="categories-3" class="widget widget_categories"><h5 class="widget-title">Categories</h5>		<ul>
+	<li class="cat-item cat-item-1780"><a href="http://www.storybench.org/category/arforchange/">ARforChange</a>
+</li>
+	<li class="cat-item cat-item-289"><a href="http://www.storybench.org/category/behind-the-scenes/">Behind the scenes</a>
+</li>
+	<li class="cat-item cat-item-1830"><a href="http://www.storybench.org/category/climate-journalism-lab/">Climate Journalism Lab</a>
+</li>
+	<li class="cat-item cat-item-1481"><a href="http://www.storybench.org/category/data-journalism-in-r/">Data Journalism in R</a>
+</li>
+	<li class="cat-item cat-item-4"><a href="http://www.storybench.org/category/how-to/">How to</a>
+</li>
+	<li class="cat-item cat-item-8"><a href="http://www.storybench.org/category/vision/">Insights</a>
+</li>
+	<li class="cat-item cat-item-7"><a href="http://www.storybench.org/category/interviews/">Interviews</a>
+</li>
+	<li class="cat-item cat-item-485"><a href="http://www.storybench.org/category/ochre/">Longform</a>
+</li>
+	<li class="cat-item cat-item-1255"><a href="http://www.storybench.org/category/mediawatch/">Media Watch</a>
+</li>
+	<li class="cat-item cat-item-924"><a href="http://www.storybench.org/category/northeastern/">Northeastern</a>
+</li>
+	<li class="cat-item cat-item-995"><a href="http://www.storybench.org/category/tvnews/">Reinventing Local TV News</a>
+</li>
+	<li class="cat-item cat-item-38"><a href="http://www.storybench.org/category/clickworthy/">Roundups</a>
+</li>
+	<li class="cat-item cat-item-1734"><a href="http://www.storybench.org/category/sxsw/">SXSW</a>
+</li>
+	<li class="cat-item cat-item-6"><a href="http://www.storybench.org/category/tools/">Tools</a>
+</li>
+		</ul>
+</aside></div><!-- #secondary -->
+
+			</div>
+		</div>		
+	</div><!-- .page-content -->
+
+    <a class="go-top">
+        <i class="fa fa-angle-up"></i>
+    </a>
+
+	<footer id="colophon" class="site-info" role="contentinfo">
+		<div class="go-top2"></div>
+
+					
+
+	
+	<div id="sidebar-footer" class="footer-widgets widget-area" role="complementary">
+		<div class="container">
+							<div class="sidebar-column col-md-6">
+					<aside id="text-6" class="widget widget_text">			<div class="textwidget"><img src="./How to manipulate data with dplyr in R - Storybench_files/IIBA2015_Badge_Shortlist.png" style="height:205px;"></div>
+		</aside>				</div>
+				
+							<div class="sidebar-column col-md-6">
+					<aside id="text-9" class="widget widget_text">			<div class="textwidget"><p><img src="./How to manipulate data with dplyr in R - Storybench_files/camd.jpg"></p>
+</div>
+		</aside>				</div>
+				
+							<div class="sidebar-column col-md-6">
+									</div>
+				
+				
+		</div>	
+	</div>		
+		<div class="container">
+			<a href="http://storybench.org/">Storybench.org</a>
+			<span class="sep"> | © 2017</span>
+		</div><!-- /.container -->
+	</footer><!-- #colophon -->
+
+</div><!-- #page -->
+
+<iframe src="./How to manipulate data with dplyr in R - Storybench_files/portal.html" id="st_gdpr_iframe" style="width: 0px; height: 0px; position: absolute; left: -5000px;"></iframe><script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/form.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/admin-bar.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/core.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/widget.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/accordion.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/position.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/menu.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/wp-a11y.min.js"></script>
+<script type="text/javascript">
+/* <![CDATA[ */
+var uiAutocompleteL10n = {"noResults":"No results found.","oneResult":"1 result found. Use up and down arrow keys to navigate.","manyResults":"%d results found. Use up and down arrow keys to navigate.","itemSelected":"Item selected."};
+/* ]]> */
+</script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/autocomplete.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/button.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/datepicker.min.js"></script>
+<script type="text/javascript">
+jQuery(document).ready(function(jQuery){jQuery.datepicker.setDefaults({"closeText":"Close","currentText":"Today","monthNames":["January","February","March","April","May","June","July","August","September","October","November","December"],"monthNamesShort":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"nextText":"Next","prevText":"Previous","dayNames":["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"dayNamesShort":["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],"dayNamesMin":["S","M","T","W","T","F","S"],"dateFormat":"MM d, yy","firstDay":1,"isRTL":false});});
+</script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/mouse.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/resizable.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/draggable.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/dialog.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/droppable.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/progressbar.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/selectable.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/slider.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/spinner.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/sortable.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/tabs.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/tooltip.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/effect.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/effect-blind.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/effect-bounce.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/effect-clip.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/effect-drop.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/effect-explode.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/effect-fade.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/effect-fold.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/effect-highlight.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/effect-pulsate.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/effect-size.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/effect-scale.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/effect-shake.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/effect-slide.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/effect-transfer.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/ssba.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/jquery.fitvids.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/imagesloaded.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/main.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/skip-link-focus-fix.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/comment-reply.min.js"></script>
+<script type="text/javascript" src="./How to manipulate data with dplyr in R - Storybench_files/wp-embed.min.js"></script>
+		<div id="wpadminbar" class="">
+							<a class="screen-reader-shortcut" href="http://www.storybench.org/how-to-manipulate-data-with-dplyr-in-r/#wp-toolbar" tabindex="1">Skip to toolbar</a>
+						<div class="quicklinks" id="wp-toolbar" role="navigation" aria-label="Toolbar" tabindex="0">
+				<ul id="wp-admin-bar-root-default" class="ab-top-menu">
+		<li id="wp-admin-bar-wp-logo" class="menupop"><a class="ab-item" aria-haspopup="true" href="http://www.storybench.org/wp-admin/about.php"><span class="ab-icon"></span><span class="screen-reader-text">About WordPress</span></a><div class="ab-sub-wrapper"><ul id="wp-admin-bar-wp-logo-default" class="ab-submenu">
+		<li id="wp-admin-bar-about"><a class="ab-item" href="http://www.storybench.org/wp-admin/about.php">About WordPress</a>		</li></ul><ul id="wp-admin-bar-wp-logo-external" class="ab-sub-secondary ab-submenu">
+		<li id="wp-admin-bar-wporg"><a class="ab-item" href="https://wordpress.org/">WordPress.org</a>		</li>
+		<li id="wp-admin-bar-documentation"><a class="ab-item" href="https://codex.wordpress.org/">Documentation</a>		</li>
+		<li id="wp-admin-bar-support-forums"><a class="ab-item" href="https://wordpress.org/support/">Support Forums</a>		</li>
+		<li id="wp-admin-bar-feedback"><a class="ab-item" href="https://wordpress.org/support/forum/requests-and-feedback">Feedback</a>		</li></ul></div>		</li>
+		<li id="wp-admin-bar-site-name" class="menupop"><a class="ab-item" aria-haspopup="true" href="http://www.storybench.org/wp-admin/">Storybench</a><div class="ab-sub-wrapper"><ul id="wp-admin-bar-site-name-default" class="ab-submenu">
+		<li id="wp-admin-bar-dashboard"><a class="ab-item" href="http://www.storybench.org/wp-admin/">Dashboard</a>		</li></ul></div>		</li>
+		<li id="wp-admin-bar-comments"><a class="ab-item" href="http://www.storybench.org/wp-admin/edit-comments.php"><span class="ab-icon"></span><span class="ab-label awaiting-mod pending-count count-6" aria-hidden="true">6</span><span class="screen-reader-text">6 comments awaiting moderation</span></a>		</li>
+		<li id="wp-admin-bar-new-content" class="menupop"><a class="ab-item" aria-haspopup="true" href="http://www.storybench.org/wp-admin/post-new.php"><span class="ab-icon"></span><span class="ab-label">New</span></a><div class="ab-sub-wrapper"><ul id="wp-admin-bar-new-content-default" class="ab-submenu">
+		<li id="wp-admin-bar-new-post"><a class="ab-item" href="http://www.storybench.org/wp-admin/post-new.php">Post</a>		</li></ul></div>		</li>
+		<li id="wp-admin-bar-wpseo-menu" class="menupop"><div class="ab-item ab-empty-item" tabindex="0" aria-haspopup="true"><div id="yoast-ab-icon" class="ab-item yoast-logo svg"><span class="screen-reader-text">SEO</span></div><div class="wpseo-score-icon adminbar-seo-score na"><span class="adminbar-seo-score-text screen-reader-text"></span></div></div><div class="ab-sub-wrapper"><ul id="wp-admin-bar-wpseo-menu-default" class="ab-submenu">
+		<li id="wp-admin-bar-wpseo-kwresearch" class="menupop"><div class="ab-item ab-empty-item" tabindex="0" aria-haspopup="true">Keyword Research</div><div class="ab-sub-wrapper"><ul id="wp-admin-bar-wpseo-kwresearch-default" class="ab-submenu">
+		<li id="wp-admin-bar-wpseo-adwordsexternal"><a class="ab-item" href="http://adwords.google.com/keywordplanner" target="_blank">AdWords External</a>		</li>
+		<li id="wp-admin-bar-wpseo-googleinsights"><a class="ab-item" href="https://www.google.com/trends/explore#q=" target="_blank">Google Trends</a>		</li>
+		<li id="wp-admin-bar-wpseo-wordtracker"><a class="ab-item" href="http://tools.seobook.com/keyword-tools/seobook/?keyword=" target="_blank">SEO Book</a>		</li></ul></div>		</li>
+		<li id="wp-admin-bar-wpseo-analysis" class="menupop"><div class="ab-item ab-empty-item" tabindex="0" aria-haspopup="true">Analyze this page</div><div class="ab-sub-wrapper"><ul id="wp-admin-bar-wpseo-analysis-default" class="ab-submenu">
+		<li id="wp-admin-bar-wpseo-inlinks-ose"><a class="ab-item" href="http://moz.com/researchtools/ose/links?site=http%3A%2F%2Fwww.storybench.org%2Fhow-to-manipulate-data-with-dplyr-in-r%2F" target="_blank">Check Inlinks (OSE)</a>		</li>
+		<li id="wp-admin-bar-wpseo-kwdensity"><a class="ab-item" href="http://www.zippy.co.uk/keyworddensity/index.php?url=http%3A%2F%2Fwww.storybench.org%2Fhow-to-manipulate-data-with-dplyr-in-r%2F&amp;keyword=" target="_blank">Check Keyword Density</a>		</li>
+		<li id="wp-admin-bar-wpseo-cache"><a class="ab-item" href="http://webcache.googleusercontent.com/search?strip=1&amp;q=cache:http%3A%2F%2Fwww.storybench.org%2Fhow-to-manipulate-data-with-dplyr-in-r%2F" target="_blank">Check Google Cache</a>		</li>
+		<li id="wp-admin-bar-wpseo-header"><a class="ab-item" href="http://quixapp.com/headers/?r=http%3A%2F%2Fwww.storybench.org%2Fhow-to-manipulate-data-with-dplyr-in-r%2F" target="_blank">Check Headers</a>		</li>
+		<li id="wp-admin-bar-wpseo-structureddata"><a class="ab-item" href="https://search.google.com/structured-data/testing-tool#url=http%3A%2F%2Fwww.storybench.org%2Fhow-to-manipulate-data-with-dplyr-in-r%2F" target="_blank">Google Structured Data Test</a>		</li>
+		<li id="wp-admin-bar-wpseo-facebookdebug"><a class="ab-item" href="http://developers.facebook.com/tools/debug/og/object?q=http%3A%2F%2Fwww.storybench.org%2Fhow-to-manipulate-data-with-dplyr-in-r%2F" target="_blank">Facebook Debugger</a>		</li>
+		<li id="wp-admin-bar-wpseo-pinterestvalidator"><a class="ab-item" href="https://developers.pinterest.com/tools/url-debugger/?link=http%3A%2F%2Fwww.storybench.org%2Fhow-to-manipulate-data-with-dplyr-in-r%2F" target="_blank">Pinterest Rich Pins Validator</a>		</li>
+		<li id="wp-admin-bar-wpseo-htmlvalidation"><a class="ab-item" href="http://validator.w3.org/check?uri=http%3A%2F%2Fwww.storybench.org%2Fhow-to-manipulate-data-with-dplyr-in-r%2F" target="_blank">HTML Validator</a>		</li>
+		<li id="wp-admin-bar-wpseo-cssvalidation"><a class="ab-item" href="http://jigsaw.w3.org/css-validator/validator?uri=http%3A%2F%2Fwww.storybench.org%2Fhow-to-manipulate-data-with-dplyr-in-r%2F" target="_blank">CSS Validator</a>		</li>
+		<li id="wp-admin-bar-wpseo-pagespeed"><a class="ab-item" href="http://developers.google.com/speed/pagespeed/insights/?url=http%3A%2F%2Fwww.storybench.org%2Fhow-to-manipulate-data-with-dplyr-in-r%2F" target="_blank">Google Page Speed Test</a>		</li>
+		<li id="wp-admin-bar-wpseo-microsoftedge"><a class="ab-item" href="https://developer.microsoft.com/en-us/microsoft-edge/tools/staticscan/?url=http%3A%2F%2Fwww.storybench.org%2Fhow-to-manipulate-data-with-dplyr-in-r%2F" target="_blank">Microsoft Edge Site Scan</a>		</li>
+		<li id="wp-admin-bar-wpseo-google-mobile-friendly"><a class="ab-item" href="https://www.google.com/webmasters/tools/mobile-friendly/?url=http%3A%2F%2Fwww.storybench.org%2Fhow-to-manipulate-data-with-dplyr-in-r%2F" target="_blank">Mobile-Friendly Test</a>		</li></ul></div>		</li></ul></div>		</li></ul><ul id="wp-admin-bar-top-secondary" class="ab-top-secondary ab-top-menu">
+		<li id="wp-admin-bar-search" class="admin-bar-search"><div class="ab-item ab-empty-item" tabindex="-1"><form action="http://www.storybench.org/" method="get" id="adminbarsearch"><input class="adminbar-input" name="s" id="adminbar-search" type="text" value="" maxlength="150"><label for="adminbar-search" class="screen-reader-text">Search</label><input type="submit" class="adminbar-button" value="Search"></form></div>		</li>
+		<li id="wp-admin-bar-my-account" class="menupop with-avatar"><a class="ab-item" aria-haspopup="true" href="http://www.storybench.org/wp-admin/profile.php">Howdy, <span class="display-name">Martin Frigaard</span><img src="./How to manipulate data with dplyr in R - Storybench_files/mf-final-e1547782943752-150x150.jpg" width="26" height="26" alt="Martin Frigaard" class="avatar avatar-26 wp-user-avatar wp-user-avatar-26 alignnone photo"></a><div class="ab-sub-wrapper"><ul id="wp-admin-bar-user-actions" class="ab-submenu">
+		<li id="wp-admin-bar-user-info"><a class="ab-item" tabindex="-1" href="http://www.storybench.org/wp-admin/profile.php"><img src="./How to manipulate data with dplyr in R - Storybench_files/mf-final-e1547782943752-150x150.jpg" width="64" height="64" alt="Martin Frigaard" class="avatar avatar-64 wp-user-avatar wp-user-avatar-64 alignnone photo"><span class="display-name">Martin Frigaard</span><span class="username">martinfri</span></a>		</li>
+		<li id="wp-admin-bar-edit-profile"><a class="ab-item" href="http://www.storybench.org/wp-admin/profile.php">Edit My Profile</a>		</li>
+		<li id="wp-admin-bar-logout"><a class="ab-item" href="http://www.storybench.org/storybenchr?action=logout&amp;_wpnonce=2ab49c227d">Log Out</a>		</li></ul></div>		</li></ul>			</div>
+						<a class="screen-reader-shortcut" href="http://www.storybench.org/storybenchr?action=logout&amp;_wpnonce=2ab49c227d">Log Out</a>
+					</div>
+
+		
+
+
+<div role="log" aria-live="assertive" aria-relevant="additions" class="ui-helper-hidden-accessible"></div><div id="wp-a11y-speak-polite" aria-live="polite" aria-relevant="additions text" aria-atomic="true" class="screen-reader-text wp-a11y-speak-region"></div><div id="wp-a11y-speak-assertive" aria-live="assertive" aria-relevant="additions text" aria-atomic="true" class="screen-reader-text wp-a11y-speak-region"></div><iframe scrolling="no" frameborder="0" allowtransparency="true" src="./How to manipulate data with dplyr in R - Storybench_files/widget_iframe.a600a62a1c92aa33bb89e73fa1e8b3b3.html" title="Twitter settings iframe" style="display: none;"></iframe><div id="fb-root" class=" fb_reset"><div style="position: absolute; top: -10000px; width: 0px; height: 0px;"><div><iframe name="fb_xdm_frame_https" frameborder="0" allowtransparency="true" allowfullscreen="true" scrolling="no" allow="encrypted-media" id="fb_xdm_frame_https" aria-hidden="true" title="Facebook Cross Domain Communication Frame" tabindex="-1" src="./How to manipulate data with dplyr in R - Storybench_files/j-GHT1gpo6-.html" style="border: none;"></iframe></div><div></div></div></div><iframe id="rufous-sandbox" scrolling="no" frameborder="0" allowtransparency="true" allowfullscreen="true" style="position: absolute; visibility: hidden; display: none; width: 0px; height: 0px; padding: 0px; border: none;" title="Twitter analytics iframe" src="./How to manipulate data with dplyr in R - Storybench_files/saved_resource(1).html"></iframe></body></html>

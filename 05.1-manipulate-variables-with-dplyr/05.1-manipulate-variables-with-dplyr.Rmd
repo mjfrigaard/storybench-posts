@@ -1,5 +1,5 @@
 ---
-title: "How to manipulate data with dplyr in R"
+title: "How to manipulate variables with dplyr in R (part 1)"
 author: "Martin Frigaard"
 date: "2017-08-30"
 output: 
@@ -376,6 +376,17 @@ knitr::include_graphics(path = "https://media.giphy.com/media/2wX2jnNj5Z7OkBrsaq
 
 The output for each `dplyr::count()` contains two numbers: the total answers to a particular response (like `Father or father figure(s)` or `Pop culture`), and the total of `Not selected` for that response. 
 
+## Change an existing variable
+
+Often I need to change the format of an exisitng variable in a data frame. This can be done using `dplyr::mutate()` and the equals sign `=`. For example, I notice the `id` variable is formatted as a double, but I want it to be an integer. I can do this with `dplyr::mutate()` and `as.integer()`
+
+```{r as.integer-id}
+MascSurveyData <- MascSurveyData %>% 
+    dplyr::mutate(id = as.integer(id))
+MascSurveyData$id %>% dplyr::glimpse(78)
+```
+
+
 ## Creating new variables (1 condition)
 
 Now that I'm getting a better understanding of how the survey data are structured in the raw data set, I can begin to create new variables to suit my needs. For example, the article mentions collapsing two response categories into a single statistic. 
@@ -543,10 +554,6 @@ dplyr::mutate(
     masc_scale = dplyr::case_when( ...)
 ```
 
-```{r id-integer, echo=FALSE}
-MascSurveyData <- MascSurveyData %>% dplyr::mutate(id = as.integer(id))
-```
-
 
 There are three additional variants of `mutate()` I will briefly cover below.
 
@@ -590,8 +597,40 @@ MascSurveyData %>%
     dplyr::pull(weight) %>% utils::head()
 ```
 
-```{r apply-mutations}
+```{r apply-mutations, echo=FALSE, results='hide'}
+# masc_ind ----
+MascSurveyData <- MascSurveyData %>% 
+    dplyr::mutate(masc_ind = 
+        dplyr::if_else(
+            condition = how_masc %in% c("Very masculine", 
+                                             "Somewhat masculine"),
+                 true = TRUE,
+                 false = FALSE,
+                 missing = NA)) 
 
+MascSurveyData <- MascSurveyData %>% 
+dplyr::mutate(masc_scale = dplyr::case_when(
+# masc_scale ----
+# feel very masculine and always pays for dates
+how_masc == "Very masculine" & q0018 == "Always" ~ "high",
+
+
+# feel somewhat masculine and often/sometimes pay for dates
+how_masc == "Somewhat masculine" & q0018 %in% c("Often", 
+                                                "Sometimes") ~ "moderate",
+
+
+# feel not very/not at all masculine and rarely/never pay for dates
+how_masc %in% c("Not very masculine", 
+                "Not at all masculine") & q0018 %in% c("Rarely", 
+                                                       "Never") ~ "low",
+
+
+how_masc == "No answer" & q0018 == "No answer" ~ NA_character_))
+# format dates ---
+MascSurveyData <- MascSurveyData %>% 
+    dplyr::mutate_at(vars(matches("date")), lubridate::mdy_hm)
+MascSurveyData %>% dplyr::glimpse(78)
 ```
 
 
