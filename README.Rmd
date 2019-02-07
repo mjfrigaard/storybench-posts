@@ -68,7 +68,7 @@ We don't have anything on this explicitly, but now there are enough bells and wh
 
 Include a link to pandoc markdown, basic table formatting, bullets, bold, italics, etc.
 
-**Tutorial**: [http://www.storybench.org/getting-started-r-rstudio-notebooks/](http://www.storybench.org/getting-started-r-rstudio-notebooks/) 
+Tutorial: [http://www.storybench.org/getting-started-r-rstudio-notebooks/](http://www.storybench.org/getting-started-r-rstudio-notebooks/) 
 
 ## 2) Getting Started with tidyverse in R
 
@@ -230,7 +230,7 @@ Continue with survey data from fivethirtyeight's [Github account](https://github
 
 raw masculinity [survey data](https://github.com/fivethirtyeight/data/blob/master/masculinity-survey/raw-responses.csv).
 
-## 6) **Getting started with data visualization in R using ggplot2 (part **2** of visualize with ggplot2)**
+## 6) Getting started with data visualization in R using ggplot2 (part 2 of visualize with ggplot2)
 
 Second part of the ggplot2 tutorial. This adds multivariate plots, themes, and maps. First objective is to provide lots of code and examples of customizing ggplot2 with layers, second is to understand how facetting can aid in understanding variation.  
 
