@@ -23,6 +23,8 @@ from [Renato Magini](https://github.com/mangini).
 Below is the general outline for these tutorials. More lessons are added
 as new packages come out or better workflows/methods are discovered.
 
+*Previous Versions are in the `archive` folder.*
+
 Table of Contents
 
 # Day 1 (section 1)

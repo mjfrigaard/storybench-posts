@@ -23,6 +23,8 @@ This document is also maintained in this [Google Doc](http://bit.ly/gdocstoryben
 
 Below is the general outline for these tutorials. More lessons are added as new packages come out or better workflows/methods are discovered. 
 
+*Previous Versions are in the `archive` folder.*
+
 Table of Contents
 
 # Day 1 (section 1)
