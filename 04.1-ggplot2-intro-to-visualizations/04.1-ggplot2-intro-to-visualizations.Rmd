@@ -1,0 +1,126 @@
+---
+title: "Getting started with data visualization in R using ggplot2 (part 1)"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(magrittr)
+# create image folder ----
+if (!file.exists("images/")) {
+    dir.create("images/")
+}
+# create data folder ----
+if (!file.exists("data/")) {
+    dir.create("data/")
+}
+# knitr settings ------
+knitr::opts_chunk$set(
+    echo = TRUE, # show all code
+    tidy = FALSE, # cleaner code printing
+    size = "small",
+    fig.path = "images/") # smaller code
+knitr::opts_knit$set(
+    width = 78)
+base::options(tibble.print_max = 25,
+              tibble.width = 78)
+```
+
+Creating a customized graph that communicates your ideas effectively can be challenging. This tutorial will introduce you to the popular R package ggplot2, its underlying grammar of graphics, and show you how to create stylish and simple graphs quickly. We will also go over some basic principles of data visualization.
+
+Spending some time thinking about the structure/arrangement of your data set will help you produce a better visualization, and we have covered some everyday data wrangling tasks in these previous tutorials:
+
+1. Getting started with RStudio Notebooks for reproducible reporting
+2. Tidying data and the tidyverse
+3. Exploring data using FiveThirtyEight’s R package
+4. Manipulating data using the dplyr package
+
+## Start your data visualizations with a pen and paper
+
+The best place to start with any visualization is with a pen and paper sketch. I’ve found removing the confines of any particular software or programming language and brainstorming on paper helps get the first bad ideas out of the way. After I have an outline or sketch of the visualization I want to create, I figure out the details within whatever computer/software environment I’m using. I find this much more helpful than jumping in and programming from scratch – it’s much harder to end up in the right place if you have no idea where you’re going.
+
+## Graphs and comedy
+
+My goal when I create a graph or visualization is to communicate an idea or some information about the underlying data (i.e., the differences, patterns, etc.) with a minimal amount additional explanation. In many ways, good graphics are like well-written jokes; if I have to explain a joke, it loses the desired effect. You’ve heard the phrase, “a picture is worth a thousand words.” Well, if I want the picture (i.e., the visualization), I create to be worth 1,000 words, any additional explanation I have to provide diminishes that word value.
+
+Graphs are also similar to jokes in that you should know your audience before delivering either. Thanksgiving dinner at your in-law’s house probably isn’t the place for Redd Foxx’s “What’s the difference between a pickpocket and a peeping tom?",  but you might get away with Abbott & Costello’s, “Who’s on first?” 
+
+Telling jokes to the wrong audience can be awkward (or even volatile) because 1) it failed to make the material relevant and funny, or 2) you unknowingly encroached on a sensitive topic. Showing a visualization to the wrong audience is more akin to the first mistake (resulting in crickets, blank stares, or just being overlooked), but the second isn’t impossible. After all, data is information, so it’s a good idea to think about how a visualization you’re sharing will fit into your audience’s world view.
+
+## Share selectively & often
+
+The comedian Jamie Foxx said he tests out his new stand-up material on his family before using it on stage. Beta testing rough jokes like this on an audience you trust enough to give you honest feedback is a great way to refine your work. That is also an excellent way to improve the reception of your data visualizations. By sending early drafts to friends and colleagues, you’re getting a fresh set of eyes on the graphs you’ve created to see if they’re communicating your ideas effectively.
+
+The final similarity between jokes and data visualizations is their ability to influence their audience. Data visualizations from journalists like Alberto Cairo, Mona Chalabi, and Jeremy Singer-Vine have incited countless readers to demand that evidence accompanies journalism. The current media technology landscape continues to create opportunities for people to look at data and in new and compelling ways.
+
+Many jokes are funny because they present an uncomfortable truth in a novel and entertaining way. Facts are more accessible to digest when presented in jest (i.e., *it's funny because it's true*). I like to keep this as a standard for visualizations--*a good visualization makes the truth easier to comprehend*. After all, the goal here is communication, so anything short of comprehension by the intended audience is a failure.
+
+Three goals for your data visualization or graph: 1) your audience sees your finished work (so you have to complete it), 2) everyone in the intended audience understands the ideas or information you’re trying to convey, and 3) you present the data to your audience in a novel/entertaining way.
+
+## Communicating numbers with graphs
+
+In 1985, two scientists at Bell Laboratories – William Cleveland and Robert McGill – published a paper on “visual decoding of elementary graphical-perception tasks” (i.e., which graph elements convey statistical concepts with minimal mental effort). The authors identified ten commonly used graphing components for representing numerical data. Then they ran some experiments that tested people’s ability to quickly and easily see the relevant information each graph was supposed to convey. The authors used the results from these tests to rank the graphing elements according to how accurately the patterns in the data were perceived. Their ranking is below:
+
+People could see the information and ideas in the graphs best when they were displayed using positions and geometric shapes (positioning, length, and angles). For example, the graphs below are presenting values in positions on a horizontal axis, easing our ability to make a comparison because the location of these values is on identical (but not aligned) scales.
+
+<image>
+
+Nathan Yau from Flowing Data refers to this list of elements (but also includes ‘shape’) as the visual cues in a graph or visualization. Below is a visual ranking of each item adapted from Yau’s text, Data Points. These elements are one of four visualization components he covers (the other three being a coordinate system, scale, and context).
+
+<image>
+
+Leland Wilkinson’s Grammar of Graphics presents a unique system for creating graphics in a distributed computing environment (implemented in SPSS as GPL). Hadley Wickham expanded and adapted Wilkinson’s grammar to the R language in the ggplot2 package.
+
+## Why have a grammar of graphics?
+
+Having a grammar of graphics allows us to build graphs using a standard syntax. The individual elements of each graph are like the parts of a well-written sentence. It takes a strong command of English to write clear sentences.
+
+“appreciating the engineering design behind a sentence – a linear ordering of phrases which conveys a gnarly network of ideas — is the key to understanding what you are trying to accomplish when you compose a sentence.” - Stephen Pinker
+
+`ggplot2` uses geometric objects ("geoms"), aesthetic mappings, and layers as the  “linear ordering of phrases” to build graphs “which convey a gnarly network of ideas.” The grammar provides a framework for building each graph one part at a time in sequential order (or layers).
+
+### The basic composition
+
+The composition of `ggplot2` calls have three parts:
+
+1. A data set
+2. The aesthetic mapping ( `mapping = aes()` )
+3. A geometric object ( `geom_` )
+
+In order to build a `ggplot2` figure, I like to start with a dataset (`DataSet`), then initialize the `ggplot2` object. 
+
+`Data %>% ggplot()`
+
+Then I use the `+` operator to add geoms and map aesthetics to variables (`variable_x` and `variable_y`),
+
+`Data %>% ggplot() +`
+
+  `ggplot2::geom_function(mapping = aes(x = variable_x, y = variable_y))`
+  
+The syntax above includes mapping to `x` and `y` variables, but I will start looking at graphs with only one variable to get the hang of the grammar. 
+
+## The data set
+
+We will use a variety of data sets throughout this tutorial, starting with data from the `fandango`, in the `fivethirtyeight` package. It is important to note that `ggplot2` and other packages in the `tidyverse` are designed to work with tidy data.
+
+```{r Fandango}
+library(fivethirtyeight)
+Fandango <- fivethirtyeight::fandango
+Fandango %>% glimpse(78)
+```
+
+### The aesthetic layer
+
+The pipe (`%>%`) operator makes the `ggplot` code easier to read and write by adding each layer of the graph logically like the parts of a sentence (data %>% aesthetic + geom).
+
+With the pipe we can map the aesthetic `x` to variable `fandango_stars` and create our first graph using the `ggplot2::geom_histogram()` function:
+
+```{r histogram}
+# start with the data 
+Fandango %>% 
+    # add the aesthetic mapping to the fandango_stars variable
+    ggplot2::ggplot(mapping = aes(x = fandango_ratingvalue)) +
+    # add the necessary geom
+    ggplot2::geom_freqpoly(bins = 24)
+```
+

@@ -53,6 +53,10 @@ Important things to note about the import:
 3. both dates are formatted as date-time (`col_datetime(format = "")`)
 4. the masculine indicator (`masc_ind`) is a binary (`TRUE` / `FALSE`) variable 
 
+## Extract rows by position with (slice)
+
+The `dplyr::slice()` function uses numerical indices to retrive observations from a data frame or tibble. 
+
 
 ## Filtering responses 
 
@@ -80,11 +84,13 @@ MascSurveyData %>%
 # # … with 1,398 more rows, and 95 more variables:
 ```
 
-This returns a data frame with fewer rows than the original (1,408 vs. 1,615) because this only includes the `"Straight"` respondents. 
+This returns a data frame with fewer rows than the original (1,408 vs. 1,615) because this only includes the `"Straight"` respondents.
+
+**Quick Tip #1:** Checking the dimensions of your data from time to time serves as a nice little sanity check :) 
 
 ## Filtering responses on multiple conditions
 
-If I want to add another condition to `filter()` the response on, I can use the logical (`&` or `|`) operators. For example, what if I wanted to add respondents who were `"Divorced"` or `"Separated"`? 
+If I want to add another condition to `filter()` the response on, I can use the logical (`&` or `|`) operators. For example, what if I wanted to add a condition that included only respondents who were `"Divorced"` or `"Separated"` (question `q0024`)?
 
 *I can rely on my old friend `dplyr::count()` from the last tutorial to verify I'm getting the correct counts here.*
 
@@ -99,7 +105,7 @@ MascSurveyData %>%
     dplyr::count(q0024)
 ```
 
-And between the ages of `"18 - 34"`?
+Note there are two ways to filter these data and get the same response. The `%in%` operator is better for specifying text responses (as opposed to the equal sign `=`). For example, if I wanted to build on the previous condition to include repondents who are between the ages of 18 and 34, I could add the following:
 
 ```{r and-condition}
 MascSurveyData %>% 
@@ -108,33 +114,25 @@ MascSurveyData %>%
     tidyr::spread(q0024, n)
 ```
 
+**Quick Tip #2:** Be careful with the logical operators--their order counts!
+
 ## Return unique (i.e. `distinct`) responses 
 
-The `dplyr::distinct()` function returns the unique values in a column, data frame or tibble. It's similar to `dplyr::count()`, does not return the sum. If I wanted to check the distinct responses to `q0014` (or `"How much have you heard about the #MeToo movement?"`).
+The `dplyr::distinct()` function returns the unique values in a column, data frame or tibble. It's similar to `dplyr::count()`, but it does not return the sum column. If I wanted to check the distinct responses to `q0014` (or `"How much have you heard about the #MeToo movement?"`).
 
 ```{r distinct-column}
 MascSurveyData %>% dplyr::distinct(q0014)
 ```
 
 
-Depending on the data set, I'll occaisionally also need to check if I am dealing with the distinct/unique observations (or if the rows have been duplicated). 
+Depending on the data set, I'll occaisionally also need to check if I am dealing with the distinct/unique observations (or if the rows have been duplicated). When we downloaded the `raw-responses.csv` data, we saw that there was an unnamed column (`X1`) with respondent ids (`id`). One of the ways I use `dplyr::distinct()` is in combination with `base::identical()` and `base::nrow()`.
 
-When we downloaded the `raw-responses.csv` data, we saw that there was an unnamed column (`X1`) with respondent ids (`id`). One of the ways I use `dplyr::distinct()` is in combination with `base::identical()` and `base::nrow()`.
-
-In the `MascSurveyData`, I want the number of rows to be identical to the number of unique respondents (we know this from the documentation, but in other data arrangements it isn't as clear). I can test this by passing 
+In the `MascSurveyData`, I want the number of rows to be identical to the number of unique respondents (we know this from the documentation, but in other data arrangements it isn't as clear). I can test this by comparing the distinct number of rows in `MascSurveyData` to the number of rows in `MascSurveyData`. 
 
 ```{r check-identical}
 base::identical(x = MascSurveyData %>% dplyr::distinct() %>% base::nrow(), 
-                y = base::nrow(MascSurveyData))
-```
-
-```{r}
-base::identical(x = distinct(MascSurveyData, id, .keep_all = TRUE) %>% nrow(),
-          y = nrow(MascSurveyData))
+                y = MascSurveyData %>% base::nrow())
 ```
 
 
-```{r}
-fs::dir_ls("data")
-```
 
