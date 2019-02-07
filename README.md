@@ -64,18 +64,18 @@ none, basic data objects are created in RStudio.
 
 #### 1 e) Notes
 
-1.  ***Need to add RStudio IDE***:
+1.  Need to add RStudio IDE:
 
 We don’t have anything on this explicitly, but now there are enough
 bells and whistles that we could do a post on Add-inns, pane layouts,
 Terminal, etc. Also add [RStudio Cloud](https://rstudio.cloud/).
 
-2.  ***Need to add Markdown resources: ***
+2.  Need to add Markdown resources:
 
 Include a link to pandoc markdown, basic table formatting, bullets,
 bold, italics, etc.
 
-**Tutorial**:
+Tutorial:
 <http://www.storybench.org/getting-started-r-rstudio-notebooks/>
 
 ## 2\) Getting Started with tidyverse in R
@@ -218,21 +218,26 @@ mappings.
 
 ### 4 d) Current version
 
-#### Notes
+#### 4 e) Notes
 
-***Need to add ggplot2 template and mental model
-image:***
+Need to add `ggplot2` template and mental model
+image:
 
 ## 5.1) How to manipulate data with dplyr in R (Part 1 = overview of dplyr variable functions)
 
 Change this to use actual survey data from fivethirtyeight’s [Github
 account](https://github.com/fivethirtyeight/data/tree/master/masculinity-survey).
 
-**Learning Objectives: **1) dplyr overview (select, pull, count, filter,
-mutate, if\_else, case\_when), 2) [naming
-things](https://speakerdeck.com/jennybc/how-to-name-files).
+### Learning Objectives:
 
-### Data set(s) used:raw masculinity [survey data](https://github.com/fivethirtyeight/data/blob/master/masculinity-survey/raw-responses.csv).
+1)  dplyr overview (select, pull, count, filter, mutate, if\_else,
+    case\_when), 2) [naming
+    things](https://speakerdeck.com/jennybc/how-to-name-files).
+
+### Data set(s) used:
+
+raw masculinity [survey
+data](https://github.com/fivethirtyeight/data/blob/master/masculinity-survey/raw-responses.csv).
 
 # Day 2 (section 2)
 
@@ -255,7 +260,7 @@ account](https://github.com/fivethirtyeight/data/tree/master/masculinity-survey)
 raw masculinity [survey
 data](https://github.com/fivethirtyeight/data/blob/master/masculinity-survey/raw-responses.csv).
 
-## 6\) **Getting started with data visualization in R using ggplot2 (part **2\*\* of visualize with ggplot2)\*\*
+## 6\) Getting started with data visualization in R using ggplot2 (part 2 of visualize with ggplot2)
 
 Second part of the ggplot2 tutorial. This adds multivariate plots,
 themes, and maps. First objective is to provide lots of code and
@@ -281,7 +286,7 @@ background on for loops, apply functions, and purrr for iteration.
 Introduce regex and strings
     manipulations.
 
-    1. **_Need to add _****_web data collection_****_:_****_ _**Add a tutorial on web tools for data collection.
+    1. Need to add web data collection: Add a tutorial on web tools for data collection.
 
 ### Learning Objectives:
 
