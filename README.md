@@ -246,7 +246,9 @@ The second day we can pick up with more visualizations (the fun stuff)
 before getting into more abstract concepts (like iteration, for loops,
 etc.).*
 
-## 5.2) How to manipulate data with dplyr in R (Part 2 = overview of dplyr case (row) functions)
+## 5.2) How to manipulate data with dplyr in R
+
+Part 2 = overview of `dplyr` case (row) functions
 
 Continue with survey data from fivethirtyeight’s [Github
 account](https://github.com/fivethirtyeight/data/tree/master/masculinity-survey).
@@ -265,12 +267,21 @@ data](https://github.com/fivethirtyeight/data/blob/master/masculinity-survey/raw
 Second part of the ggplot2 tutorial. This adds multivariate plots,
 themes, and maps. First objective is to provide lots of code and
 examples of customizing ggplot2 with layers, second is to understand how
-facetting can aid in understanding
-variation.
+facetting can aid in understanding variation.
 
-### Learning Objectives: 1) introduce scatter plots, color aesthetic, adjusting scales, coordinate manipulation, variation (box-plots, violin-plots) 2) faceting vs. plotting relationships.
+### Learning Objectives:
 
-### Data set(s) used:Lahman::Master, fivethirtyeight::fandango, [World Bank Open Data](https://data.worldbank.org/) (agriculture, industry, and service sector), fivethirtyeight::weather\_check, iris data set (but we should change this to something better).
+1)  introduce scatter plots, color aesthetic, adjusting scales,
+    coordinate manipulation, variation (box-plots, violin-plots) 2)
+    faceting vs. plotting relationships.
+
+### Data set(s) used:
+
+Lahman::Master, fivethirtyeight::fandango, [World Bank Open
+Data](https://data.worldbank.org/) (agriculture, industry, and service
+sector), fivethirtyeight::weather\_check, iris data set (but we should
+change this to something
+better).
 
 ## 7\) How to merge and clean up multiple CSVs using R (for loops, iterate, functions, intro)
 
