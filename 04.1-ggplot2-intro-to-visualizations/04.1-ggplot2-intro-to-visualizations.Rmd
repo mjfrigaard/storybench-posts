@@ -128,6 +128,10 @@ Fandango %$% mosaic::fav_stats(imdb)
 )
 ```
 
+
+
+
+
 NOTE: The `%$%` operator is another magical tool from the `magrittr` package and handles functions that don't have a specific data argument. Use it when the regular pipe doesn’t work.
 
 ### The components of ggplot2 graphs
@@ -284,12 +288,12 @@ Fandango %>%
 
 The relationship between the bins, `binwidth` and frequency of `imdb` scores is outlined in the image below. 
 
-```{r histogram-bins.png}
+```{r histogram-bins.png, echo=FALSE}
 # fs::dir_ls("images")
 knitr::include_graphics(path = "images/histogram-bins.png")
 ```
 
-Conversely, if I set the `binwidth` to a larger number (like `“1“`), there will be fewer bars (and more score occurances binned inside each bar).
+Conversely, if I set the `binwidth` to a larger number (like `“1“`), there will be fewer bars (and more score occurrences binned inside each bar).
 
 ```{r layer-histogram-high-bins}
 # assign data and variable to aesthetic
@@ -319,9 +323,9 @@ ggplot_object +
     geom_histogram(binwidth = 0.25)
 ```
 
-## Label snd save your work!
+## Label and save your work!
 
-A chart without axis labels and a title isn't much more than an incomplete doodle on a napkin. `ggplot2` comes with the `labs()` function that gives a ton of options for including important information on your graphs. [Other authors](http://bit.ly/2I9WPVS) have written about labelling graphs for scientific articles, but I'll add that it's worthwhile to consider the audience when adding text to any figure (spell-out acronyms, avoid unnecessary jargon, etc.). I'm going to be the next person so see this graph, so I'll include the information necessary to reproduce it. 
+A chart without axis labels and a title isn't much more than an incomplete doodle on a napkin. `ggplot2` comes with the `labs()` function that gives a ton of options for including important information on your graphs. [Other authors](http://bit.ly/2I9WPVS) have written about labeling graphs for scientific articles, but I'll add that it's worthwhile to consider the audience when adding text to any figure (spell-out acronyms, avoid unnecessary jargon, etc.). I'm going to be the next person so see this graph, so I'll include the information necessary to reproduce it. 
 
 The `ggplot2::ggsave()` function can be added to the end of any chunk of code and it will save the last graph created. I will add it below to save this graph in the `images` folder with the title, `"imdb-histo-plot.png"`.
 
@@ -340,6 +344,11 @@ ggplot_object +
 ggplot2::ggsave(filename = "images/imdb-histo-plot.png", width = 7, height = 5, units = "in")
 ```
 
-ANd just like that, we have a plot we can export to any other medium!
+And just like that, we have a plot we can export to any other medium! Below is a schematic showing the parts of a `ggplot2` graph.
+
+```{r ggplot2-function-calls, echo=FALSE}
+# fs::dir_ls("images")
+knitr::include_graphics(path = "images/ggplot2-function-calls.png")
+```
 
 ## End

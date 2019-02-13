@@ -229,6 +229,7 @@ Fandango %$% mosaic::fav_stats(imdb)
 )
 ```
 
+
 | min |  Q1 | median |  Q3 | max |     mean |        sd |   n | missing |
 | --: | --: | -----: | --: | --: | -------: | --------: | --: | ------: |
 |   4 | 6.3 |    6.9 | 7.4 | 8.6 | 6.736986 | 0.9587358 | 146 |       0 |
@@ -459,15 +460,10 @@ Fandango %>%
 The relationship between the bins, `binwidth` and frequency of `imdb`
 scores is outlined in the image below.
 
-``` r
-# fs::dir_ls("images")
-knitr::include_graphics(path = "images/histogram-bins.png")
-```
-
 ![](images/histogram-bins.png)<!-- -->
 
 Conversely, if I set the `binwidth` to a larger number (like `“1“`),
-there will be fewer bars (and more score occurances binned inside each
+there will be fewer bars (and more score occurrences binned inside each
 bar).
 
 ``` r
@@ -513,13 +509,13 @@ ggplot_object +
 
 ![](images/geom_histogram-1.png)<!-- -->
 
-## Label snd save your work\!
+## Label and save your work\!
 
 A chart without axis labels and a title isn’t much more than an
 incomplete doodle on a napkin. `ggplot2` comes with the `labs()`
 function that gives a ton of options for including important information
 on your graphs. [Other authors](http://bit.ly/2I9WPVS) have written
-about labelling graphs for scientific articles, but I’ll add that it’s
+about labeling graphs for scientific articles, but I’ll add that it’s
 worthwhile to consider the audience when adding text to any figure
 (spell-out acronyms, avoid unnecessary jargon, etc.). I’m going to be
 the next person so see this graph, so I’ll include the information
@@ -549,6 +545,9 @@ ggplot_object +
 ggplot2::ggsave(filename = "images/imdb-histo-plot.png", width = 7, height = 5, units = "in")
 ```
 
-ANd just like that, we have a plot we can export to any other medium\!
+And just like that, we have a plot we can export to any other medium\!
+Below is a schematic showing the parts of a `ggplot2` graph.
+
+![](images/ggplot2-function-calls.png)<!-- -->
 
 ## End
