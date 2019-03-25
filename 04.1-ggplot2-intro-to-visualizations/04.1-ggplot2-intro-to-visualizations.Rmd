@@ -322,9 +322,9 @@ ggplot_object +
     geom_histogram(binwidth = 0.25)
 ```
 
-## Label and save your work!
+## Label your graphs and save your work!
 
-A chart without axis labels and a title aren't much more than an incomplete doodle on a napkin. `ggplot2` comes with the `labs()` function that gives a ton of options for including important information on your graphs. [Other authors](http://bit.ly/2I9WPVS) have written about labeling graphs for scientific articles, but I'll add that it's worthwhile to consider the audience when adding text to any figure (spell-out acronyms, avoid unnecessary jargon, etc.). I'm going to be the next person to see this graph, so I'll include the information necessary to reproduce it. 
+Charts without axis labels and a title aren't much more than an incomplete doodle on a napkin. Fortunately, `ggplot2` comes with the `labs()` function that gives a *ton* of options for including important information on your graphs. [Other authors](http://bit.ly/2I9WPVS) have written about labeling graphs for scientific articles, but I'll add that it's worthwhile to consider the audience when adding text to any figure (spell-out the acronyms, avoid unnecessary jargon, etc.). I'm probably going to be the next person to see this graph, and I haven't mastered the ability to perfectly recall multiple lines of code, so I'll include the information necessary to reproduce it. 
 
 The `ggplot2::ggsave()` function can be added to the end of any chunk of code and it will save the last graph created. I will add it below to save this graph in the `images` folder with the title, `"imdb-histo-plot.png"`.
 
@@ -352,4 +352,54 @@ And just like that, we have a plot we can export to any other medium! Below is a
 knitr::include_graphics(path = "images/ggplot2-function-calls.png")
 ```
 
-## End
+## Reproducing a graph 
+
+The article that uses the `Fandango` data set show a graph with a single distribution of fandango scores. Given what we've covered, we should be able to reproduce this graph (or get pretty close). 
+
+The `dplyr::glimpse()` function tells me that there are two variables for Fandango scores in the dataset, `fandango_stars` and `fandango_ratingvalue`. One way to check if these two variables have a distribution similar to the image in the article is to pass them to pass them both to the `skimr::skim()` function. 
+
+```{r skim, eval=FALSE}
+Fandango %>% 
+    skimr::skim(fandango_stars, fandango_ratingvalue)
+```
+
+The `skimr::skim()` function perfect for comparing two variable distributions. The `hist` column produced gives us a small histogram we can view along with summary statistics. 
+
+```{r IMAGE-skimr-skim, echo=FALSE}
+# fs::dir_ls("images")
+knitr::include_graphics(path = "images/skimr-skim.png")
+```
+
+I personally prefer to use `skimr::skim_to_wide()` because it returns a `skim` of the entire data frame, with the statistics in the columns. I can also save this object to view later. 
+
+```{r FandangoSkim, eval=FALSE}
+FandangoSkim <- Fandango %>% 
+    skimr::skim_to_wide()
+FandangoSkim
+```
+
+
+```{r IMAGE-skim-to-wide, echo=FALSE}
+# fs::dir_ls("images")
+knitr::include_graphics(path = "images/skim-to-wide.gif")
+```
+
+
+Now that I can see the miny histograms for both variables, it looks like `fandango_ratingvalue` is 
+
+```{r}
+Fandango %>% 
+    ggplot2::ggplot(aes(x = fandango_ratingvalue)) + 
+    geom_freqpoly(binwidth = 1.45, 
+                   color = "darkorange2") + 
+ggplot2::labs(title = "Fandango's Lopsided Ratings Curve",
+subtitle = "Ratings for 209 films that played in theatres in 2015 and received 30+ reviews",
+  caption = "Data source: Fandango.com",
+                  x = "IMDB Score (binwidth = 1.45)",
+                  y = "Count") 
+```
+
+
+
+
+

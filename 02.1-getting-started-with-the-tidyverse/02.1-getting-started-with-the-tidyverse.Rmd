@@ -1,5 +1,5 @@
 ---
-title: "Getting Started with tidyverse"
+title: "Getting Started with the tidyverse"
 author: "Martin Frigaard"
 date: "2017-05-12"
 output: 
@@ -17,17 +17,20 @@ if (!file.exists("images/")) {
 knitr::opts_chunk$set(
     echo = TRUE, # show all code
     tidy = FALSE, # cleaner code printing
+    eval = FALSE,
     size = "small",
     fig.path = "images/") # smaller code
 ```
 
 # Getting started with tidyverse
 
-The [`tidyverse`](http://tidyverse.org/) is a collection of R packages developed primarily by RStudio’s chief scientist [Hadley Wickham](http://hadley.nz/). These packages play well together by adhering to some underlying principles, one of which we will explore below. To learn more about these tools and how they work together, read [R for data science](https://r4ds.had.co.nz/). For newcomers to R, please check out my previous tutorial for Storybench: [Getting Started with R in RStudio Notebooks](http://www.storybench.org/getting-started-r-rstudio-notebooks/).
+The [`tidyverse`](http://tidyverse.org/) is a collection of R packages developed primarily by RStudio’s chief scientist [Hadley Wickham](http://hadley.nz/). These packages play well together by adhering to some underlying principles, one of which we will explore below. To learn more about these tools and how they work together, read [R for data science](https://r4ds.had.co.nz/). For newcomers to R and RStudio, please check out my previous tutorial for Storybench: [Getting Started with R in RStudio Notebooks](http://www.storybench.org/getting-started-r-rstudio-notebooks/).
 
-The following tutorial will introduce three underlying concepts about working with data in the `tidyverse`. These ideas are tidy data, tabular data, and the pipe. Understanding these principles will make it easier to work with the other packages in the `tidyverse` to manipulate and re-structure your data for visualizations and modeling. Read more about the tidy principles in the [Tidy Tools Manifesto](https://cran.r-project.org/web/packages/tidyverse/vignettes/manifesto.html). 
+## Objectives
 
-## Load the packages
+This tutorial will introduce three underlying concepts about working with data in the `tidyverse`: 1) tidy data, 2) tabular data, and 3) the pipe. A solid understanding of these concepts will make it easier to use the other packages in the `tidyverse` to manipulate and re-structure your data for visualizations and modeling. Read more about the tidy tools in the [Tidy Tools Manifesto](https://cran.r-project.org/web/packages/tidyverse/vignettes/manifesto.html). 
+
+## Loading the packages
 
 Install and load the `tidyverse` and `magrittr` packages for this tutorial.
 
@@ -39,7 +42,7 @@ library(magrittr)
 
 ## What is tidy data?
 
-“Tidy data” is a term that describes a standardized approach to structuring datasets to make analyses and visualizations easier in R. If you’ve worked with SQL and relational databases, you’ll recognize most of these concepts. Hadley Wickham distilled a lot of the technical jargon from [Edgar F. Codd’s normal form](https://en.wikipedia.org/wiki/Third_normal_form) and applied it to statistical terms. More importantly, he translated the important principles into terms just about anyone doing data analysis should be able to recognize and understand.
+“Tidy data” is a term that describes a standardized approach to structuring datasets to make analyses and visualizations easier in R. If you’ve worked with SQL and relational databases, you’ll recognize most of these concepts. Hadley Wickham distilled a lot of the technical jargon from [Edgar F. Codd’s normal form](https://en.wikipedia.org/wiki/Third_normal_form) and applied it to statistical terms. More importantly, he translated these important principles into concepts and terms a broader audience can grasp and use for data manipulation. The first concept we will cover is **tidy data**.
 
 ### The core tidy data principles
 
