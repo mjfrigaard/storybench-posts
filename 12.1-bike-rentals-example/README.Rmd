@@ -1,5 +1,6 @@
 ---
 title: "The Bike Rental Boom Is Here"
+author: "Peter Spangler"
 output: 
   github_document: 
     toc: yes
@@ -39,7 +40,7 @@ base::options(tibble.print_max = 25,
 
 > TLDR:
 
-```{r packages}
+```{r packages, message=FALSE, warning=FALSE}
 # packages --------------------------------------------------------------
 library(tidyverse)
 library(rsample) # data splitting
@@ -65,337 +66,36 @@ In this article we will use data from Capital Bikeshare available at the [UCI Ma
 
 # Import data
 
+This code will import the daily bike rental data in the `data` folder. 
+
 ```{r import-bike}
 # read data of bike rentals daily ----
-bike <- read.csv("day.csv")
+bike <- read.csv("data/day.csv")
 ```
-
-
 
 # Wrangle
 
-The code chunk below prepares the data for modeling. Read through the comments to understand why each step was taken, and how these variables get entered into the visualizations and models.
+The script for wrangling the data is available [here])().  prepares the data for modeling. Read through the comments to understand why each step was taken, and how these variables get entered into the visualizations and models. 
 
-```{r weekday-chr}
-# WRANGLE ---------------------------------------------------------------
-
-# recode with labels and make factor
-bike <- bike %>%
-  mutate(
-    weekday_chr =
-      case_when(
-        weekday == 0 ~ "Sunday",
-        weekday == 1 ~ "Monday",
-        weekday == 2 ~ "Tuesday",
-        weekday == 3 ~ "Wednesday",
-        weekday == 4 ~ "Thursday",
-        weekday == 5 ~ "Friday",
-        weekday == 6 ~ "Saturday",
-        TRUE ~ "other"))
-# bike %>% 
-#   dplyr::count(weekday, weekday_chr) %>% 
-#   tidyr::spread(weekday, n)
-
-# Weekdays (factor) ---
-# test
-# bike %>%
-#   mutate(
-#     weekday_fct = factor(x = weekday,
-#              levels = c(0,1,2,3,4,5,6),
-#              labels = c("Sunday",
-#                        "Monday",
-#                        "Tuesday",
-#                        "Wednesday",
-#                        "Thursday",
-#                        "Friday",
-#                        "Saturday"))) %>%
-#   dplyr::count(weekday, weekday_fct) %>% 
-#   tidyr::spread(weekday, n)
-
-# assign 
-bike <- bike %>%
-  mutate(
-    weekday_fct = factor(x = weekday,
-             levels = c(0,1,2,3,4,5,6),
-             labels = c("Sunday",
-                       "Monday",
-                       "Tuesday",
-                       "Wednesday",
-                       "Thursday",
-                       "Friday",
-                       "Saturday")))
-# check
-# bike %>% 
-#   dplyr::count(weekday, weekday_fct) %>% 
-#   tidyr::spread(weekday, n)
-
-
-# Holidays ----
-
-bike <- bike %>%
-  mutate(
-    holiday_chr =
-      case_when(
-        holiday == 0 ~ "Non-Holiday",
-        holiday == 1 ~ "Holiday",
-        TRUE ~ "other"
-      )
-  )
-
-# test
-# bike %>%
-#   mutate(
-#     holiday_fct = factor(x = holiday,
-#              levels = c(0,1),
-#              labels = c("Non-Holiday",
-#                        "Holiday"))) %>%
-#   dplyr::count(holiday, holiday_fct) %>%
-#   tidyr::spread(holiday, n)
-
-# assign
-bike <- bike %>%
-  mutate(
-    holiday_fct = factor(x = holiday,
-             levels = c(0,1),
-             labels = c("Non-Holiday",
-                       "Holiday")))
-
-# verify
-# bike %>%
-#   dplyr::count(holiday_chr, holiday_fct) %>%
-#   tidyr::spread(holiday_chr, n)
-
-# Working days ----
-
-bike <- bike %>%
-  mutate(
-    workingday_chr =
-      case_when(
-        workingday == 0 ~ "Non-Working Day",
-        workingday == 1 ~ "Working Day",
-        TRUE ~ "other"
-      )
-  )
-
-# test
-# bike %>%
-#   mutate(
-#     workingday_fct = factor(x = workingday,
-#              levels = c(0,1),
-#              labels = c("Non-Working Day",
-#                        "Working Day"))) %>%
-#   dplyr::count(workingday, workingday_fct) %>%
-#   tidyr::spread(workingday, n)
-
-# assign
-bike <- bike %>%
-  mutate(
-    workingday_fct = factor(x = workingday,
-             levels = c(0,1),
-             labels = c("Non-Working Day",
-                       "Working Day")))
-
-# verify
-# bike %>% 
-#   dplyr::count(workingday_chr, workingday_fct) %>%
-#   tidyr::spread(workingday_chr, n)
-
-
-
-# Seasons
-
-bike <- bike %>%
-  mutate(
-    season_chr =
-      case_when(
-        season == 1 ~ "Spring",
-        season == 2 ~ "Summer",
-        season == 3 ~ "Fall",
-        season == 4 ~ "Winter",
-        TRUE ~ "other"
-      )
-  )
-
-# test
-# bike %>%
-#   mutate(
-#     season_fct = factor(x = season,
-#              levels = c(1, 2, 3, 4),
-#              labels = c("Spring",
-#                        "Summer",
-#                        "Fall",
-#                        "Winter"))) %>%
-#   dplyr::count(season_chr, season_fct) %>%
-#   tidyr::spread(season_chr, n)
-
-# assign
-bike <- bike %>%
-  mutate(
-    season_fct = factor(x = season,
-             levels = c(1, 2, 3, 4),
-             labels = c("Spring",
-                       "Summer",
-                       "Fall",
-                       "Winter"))) 
-
-# verify
-# bike %>%
-#   dplyr::count(season_chr, season_fct) %>%
-#   tidyr::spread(season_chr, n)
-
-
-# Weather situation ----
-
-bike <- bike %>%
-  mutate(
-    weathersit_chr =
-      case_when(
-        weathersit == 1 ~ "Good",
-        weathersit == 2 ~ "Clouds/Mist",
-        weathersit == 3 ~ "Rain/Snow/Storm",
-        TRUE ~ "other"
-      )
-  )
-
-# test
-# bike %>%
-#   mutate(
-#     weathersit_fct = factor(x = weathersit,
-#              levels = c(1, 2, 3),
-#              labels = c("Good",
-#                        "Clouds/Mist",
-#                        "Rain/Snow/Storm"))) %>%
-#   dplyr::count(weathersit, weathersit_fct) %>%
-#   tidyr::spread(weathersit, n)
-
-# assign 
-bike <- bike %>%
-  mutate(
-    weathersit_fct = factor(x = weathersit,
-             levels = c(1, 2, 3),
-             labels = c("Good",
-                       "Clouds/Mist",
-                       "Rain/Snow/Storm")))
-# verify
-# bike %>%
-#   dplyr::count(weathersit_chr, weathersit_fct) %>%
-#   tidyr::spread(weathersit_chr, n)
-
-
-# Months ----
-
-bike <- bike %>%
-  mutate(
-    month_chr =
-      case_when(
-        mnth == 1 ~ "January",
-        mnth == 2 ~ "February",
-        mnth == 3 ~ "March",
-        mnth == 4 ~ "April",
-        mnth == 5 ~ "May",
-        mnth == 6 ~ "June",
-        mnth == 7 ~ "July",
-        mnth == 8 ~ "August",
-        mnth == 9 ~ "September",
-        mnth == 10 ~ "October",
-        mnth == 11 ~ "November",
-        mnth == 12 ~ "December",
-        TRUE ~ "other"
-      )
-  )
-
-# test
-# bike %>%
-#   mutate(
-#     month_fct = factor(x = mnth,
-#              levels = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
-#              labels = c("January", "February", "March", "April", "May",
-#                         "June", "July", "August", "September", "October",
-#                         "November", "December"))) %>%
-#   dplyr::count(mnth, month_fct) %>%
-#   tidyr::spread(month_fct, n)
-
-# assign
-bike <- bike %>%
-  mutate(
-    month_fct = factor(x = mnth,
-             levels = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
-             labels = c("January", "February", "March", "April", "May",
-                        "June", "July", "August", "September", "October",
-                        "November", "December")))
-
-# verify
-# bike %>% 
-#   dplyr::count(month_chr, month_fct) %>%
-#   tidyr::spread(month_fct, n)
-
-# Year ----
-bike <- bike %>%
-  mutate(
-    yr_chr =
-      case_when(
-        yr == 0 ~ "2011",
-        yr == 1 ~ "2012",
-        TRUE ~ "other"
-      )
-  )
-
-# test
-# bike %>%
-#   mutate(
-#     yr_fct = factor(x = yr,
-#              levels = c(0, 1),
-#              labels = c("2011",
-#                        "2012"))) %>%
-#   dplyr::count(yr, yr_fct) %>%
-#   tidyr::spread(yr, n)
-
-# assign
-bike <- bike %>%
-  mutate(
-    yr_fct = factor(x = yr,
-             levels = c(0, 1),
-             labels = c("2011",
-                       "2012")))
-# verify
-# bike %>%
-#   dplyr::count(yr_chr, yr_fct) %>%
-#   tidyr::spread(yr_chr, n)
-
-# normalize temperatures ----
-bike <- bike %>%
-  mutate(temp = as.integer(temp * (39 - (-8)) + (-8)))
-
-bike <- bike %>%
-  mutate(atemp = atemp * (50 - (16)) + (16))
-
-# ~ windspeed ----
-bike <- bike %>%
-  mutate(windspeed = as.integer(67 * bike$windspeed))
-
-# ~ humidity ----
-bike <- bike %>%
-  mutate(hum = as.integer(100 * bike$hum))
-
-# ~ convert to date ----
-bike <- bike %>%
-  mutate(dteday = as.Date(dteday))
-
-# check df
-bike %>% dplyr::glimpse(78)
+```{r wrangle, include=TRUE, eval=TRUE, echo=TRUE}
+# fs::dir_ls("code")
+source("code/02-wrangle.R")
+BikeData
 ```
 
 ***
 
 # Exploratory Data Analysis (tables)
 
-Three options for summarizing the `bike` table. 
+Three options for summarizing the `bike` table into summary statistics that will give us a better understanding of the underlying distribution for each variable in the `BikeData` data frame. 
 
 ## dplyr (#1)
 
-```{r bike_dplyr_summary, message=FALSE, warning=FALSE, results='hold'}
+Check out the dplyr package [here]()
+
+```{r BikeDplyrSummary, message=FALSE, warning=FALSE, results='hold'}
 # create exploratory analysis table for continuous data
-bike_dplyr_summary <- bike %>%
+BikeDplyrSummary <- BikeData %>%
   select(temp, atemp, hum, windspeed, casual, registered, cnt) %>%
   summarise_each(list(
     min = ~min,
@@ -413,14 +113,16 @@ bike_dplyr_summary <- bike %>%
   spread(stat, val) %>%
   select(var, min, q25, median, q75, max, mean, sd)
 
-knitr::kable(bike_dplyr_summary)
+knitr::kable(BikeDplyrSummary)
 ```
 
 ## skimr (#2)
 
-```{r bike_summary_skim, results='hold'}
+Check out the skimr package [here]()
+
+```{r BikeSkimrSummary, results='hold'}
 # skimr::skim() ----
-bike_summary_skim <- bike %>%
+BikeSkimrSummary <- bike %>%
   skimr::skim_to_wide() %>%
   dplyr::select(type,
     variable,
@@ -432,29 +134,32 @@ bike_summary_skim <- bike %>%
     sd,
     median = p50,
     hist)
-knitr::kable(bike_summary_skim)
+knitr::kable(BikeSkimrSummary)
 ```
 
 ## mosaic::inspect (#3)
 
+Check out the mosaic package [here]()
+
 ```{r bike_inspect, results='hold'}
 # mosaic::inspect -----------------------------------------------------
-bike_inspect <- mosaic::inspect(bike)
+BikeMosaicInspect <- mosaic::inspect(bike)
 # categorical
-knitr::kable(bike_inspect$categorical)
+knitr::kable(BikeMosaicInspect$categorical)
 ```
 
 ```{r inspect-Date, results='hold'}
 # categorical
-knitr::kable(bike_inspect$Date)
+knitr::kable(BikeMosaicInspect$Date)
 ```
 
 
 ```{r inspect-quantitative}
 # categorical
-knitr::kable(bike_inspect$quantitative)
+knitr::kable(BikeMosaicInspect$quantitative)
 ```
 
+*** 
 
 
 Bike riders have the opportunity to avoid many of the limitations of car traffic--bikers can ride in special travel lanes, they can quickly move between vehicles, and can avoid the road altogether by riding on the sidewalk. However, unlike rideshare passengers, bikers are vulnerable to weather conditions, and this might impact their likelihood of choosing a bike over other transportation options. 
@@ -462,6 +167,8 @@ Bike riders have the opportunity to avoid many of the limitations of car traffic
 If weather conditions are influential in transportation decisions, we would expect to see relationships between the number of bike rentals and weather features including temperature, humidity and wind speed.    
 
 ## Graph1: Bike Rental Volume By Temperature
+
+We would expect riders to choose a car (or other means of transportation) if its too cold. 
 
 ```{r ggRentalsByTemp}
 # ~ rentals by temperature ----
@@ -482,7 +189,7 @@ ggRentalsByTemp <- bike %>%
 ggRentalsByTemp
 ```
 
-
+The output below is R's way of telling us how the best-fit line is being drawn through each set of data. 
 
 ```r
 `geom_smooth()` using method = 'loess' and formula 'y ~ x'
@@ -490,7 +197,7 @@ ggRentalsByTemp
 
 ## Graph2: Bike Rental Volume By Wind Speed
 
-
+We would also expect windier conditions to negatively impact bike rentals.
 
 ```{r ggRentalVolByWindSpeed}
 # ggRentalVolByWindSpeed ----
@@ -509,9 +216,33 @@ ggRentalVolByWindSpeed <- ggplot(bike) +
 ggRentalVolByWindSpeed
 ```
 
-Weather features appear to be drivers of rental behavior, where higher temperatures show more rentals and higher windspeed resulted in fewer rentals.
 
-We can think of holidays as more opportunities for riders to choose other forms of transportation, since fewer people drive on holidays.
+Holidays might influence bike riders in different ways. For instance, we can think of holidays as increasing opportunities for bike riders to enjoy being on the road with fewer drivers, since typically fewer people drive on holidays. We could also consider a situation where bike enthusiasts only prefer to ride their bikes on summer or spring holidays (considering the information we've learned about the influences of weather conditions on bike rentals).
 
 ## Graph3: Bike Rental Density By Holiday vs Non-Holiday
+
+
+```{r ggRentalVolByHoliday}
+ggRentalVolByHoliday <- ggplot(BikeData) +
+  geom_density(aes(x = cnt,
+                   fill = holiday_chr), 
+                   alpha = 0.2) +
+  scale_fill_brewer(palette = "Paired") +
+  
+  theme_fivethirtyeight() +
+  theme(axis.title = element_text()) + 
+  labs(title = "Bike Rental Density By Holiday",
+               fill = "Holiday",
+               x = "Average Bike Rentals",
+               y = "Density")
+
+ggRentalVolByHoliday
+```
+
+***
+
+With Lyft and Uber preparing for an [Initial public offering (IPO)](https://en.wikipedia.org/wiki/Initial_public_offering) this year and rideshare growth hitting one billion and 10 billion rides completed respectively, the market of transportation has been disrupted in cities across the country and around the world. How this evolution will impact greener forms of transportation like bikes will in part be determined by the ability of companies and cities to plan and execute on accommodating demand. The recent [San Francisco rideshare tax](https://www.sfchronicle.com/bayarea/philmatier/article/Things-look-good-for-SF-Supervisor-Peskin-s-13693183.php) is a manifestation of an absence of this execution. As more people choose alternative transportation forecasting the shift will be an important component for transportation leaders like Castiglione.  
+
+
+
 

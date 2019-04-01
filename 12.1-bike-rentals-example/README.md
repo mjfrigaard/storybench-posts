@@ -1,5 +1,6 @@
 The Bike Rental Boom Is Here
 ================
+Peter Spangler
 
   - [Motivation: Predicting Bike Rental Behaviour in a Metropolitan
     City](#motivation-predicting-bike-rental-behaviour-in-a-metropolitan-city)
@@ -26,64 +27,10 @@ The Bike Rental Boom Is Here
 library(tidyverse)
 library(rsample) # data splitting
 library(randomForest) # basic implementation
-```
-
-    ## randomForest 4.6-14
-
-    ## Type rfNews() to see new features/changes/bug fixes.
-
-    ## 
-    ## Attaching package: 'randomForest'
-
-    ## The following object is masked from 'package:dplyr':
-    ## 
-    ##     combine
-
-    ## The following object is masked from 'package:ggplot2':
-    ## 
-    ##     margin
-
-``` r
 library(ranger) # a faster implementation of randomForest
-```
-
-    ## 
-    ## Attaching package: 'ranger'
-
-    ## The following object is masked from 'package:randomForest':
-    ## 
-    ##     importance
-
-``` r
 library(caret) # an aggregator package for performing many machine learning models
-```
-
-    ## Loading required package: lattice
-
-    ## 
-    ## Attaching package: 'caret'
-
-    ## The following object is masked from 'package:purrr':
-    ## 
-    ##     lift
-
-``` r
 library(ggthemes)
 library(scales)
-```
-
-    ## 
-    ## Attaching package: 'scales'
-
-    ## The following object is masked from 'package:purrr':
-    ## 
-    ##     discard
-
-    ## The following object is masked from 'package:readr':
-    ## 
-    ##     col_factor
-
-``` r
 library(wesanderson)
 library(styler)
 ```
