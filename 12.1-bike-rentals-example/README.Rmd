@@ -80,7 +80,7 @@ The script for wrangling the data is available [here])().  prepares the data for
 ```{r wrangle, include=TRUE, eval=TRUE, echo=TRUE}
 # fs::dir_ls("code")
 source("code/02-wrangle.R")
-BikeData
+BikeData %>% glimpse(78)
 ```
 
 ***
