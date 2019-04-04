@@ -1,43 +1,20 @@
----
-title: "Storybench - Predicting bike rental behavior using a gradient boosting machine in R"
-author: "Peter Spangler"
-output: 
-  github_document: 
-    toc: yes
-    toc_depth: 5
----
+Storybench - Predicting bike rental behavior using a gradient boosting
+machine in R
+================
+Peter Spangler
 
-
-```{r setup, include=FALSE}
-library(tidyverse)
-library(magrittr)
-
-# create image folder ----
-if (!file.exists("images/")) {
-    dir.create("images/")
-}
-# create data folder ----
-if (!file.exists("data/")) {
-    dir.create("data/")
-}
-
-# knitr settings chunk ------
-knitr::opts_chunk$set(
-    echo = TRUE, # show all code
-    tidy = FALSE, # cleaner code printing
-    size = "small", # smaller code
-    fig.path = "images/") 
-
-#  knitr settings entire doc ------
-knitr::opts_knit$set(
-    width = 78)
-
-base::options(tibble.print_max = 25,
-              tibble.width = 78)
-```
+  - [Part 1: Exploring bike rental behavior using
+    R](#part-1-exploring-bike-rental-behavior-using-r)
+      - [Load the packages](#load-the-packages)
+      - [Import the data](#import-the-data)
+      - [Wrangling the data](#wrangling-the-data)
+      - [Exploratory data analysis](#exploratory-data-analysis)
+      - [Exploring the impact of weather conditions on bike
+        rentals](#exploring-the-impact-of-weather-conditions-on-bike-rentals)
+      - [Exploring the impact of holidays on bike rental
+        volume](#exploring-the-impact-of-holidays-on-bike-rental-volume)
 
 # Part 1: Exploring bike rental behavior using R
-
 
   - [Load the packages](#load-the-packages)
   - [Import the data](#import-the-data)
