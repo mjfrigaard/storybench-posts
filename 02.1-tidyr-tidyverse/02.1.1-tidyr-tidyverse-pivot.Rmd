@@ -478,3 +478,91 @@ LomaFightsLonger %>% glimpse(78)
 
 
 [here](http://fightland.vice.com/blog/the-pivots-and-precision-of-vasyl-lomachenko)
+
+Assume a physician wants to compare the efficacy of a new statin drug (a cholesterol lowering medicine) against the currently recommended medication. 
+
+After consenting `415` patients with high cholesterol, the physician randomly selects a sample of `209` patients to receive the new drug for six months, while the other `206` patients get a six-month course of the current drug. 
+
+*NOTE: This is a simplification of a clinical trial. In a true experiment, there are many other factors to consider.*
+
+Below is an example of how these data might get entered into a spreadsheet.
+
+```{r import-TrialDataPrePost, message=FALSE, warning=FALSE}
+TrialDataPrePost <- read_csv("data/trial-data-pre-post.csv")
+knitr::kable(
+TrialDataPrePost %>% utils::head())
+```
+
+Imagine a hypothetical chain of events for this trial, starting with the first and following in the order they occur: 
+
+1. A patient with high cholesterol gets randomized into the `treatment` condition, given an ID number (`patient id trt`), then a cholesterol measurement is taken and entered into the `baseline treatment` column. 
+
+2. A second patient with high cholesterol comes into the physician's office, is randomized into the `control` group, given their ID (`patient id cont`), and their baseline cholesterol measurement is recorded. 
+
+3. The process continues, and all `415` patients with high cholesterol are assigned to a group (`treatment` or `control`), given an ID (`patient id`), then prescribed the appropriate medication. 
+
+4. Six months after their initial appointment and baseline measurements, both groups of patients have their cholesterol measured again (in the `post` columns). 
+
+Given this timeline, does it seem *that* strange to enter the data in a spreadsheet like the `TrialDataPrePost` data frame? I don't think so, and here are some reasons why:
+
+1. This spreadsheet starts out as a record-keeping tool, and it's doing just that: something happens, then it gets documented 
+2. Tables like this can be read left-to-right, and the columns and rows are added *as they occur* 
+3. The physician (or whoever is entering the data) can see a lot of the data on the screen 
+
+We can actually think of the `TrialDataPrePost` data frame as containing *two* data frames: the `Treatment` data (with `209` patients), and the `Control` data (with `206` patients). 
+
+A little `dplyr` action will can separate these data frames. 
+
+```{r Treatment}
+Treatment <- TrialDataPrePost %>% 
+    dplyr::select(pat_id_trt,
+                  `baseline treatment`,
+                  `post treatment`)
+Treatment %>% glimpse(78)
+```
+
+```{r Control}
+Control <- TrialDataPrePost %>% 
+    dplyr::filter(!is.na(pat_id_cont)) %>% 
+    dplyr::select(pat_id_cont,
+                  `baseline control`,
+                  `post control`)
+Control %>% glimpse(78)
+```
+
+
+
+
+```{r}
+# trt <- runif(209, min = 160, max = 200)
+# cont <- runif(206, min = 160, max = 200)
+# A <- tibble::enframe(x = trt, value = "baseline treatment")
+# B <- tibble::enframe(x = cont, value = "baseline control")
+# write_csv(as.data.frame(A), "data/A.csv")
+# write_csv(as.data.frame(B), "data/B.csv")
+# trt2 <- runif(209, min = 150, max = 190)
+# cont2 <- runif(206, min = 160, max = 200)
+# A2 <- tibble::enframe(x = trt2, value = "post treatment")
+# B2 <- tibble::enframe(x = cont2, value = "post control")
+# write_csv(as.data.frame(A2), "data/A2.csv")
+# write_csv(as.data.frame(B2), "data/B2.csv")
+```
+
+
+```{r TrialData, eval=TRUE, message=FALSE, warning=FALSE, echo=FALSE}
+base::source("data/trial-data.R")
+TrialData %>% utils::head()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+

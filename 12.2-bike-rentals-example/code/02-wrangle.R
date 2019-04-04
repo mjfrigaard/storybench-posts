@@ -3,13 +3,45 @@
 # Authored by and feedback to mjfrigaard@gmail.com
 # MIT License
 # Version: 1.0
-# depends on 01-import.R.
+# depends on 01-import.R
 #=====================================================================#
 
-# WRANGLE ---------------------------------------------------------------
+library(tidyverse)
+library(skimr)
+library(janitor)
 
-# recode with labels and make factor
+source("code/01-import.R")
+ls()
+
+# WRANGLE ---------------------------------------------------------------
+# I like to be overly cautious when it comes to wrangling because all models
+# are only as good as the underlying data. This data set came with many
+# categorical variables coded numerically, so I am going to create a 
+# character version of each variable (_chr) and a factor version (_fct).
+# Creating a character and factor variable will let me choose which one to 
+# use for each graph and model.
+# 
+# 
+# 
+
 # this recodes the weekday variable into a character variable
+# test 
+# bike %>%
+#   mutate(
+#     weekday_chr =
+#       case_when(
+#         weekday == 0 ~ "Sunday",
+#         weekday == 1 ~ "Monday",
+#         weekday == 2 ~ "Tuesday",
+#         weekday == 3 ~ "Wednesday",
+#         weekday == 4 ~ "Thursday",
+#         weekday == 5 ~ "Friday",
+#         weekday == 6 ~ "Saturday",
+#         TRUE ~ "other")) %>% 
+#     dplyr::count(weekday, weekday_chr) %>%
+#     tidyr::spread(weekday, n)
+
+# assign
 bike <- bike %>%
   mutate(
     weekday_chr =
@@ -23,26 +55,27 @@ bike <- bike %>%
         weekday == 6 ~ "Saturday",
         TRUE ~ "other"))
 
-# check 
+# verify
 # bike %>% 
 #   dplyr::count(weekday, weekday_chr) %>% 
 #   tidyr::spread(weekday, n)
 
 # Weekdays (factor) ---
+
 # test factor variable
-bike %>%
-  mutate(
-    weekday_fct = factor(x = weekday,
-             levels = c(0,1,2,3,4,5,6),
-             labels = c("Sunday",
-                       "Monday",
-                       "Tuesday",
-                       "Wednesday",
-                       "Thursday",
-                       "Friday",
-                       "Saturday"))) %>%
-  dplyr::count(weekday, weekday_fct) %>%
-  tidyr::spread(weekday, n)
+# bike %>%
+#   mutate(
+#     weekday_fct = factor(x = weekday,
+#              levels = c(0,1,2,3,4,5,6),
+#              labels = c("Sunday",
+#                        "Monday",
+#                        "Tuesday",
+#                        "Wednesday",
+#                        "Thursday",
+#                        "Friday",
+#                        "Saturday"))) %>%
+#   dplyr::count(weekday, weekday_fct) %>%
+#   tidyr::spread(weekday, n)
 
 # assign factor variable
 bike <- bike %>%
@@ -64,15 +97,26 @@ bike <- bike %>%
 
 
 # Holidays ----
+# test
+# bike %>%
+#   mutate(holiday_chr =
+#       case_when(
+#         holiday == 0 ~ "Non-Holiday",
+#         holiday == 1 ~ "Holiday")) %>% 
+#   dplyr::count(holiday, holiday_chr) %>%
+#   tidyr::spread(holiday, n)
+
+# assign
 bike <- bike %>%
-  mutate(
-    holiday_chr =
+  mutate(holiday_chr =
       case_when(
         holiday == 0 ~ "Non-Holiday",
-        holiday == 1 ~ "Holiday",
-        TRUE ~ "other"
-      )
-  )
+        holiday == 1 ~ "Holiday"))
+
+# verify
+# bike %>%
+#   dplyr::count(holiday, holiday_chr) %>%
+#   tidyr::spread(holiday, n)
 
 # test
 # bike %>%
@@ -80,9 +124,9 @@ bike <- bike %>%
 #     holiday_fct = factor(x = holiday,
 #              levels = c(0,1),
 #              labels = c("Non-Holiday",
-#                        "Holiday"))) %>%
-#   dplyr::count(holiday, holiday_fct) %>%
-#   tidyr::spread(holiday, n)
+#                        "Holiday"))) %>% 
+#     dplyr::count(holiday, holiday_fct) %>%
+#     tidyr::spread(holiday, n)
 
 # assign
 bike <- bike %>%
@@ -92,22 +136,37 @@ bike <- bike %>%
              labels = c("Non-Holiday",
                        "Holiday")))
 
-# verify
+# # verify
 # bike %>%
 #   dplyr::count(holiday_chr, holiday_fct) %>%
 #   tidyr::spread(holiday_chr, n)
 
 # Working days ----
-bike <- bike %>%
+# test
+ # bike %>%
+ #  mutate(
+ #    workingday_chr =
+ #      case_when(
+ #        workingday == 0 ~ "Non-Working Day",
+ #        workingday == 1 ~ "Working Day",
+ #        TRUE ~ "other")) %>% 
+ #    dplyr::count(workingday, workingday_chr) %>%
+ #    tidyr::spread(workingday, n)
+
+# assign
+ bike <- bike %>%
   mutate(
     workingday_chr =
       case_when(
         workingday == 0 ~ "Non-Working Day",
         workingday == 1 ~ "Working Day",
-        TRUE ~ "other"
-      )
-  )
-
+        TRUE ~ "other")) 
+ 
+ # verify
+ # bike %>% 
+ #    dplyr::count(workingday, workingday_chr) %>%
+ #    tidyr::spread(workingday, n)
+   
 # test
 # bike %>%
 #   mutate(
@@ -127,7 +186,7 @@ bike <- bike %>%
                        "Working Day")))
 
 # verify
-# bike %>% 
+# bike %>%
 #   dplyr::count(workingday_chr, workingday_fct) %>%
 #   tidyr::spread(workingday_chr, n)
 
@@ -142,8 +201,7 @@ bike <- bike %>%
         season == 3 ~ "Fall",
         season == 4 ~ "Winter",
         TRUE ~ "other"
-      )
-  )
+      ))
 
 # test
 # bike %>%
@@ -174,16 +232,31 @@ bike <- bike %>%
 
 
 # Weather situation ----
+# test
+# bike %>%
+#   mutate(
+#     weathersit_chr =
+#       case_when(
+#         weathersit == 1 ~ "Good",
+#         weathersit == 2 ~ "Clouds/Mist",
+#         weathersit == 3 ~ "Rain/Snow/Storm",
+#         TRUE ~ "other")) %>% 
+#   dplyr::count(weathersit, weathersit_chr) %>%
+#   tidyr::spread(weathersit, n)
+
+# assign
 bike <- bike %>%
   mutate(
     weathersit_chr =
       case_when(
         weathersit == 1 ~ "Good",
         weathersit == 2 ~ "Clouds/Mist",
-        weathersit == 3 ~ "Rain/Snow/Storm",
-        TRUE ~ "other"
-      )
-  )
+        weathersit == 3 ~ "Rain/Snow/Storm"))
+
+# verify
+# bike %>% 
+#   dplyr::count(weathersit, weathersit_chr) %>%
+#   tidyr::spread(weathersit, n)
 
 # test
 # bike %>%
@@ -200,10 +273,10 @@ bike <- bike %>%
 bike <- bike %>%
   mutate(
     weathersit_fct = factor(x = weathersit,
-             levels = c(1, 2, 3),
-             labels = c("Good",
-                       "Clouds/Mist",
-                       "Rain/Snow/Storm")))
+                       levels = c(1, 2, 3),
+                       labels = c("Good",
+                                 "Clouds/Mist",
+                                 "Rain/Snow/Storm")))
 # verify
 # bike %>%
 #   dplyr::count(weathersit_chr, weathersit_fct) %>%
@@ -213,27 +286,25 @@ bike <- bike %>%
 # Months ----
 # huge shoutout to Thomas Mock over at RStudio for showing me 
 # lubridate::month() (and stopping my case_when() obsession)
+# https://twitter.com/thomas_mock/status/1113105497480183818
 
+# test 
+# bike %>% 
+#   mutate(month_ord = 
+#            lubridate::month(mnth, label = TRUE)) %>% 
+#   dplyr::count(month_ord, mnth) %>% 
+#   tidyr::spread(month_ord, n)
 
+# assign
+bike <- bike %>% 
+  mutate(month_ord = 
+           lubridate::month(mnth, label = TRUE))
 
-# bike <- bike %>%
-#   mutate(
-#     month_chr =
-#       case_when(
-#         mnth == 1 ~ "January",
-#         mnth == 2 ~ "February",
-#         mnth == 3 ~ "March",
-#         mnth == 4 ~ "April",
-#         mnth == 5 ~ "May",
-#         mnth == 6 ~ "June",
-#         mnth == 7 ~ "July",
-#         mnth == 8 ~ "August",
-#         mnth == 9 ~ "September",
-#         mnth == 10 ~ "October",
-#         mnth == 11 ~ "November",
-#         mnth == 12 ~ "December",
-#         TRUE ~ "other"
-#       ))
+# verify
+# bike %>% 
+#   dplyr::count(month_ord, mnth) %>% 
+#   tidyr::spread(month_ord, n)
+  
 
 # test
 # bike %>%
@@ -261,15 +332,28 @@ bike <- bike %>%
 #   tidyr::spread(month_fct, n)
 
 # Year ----
+# test
+# bike %>%
+#   mutate(
+#     yr_chr =
+#       case_when(
+#         yr == 0 ~ "2011",
+#         yr == 1 ~ "2012",
+#         TRUE ~ "other")) %>% 
+#     dplyr::count(yr, yr_chr) %>%
+#     tidyr::spread(yr, n)
+
+# assign
 bike <- bike %>%
   mutate(
     yr_chr =
       case_when(
         yr == 0 ~ "2011",
-        yr == 1 ~ "2012",
-        TRUE ~ "other"
-      )
-  )
+        yr == 1 ~ "2012"))
+# verify
+# bike %>%
+#     dplyr::count(yr, yr_chr) %>%
+#     tidyr::spread(yr, n)
 
 # test
 # bike %>%
@@ -313,7 +397,7 @@ bike <- bike %>%
   mutate(dteday = as.Date(dteday))
 
 # check df
-bike %>% dplyr::glimpse(78)
+# bike %>% dplyr::glimpse(78)
 
 # rename the data frame so these don't get confused
 BikeData <- bike

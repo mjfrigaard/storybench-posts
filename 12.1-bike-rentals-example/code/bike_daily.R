@@ -14,7 +14,7 @@ library(styler)
 # library(gbm)
 
 # read data of bike rentals daily ----
-bike <- read.csv("day.csv")
+bike <- read.csv("data/day.csv")
 
 
 # WRANGLE ---------------------------------------------------------------

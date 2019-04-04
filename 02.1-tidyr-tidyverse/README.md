@@ -1,668 +1,394 @@
-Getting Started with tidyverse
+Data Science Communication using R - tidyr
 ================
 Martin Frigaard
 2017-05-12
 
-# Getting started with tidyverse
+  - [Objectives](#objectives)
+  - [Part one: Tidy data](#part-one-tidy-data)
+      - [Core tidy data principles](#core-tidy-data-principles)
+  - [Part two: Grouping](#part-two-grouping)
+  - [Part three: Pivoting](#part-three-pivoting)
+      - [It’s like having fancy
+        footwork](#its-like-having-fancy-footwork)
+  - [Scenario 1: categorical variable across multiple
+    columns](#scenario-1-categorical-variable-across-multiple-columns)
 
-The [`tidyverse`](http://tidyverse.org/) is a collection of R packages
-developed primarily by RStudio’s chief scientist [Hadley
-Wickham](http://hadley.nz/). These packages play well together by
-adhering to some underlying principles, one of which we will explore
-below. To learn more about these tools and how they work together, read
-[R for data science](https://r4ds.had.co.nz/). For newcomers to R,
-please check out my previous tutorial for Storybench: [Getting Started
-with R in RStudio
-Notebooks](http://www.storybench.org/getting-started-r-rstudio-notebooks/).
+*TLDR: This tutorial was prompted by the recent changes to the `tidyr`
+package (see the tweet from Hadley Wickham below). Two functions for
+reshaping columns and rows (`gather()` and `spread()`) were replaced
+with `tidyr::pivot_longer()` and `tidyr::pivot_wider()` functions.*
 
-The following tutorial will introduce three underlying concepts about
-working with data in the `tidyverse`. These ideas are tidy data, tabular
-data, and the pipe. Understanding these principles will make it easier
-to work with the other packages in the `tidyverse` to manipulate and
-re-structure your data for visualizations and modeling. Read more about
-the tidy principles in the [Tidy Tools
-Manifesto](https://cran.r-project.org/web/packages/tidyverse/vignettes/manifesto.html).
-
-## Load the packages
-
-Install and load the `tidyverse` and `magrittr` packages for this
-tutorial.
+> Thanks to all 2649 (\!\!\!) people who completed my survey about table
+> shapes\! I've done analysed the data at
+> <a href="https://t.co/hyu1o91xRm">https://t.co/hyu1o91xRm</a> and the
+> new functions will be called pivot\_longer() and pivot\_wider()
+> <a href="https://twitter.com/hashtag/rstats?src=hash&amp;ref_src=twsrc%5Etfw">\#rstats</a>
+> 
+> </p>
+> 
+> — Hadley Wickham (@hadleywickham)
+> <a href="https://twitter.com/hadleywickham/status/1109816130774986753?ref_src=twsrc%5Etfw">March
+> 24,
+> 2019</a>
+> 
+> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 ``` r
-install.packages(c("tidyverse", "magrittr"))
+# this will require the newest version of tidyr from github
+# devtools::install_github("tidyverse/tidyr")
 library(tidyverse)
-library(magrittr)
 ```
 
-## What is tidy data?
+    TIDY⬢TIDY⬢TIDY⬢TIDY⬢TIDY⬢TIDY⬢TID⬢TIDY
+     ⬢ __  _    __   .    ⬡           ⬢  . 
+      / /_(_)__/ /_ ___  _____ _______ ___ 
+     / __/ / _  / // / |/ / -_) __(_-</ -_)
+     \__/_/\_,_/\_, /|___/\__/_/ /___/\__/ 
+          ⬢  . /___/      ⬡      .       ⬢
+    TIDY⬢TIDY⬢TIDY⬢TIDY⬢TIDY⬢TIDY⬢TID⬢TIDY
 
-“Tidy data” is a term that describes a standardized approach to
-structuring datasets to make analyses and visualizations easier in R. If
-you’ve worked with SQL and relational databases, you’ll recognize most
-of these concepts. Hadley Wickham distilled a lot of the technical
-jargon from [Edgar F. Codd’s normal
-form](https://en.wikipedia.org/wiki/Third_normal_form) and applied it to
-statistical terms. More importantly, he translated the important
-principles into terms just about anyone doing data analysis should be
-able to recognize and understand.
+# Objectives
 
-### The core tidy data principles
+This tutorial will cover three concepts about working with data in the
+`tidyverse`:
 
-There are three principles for tidy data:
+1)  tidy data,  
+2)  grouping, and  
+3)  the new pivoting verbs in `tidyr`
 
-1.  Variables make up columns
-2.  Observations (or cases) go in the rows
+A solid understanding of these topics makes it easier to manipulate and
+re-structure your data for visualizations and modeling in the
+`tidyverse`.
+
+I’ll be using examples of spreadsheets that were designed for data
+entry, not necessarily statistical modeling or graphics.
+
+My goal is that by showing the reasoning behind the data entry process,
+you’ll walk away with a better understanding (and hopefully a little
+less frustration) for why data are collected in so many different ways.
+
+-----
+
+# Part one: Tidy data
+
+[Tidy data](https://www.jstatsoft.org/article/view/v059i10) is… *“a
+standardized way to link the structure of a dataset (its physical
+layout) with its semantics (its meaning)”*
+
+If you’ve worked with SQL and relational databases, you’ll recognize
+most of these concepts. Hadley Wickham distilled a lot of the technical
+jargon from [Edgar F. Codd’s ‘normal
+form’](https://en.wikipedia.org/wiki/Third_normal_form) and applied it
+to statistical terms. More importantly, he translated these essential
+principles into concepts and terms a broader audience can grasp and use
+for data manipulation.
+
+## Core tidy data principles
+
+Tidy data, at least in the `tidyverse`, is referring to ‘rectangular’
+data. These are the data we typically see in spreadsheet software like
+Googlesheets, Microsoft Excel, or in a relational database like MySQL,
+PostgreSQL, or Microsoft Access, The three principles for tidy data are:
+
+1.  Variables make up the columns  
+2.  Observations (or cases) go in the rows  
 3.  Values are in cells
 
-*The third principle is almost a given if you’ve handled the first two,
-so we will focus on these.*
+Put them together, and these three statements make up the contents in a
+[data frame or tibble](https://tibble.tidyverse.org/). Data frame’s can
+contain any number of variables, which are used to store various
+measurements associated with each observation.
 
-R has quite a few objects for storing data–more than we can cover in a
-single post. But the beauty of working in the `tidyverse` is that you
-can focus on just a few of these objects (and start
-analyzing/visualizing data quickly). You’ve learned about atomic vectors
-in the [first
-tutorial](http://www.storybench.org/getting-started-r-rstudio-notebooks/).
-The next two objects we will introduce are `tibble`s and `data.frame`s.
+While these might seem obvious at first, many of the data arrangements
+we encounter in real life don’t adhere to this guidance.
 
-## Storing data in tables
+![](images/table-intersection.png)<!-- -->
 
-The three principles outlined above provide a foundation for thinking
-about your data. The shape these principles create is a square or
-rectangle.
+Let’s walk through a few scenarios to show how the decisions about data
+entry can lead to many different column and row orientations.
 
-See below:
+# Part two: Grouping
 
-![](images/table.png)<!-- -->
+Grouping is a way of summarizing data with functions in the `dplyr`
+package. Similar to `GROUP BY` in SQL, `dplyr::group_by()` silently
+groups a data frame (which means we don’t see any changes to the data
+frame after applying the function).
 
-At the intersection of each column and row is a value. In order to know
-which values we are referring to, we’ll need a way to think about their
-location in the table. The table below shows an address for each of the
-values in the table above.
+Take the data frame below, which has 5 variables:
 
-|                  | column 1 = `[ , 1]` | column 2 = `[ , 2]` |
-| ---------------- | ------------------- | ------------------- |
-| row 1 = `[ 1, ]` | `[row 1, col 1]`    | `[row 1, col 2]`    |
-| row 2 = `[ 2, ]` | `[row 2, col 1]`    | `[row 2, col 2]`    |
-| row 3 = `[ 3, ]` | `[row 3, col 1]`    | `[row 3, col 2]`    |
-
-The brackets `[ ]` give me access to each value’s position. If I want to
-look at the value in column 1, row 3 I would use `data[ 3, 1]`. This
-gives me the ability to refer to individual values using their row and
-column position. We will put this operator to use below.
-
-### Data frames
-
-The code below will create a `base::data.frame`. This function needs the
-`stringsAsFactors` argument set to `FALSE`, the names of the columns
-(`column 1` and `column 1`), the names of the rows (as `row.names =
-c("row 1", "row 2", "row 3")`), and the values in each cell.
-
-*Don’t worry about what all of these arguments do–we will cover that
-later. Just focus on the resulting object*
-
-``` r
-DataFrame <- base::data.frame(stringsAsFactors = FALSE, 
-            `column 1` = c("row 1, col 1", "row 2, col 1", "row 3, col 1"),
-            `column 2` = c("row 1, col 2", "row 2, col 2", "row 3, col 2"),
-            row.names = c("row 1", "row 2", "row 3"))
-DataFrame
-```
-
-    ##           column.1     column.2
-    ## row 1 row 1, col 1 row 1, col 2
-    ## row 2 row 2, col 1 row 2, col 2
-    ## row 3 row 3, col 1 row 3, col 2
-
-**Things to know about `data.frame`s:**
-
-1.  They have row names
+  - `group_var` - a categorical group
+  - `year` - the calendar year the measurements were collected
+  - `x_measurement` and `y_measurement` - these are randomly generated
+    numbers
+  - `ordinal_x_var` - this is an ordinal variable corresponding to the
+    values in `x_measurement` (greater than or equal to 75 is `"high"`
+    or `3`, greater than or equal to `50` and less than `75` is `"med"`,
+    and less than `50` is `"low"`).
 
 <!-- end list -->
 
 ``` r
-# check row.names
-base::row.names(DataFrame)
+DataTibble <- tibble::tribble(
+   ~group_var, ~year,   ~x_measurement,   ~y_messurement,  ~ordinal_x_var,
+          "A",  2018, 11.8159851059318, 532.373521731468,           "low",
+          "A",  2017, 28.4611755283549, 116.042412365321,           "low",
+          "A",  2016, 49.1562793264166, 304.210926492466,           "low",
+          "B",  2018, 87.5606247922406, 719.384127181955,          "high",
+          "B",  2017, 11.3308956148103, 984.383774694521,           "low",
+          "C",  2018, 15.8781699370593, 959.414658935741,           "low",
+          "C",  2017, 63.7600556015968, 962.275661041727,           "med",
+          "C",  2016, 96.0327247157693, 744.529502285644,          "high") %>% 
+    dplyr::mutate(ordinal_x_var = base::factor(ordinal_x_var, 
+                                            levels = c("high", 
+                                                        "med", 
+                                                        "low"),
+                                            labels = c(3, 2, 1)))
+
+DataTibble %>% dplyr::glimpse(78)
 ```
 
-    ## [1] "row 1" "row 2" "row 3"
-
-2.  The columns in `data.frame`s are vectors.
-
-<!-- end list -->
+If I apply `dplyr::group_by()` to the `group_var` in `DataTibble`, I
+will see no visible result.
 
 ``` r
-# subset the first column 
-base::is.vector(DataFrame[ , 1])
+DataTibble %>% 
+    dplyr::group_by(group_var)
 ```
 
-    ## [1] TRUE
-
-3.  The rows in `data.frame`s are lists
-
-<!-- end list -->
+But if I combine `dplyr::group_by()` with `dplyr::summarize()`, I can
+collapse `DataTibble` into a smaller table by supplying an aggregate
+function to `summarize()`. Examples of these are `mean()`, `median()`,
+`sum()`, `n()`, `sd()`, etc.
 
 ``` r
-# subset the first row
-base::is.list(DataFrame[ 1, ])
+knitr::kable(
+DataTibble %>% 
+    dplyr::group_by(group_var) %>% 
+    dplyr::summarize(x_mean = mean(x_measurement), 
+                     y_mean = mean(y_messurement),
+                     no = n())
+)
 ```
 
-    ## [1] TRUE
-
-4.  Column names can’t be non-syntactic (i.e. have white space, start
-    with a number, etc)
-
-<!-- end list -->
+Grouping can also work with categorical/factor variables. The code below
+uses `dplyr::count()` to summarize the number of `ordinal_x_var` levels
+per category of `group_var`,
 
 ``` r
-# the base::data.frame() function added a period 
- base::names(DataFrame)
+knitr::kable(
+DataTibble %>% 
+    dplyr::count(group_var, ordinal_x_var))
 ```
 
-    ## [1] "column.1" "column.2"
-
-### Tibbles
-
-A `tibble` is an optimized way to store and display data when using
-packages from the `tidyverse`. We can create a `tibble` similar to the
-`data.frame` above with the `tibble::tribble()` function. Unlike the
-`base::data.frame()` function, we can arrange these data just like would
-appear in the `tibble`. The `~` operator is used to signify the column
-names, and the values are entered below each column (separated by
-commas).
+This table isn’t very easy to read because all of the information is
+oriented and indexed vertically. I can move the values of `group_var`
+into individual columns to make it easier on the eyes using
+`tidyr::spread`.
 
 ``` r
-Tibble <- tibble::tribble(
-    ~`column 1`, ~`column 2`,
-    "row 1, col 1", "row 1, col 2",
-    "row 2, col 1", "row 2, col 2")
-Tibble
+knitr::kable(
+DataTibble %>% 
+    dplyr::count(group_var, 
+                 ordinal_x_var) %>% 
+    tidyr::spread(key = group_var, 
+                  value = n))
 ```
 
-    ## # A tibble: 2 x 2
-    ##   `column 1`   `column 2`  
-    ##   <chr>        <chr>       
-    ## 1 row 1, col 1 row 1, col 2
-    ## 2 row 2, col 1 row 2, col 2
-
-**Things to know about `tibble`s:**
-
-1.  There is no need to tell R what to do with `strings` (i.e. no
-    `stringsAsFactors` argument)
-
-<!-- end list -->
+Notice how this creates a table with different dimensions? This can
+quickly be undone with the accompanying `tidyr::gather()` function, but
+requires us to specify that the missing values should be removed. *I
+also added a `dplyr::select()` statement to arrange these values so they
+are similar to the table above*.
 
 ``` r
-?tribble
+knitr::kable(
+DataTibble %>% 
+    dplyr::count(group_var, 
+                 ordinal_x_var) %>% 
+    tidyr::spread(key = group_var, 
+                  value = n) %>% 
+    tidyr::gather(key = group_var, 
+                  value = "n", 
+                  -ordinal_x_var, 
+                  na.rm = TRUE) %>% 
+    dplyr::select(group_var, ordinal_x_var, n))
 ```
 
-2.  `tibble`s don’t need row names
+# Part three: Pivoting
 
-<!-- end list -->
+All this data manipulation brings us to *pivoting*, the [recent
+additions](https://tidyr.tidyverse.org/dev/articles/pivot.html) to the
+`tidyr` package. These functions will be slowly replacing the previous
+functions for reshaping data frames, `tidyr::gather()` and
+`tidyr::spread()`. I found it refreshing to learn that I wasn’t the only
+person struggling to use these functions. Hadley Wickham, the package
+developer/author, confessed he also struggles when using these
+functions,
+
+> Many people don’t find the names intuitive and find it hard to
+> remember which direction corresponds to spreading and which to
+> gathering. It also seems surprisingly hard to remember the arguments
+> to these functions, meaning that many people (including me\!) have to
+> consult the documentation every time.
+
+Statements like these are examples of why I appreciate the `tidyverse`,
+because I can tell a lot of thought gets put into identifying verbs that
+accurately capture the users intentions. Knowing how to reshape data is
+an important skill for data scientists, and I think the `tidyr::pivot_`
+functions are great additions to data manipulation in the `tidyverse`.
+
+-----
+
+## It’s like having fancy footwork
+
+Vasily Lomachenko, the best [pound-for-pound
+boxer](https://en.wikipedia.org/wiki/Boxing_pound_for_pound_rankings) in
+the world, is known for taking [traditional Ukrainian dance classes as a
+child before ever stepping into a boxing
+ring](traditional%20Ukrainian%20dance%20classes). Why would an athlete
+who punches people for a living spend time learning how to dance?
+Because having precise footwork and the ability to change direction
+sharply is so essential in boxing that these skills are often what
+separates a good fighter from an elite
+athlete.
+
+![<http://fightland.vice.com/blog/the-pivots-and-precision-of-vasyl-lomachenko>](images/loma-pivot.gif)
+
+As you can see, Lomachenko’s pivoting abilities not only make him
+frustratingly hard to hit, but they also allow him to see openings in
+his opponents defense (which makes him incredibly successful at landing
+punches).
+
+![<http://fightland.vice.com/blog/the-pivots-and-precision-of-vasyl-lomachenko>](images/loma-pivot-strike.gif)
+
+*Why am I telling you about Vasyl Lomachenko’s footwork?*
+
+The `tidyr::pivot_` functions give you a similar ability with your data.
+Being able to rapidly rotate your data from columns to rows (and back)
+is similar to being able to turn 90 degrees on a dime and avoid an
+incoming punch (or to see an opening and land a stiff jab).
+
+> “I think footwork is one of the most important things to becoming a
+> great fighter. That’s where everything starts.” - Vasyl Lomachenko
+
+We’re going to start by manipulating a data set of Lomachenko’s fights
+from the [BoxRec](http://boxrec.com/en/boxer/659771) database. The fight
+information has been entered in a way that makes sense for the person
+entering the data, but it’s not ideal for analysis or modeling.
+
+# Scenario 1: categorical variable across multiple columns
+
+We will load Lomachenko’s fight record from Wikipedia and explore how to
+use these new functions. To see how these data are created, check out
+the script file
+[here](https://github.com/mjfrigaard/storybenchR/blob/master/02.1-tidyr-tidyverse/loma-fights-wikipedia.R)
 
 ``` r
-base::row.names(Tibble)
+# fs::dir_ls("data")
+LomaFightsWide <- readr::read_csv(file = "data/2019-03-29-LomaFightsWide.csv")
 ```
 
-    ## [1] "1" "2"
+Assume a physician wants to compare the efficacy of a new statin drug (a
+cholesterol lowering medicine) against the currently recommended
+medication.
 
-3.  `tibble`s offer more flexibility in column names (they allow
-    non-syntactic names).
+After consenting `415` patients with high cholesterol, the physician
+randomly selects a sample of `209` patients to receive the new drug for
+six months, while the other `206` patients get a six-month course of the
+current drug.
 
-<!-- end list -->
+*NOTE: This is a simplification of a clinical trial. In a true
+experiment, there are many other factors to consider.*
+
+Below is an example of how these data might get entered into a
+spreadsheet.
 
 ``` r
-base::names(Tibble)
+TrialDataPrePost <- read_csv("data/trial-data-pre-post.csv",
+                             col_types = list())
+knitr::kable(
+TrialDataPrePost %>% utils::head())
 ```
 
-    ## [1] "column 1" "column 2"
+Imagine a hypothetical chain of events for this trial, starting with the
+first and following in the order they occur:
 
-Other than these differences, these two objects are very similar. In
-fact, a `tibble` is a `data.frame` (but a `data.frame` is not a
-`tibble`)
+1.  A patient with high cholesterol gets randomized into the `treatment`
+    condition, given an ID number (`patient id trt`), then a cholesterol
+    measurement is taken and entered into the `baseline treatment`
+    column.
 
-We can check this with `utils::str()`
+2.  A second patient with high cholesterol comes into the physician’s
+    office, is randomized into the `control` group, given their ID
+    (`patient id cont`), and their baseline cholesterol measurement is
+    recorded.
+
+3.  The process continues, and all `415` patients with high cholesterol
+    are assigned to a group (`treatment` or `control`), given an ID
+    (`patient id`), then prescribed the appropriate medication.
+
+4.  Six months after their initial appointment and baseline
+    measurements, both groups of patients have their cholesterol
+    measured again (in the `post` columns).
+
+Given this timeline, does it seem *that* strange to enter the data in a
+spreadsheet like the `TrialDataPrePost` data frame? I don’t think so,
+and here are some reasons why:
+
+1.  This spreadsheet starts out as a record-keeping tool, and it’s doing
+    just that: something happens, then it gets documented
+2.  Tables like this can be read left-to-right, and the columns and rows
+    are added *as they occur*
+3.  The physician (or whoever is entering the data) can see a lot of the
+    data on the screen
+
+We can actually think of the `TrialDataPrePost` data frame as containing
+*two* data frames: the `Treatment` data (with `209` patients), and the
+`Control` data (with `206` patients).
+
+A little `dplyr` action will can separate these data frames.
 
 ``` r
-utils::str(DataFrame)
+Treatment <- TrialDataPrePost %>% 
+    dplyr::select(pat_id_trt,
+                  `baseline treatment`,
+                  `post treatment`)
+Treatment %>% glimpse(78)
 ```
-
-    ## 'data.frame':    3 obs. of  2 variables:
-    ##  $ column.1: chr  "row 1, col 1" "row 2, col 1" "row 3, col 1"
-    ##  $ column.2: chr  "row 1, col 2" "row 2, col 2" "row 3, col 2"
 
 ``` r
-utils::str(Tibble)
+Control <- TrialDataPrePost %>% 
+    dplyr::filter(!is.na(pat_id_cont)) %>% 
+    dplyr::select(pat_id_cont,
+                  `baseline control`,
+                  `post control`)
+Control %>% glimpse(78)
 ```
-
-    ## Classes 'tbl_df', 'tbl' and 'data.frame':    2 obs. of  2 variables:
-    ##  $ column 1: chr  "row 1, col 1" "row 2, col 1"
-    ##  $ column 2: chr  "row 1, col 2" "row 2, col 2"
-
-You can read more about them [here](http://tibble.tidyverse.org/).
-
-## The “pipe”
-
-The pipe is a symbol (`%>%`) from the `magrittr` package. It makes the R
-language easier to write and understand. If you imagine the objects in R
-(data frames, vectors, etc.) are nouns, the functions (`function()`)
-like verbs. Functions do things to objects. If I wanted to apply
-function `f()` to object `x`, I would write it as `f(x)`. If I had a
-series of functions to apply to `x`, they would be written `h(g(f(x)))`.
-
-This gets hard to read when there are multiple functions to apply,
-because if I start reading from left to right, the first function I
-read, `h()`, is the last function that gets applied to `x`. Fortunately,
-the pipe allows us to write R code like so:
-
-`x %>% f() %>% g() %>% h()`
-
-Isn’t that better? Read about using it
-[here.](https://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html)
-
-## What is a variable?
-
-A **variable** is any measurement that can take multiple values.
-Depending on the field a dataset comes from, variables can be referred
-to as an independent or dependent variables, features, predictors,
-outcomes, targets, responses, or attributes.
-
-Variables can generally fit into three categories:
-
-  - **fixed variables** (characteristics that were known before the data
-    were collected),  
-  - **measured variables** (variables containing information captured
-    during a study or investigation), and  
-  - **derived variables** (variables that are created during the
-    analysis process from existing variables)
-
-Here’s an example: Suppose clinicians were testing a new
-anti-hypertensive drug. They recruit 30 patients, all of whom are being
-treated for high blood pressure, and divide them randomly into three
-groups. The clinician gives one third of the patients the drug for eight
-weeks, another third gets a placebo, and the final third gets care as
-usual. At the beginning of the study, the clinicians collect information
-about the patients. These measurements included the patient’s sex, age,
-weight, height, and baseline blood pressure (pre BP).
-
-For patients in this hypothetical study, suppose the group they were
-randomized to (i.e the drug, control, or placebo group), would be
-considered a fixed variable. The measured `pre BP` (and `post BP`) would
-be considered the measured variables.
-
-Suppose that after the trial was over, all of the data were collected,
-and the clinicians wanted a way of identifying the number of patients in
-the trial with a reduced blood pressure (yes or no)? One way is to
-create a new categorical variable that would identify the patients with
-post BP less than 140 mm Hg (`1` = `yes`, `0` = `no`). This new
-categorical variable would be considered a derived variable.
-
-The data for the fictional study I’ve described also contains an
-underlying dimension of time. As the description implies, each patient’s
-blood pressure was measured before and after they took the drug (or
-placebo). So these data could conceivably have variables for date of
-enrollment (the date a patient entered the study), date of pre blood
-pressure measurement (baseline measurements), date of drug delivery
-(patient takes the drug), date of post blood pressure measurement (blood
-pressure measurement taken at the end of the study).
-
-## What’s an observation?
-
-Observations are the unit of analysis or whatever the “thing” is that’s
-being described by the variables. Sticking with our hypothetical blood
-pressure trial, the patients would be the unit of analysis. In a tidy
-dataset, we would expect each row to represent a single patient.
-Observations are a bit like [nouns](https://en.wikipedia.org/wiki/Noun),
-in a sense that pinning down an exact definition can be difficult, and
-it often relies heavily on how the data were collected and what kind of
-questions you’re trying to answer. Other terms for observations include
-records, cases, examples, instance, or samples.
-
-### Different table, same data
-
-Imagine a single number, 140, sitting in a table.
-
-|       | Column 1 | Column 2 |
-| ----- | -------- | -------- |
-| row 1 | 140      |          |
-| row 2 |          |          |
-
-We could say this number’s location is the intersection of Column 1 and
-Row 1, but that doesn’t tell us much about the number. The data, 140, is
-meaningless if it’s just sitting in a cell without any information about
-what it represents. A number all alone in a table begs the question,
-“*one hundred and forty what?*”
-
-This is why thinking of a table as being made of variables (in the
-columns) and observations (in the rows) helps get to the meaning behind
-the values in each cell. After adding variable (column) and observation
-(row) names, we can answer the question above by saying, “*these data
-are `[insert variable]` on `[insert observation]`*”
-
-For example, by adding two variable names and one additional observation
-I can see that this `140` is the pre diastolic blood pressure
-(`pre_dia_bp`) for patient number 3 (`patient_3`).
-
-| `id`        | `pre_dia_bp` | Column 2 |
-| ----------- | ------------ | -------- |
-| `patient_3` | 140          |          |
-| row 2       |              |          |
-
-As time goes on in this hypothetical study, a second measurement gets
-taken on patient 3 and placed in the next column. This might look like
-the table below.
-
-| `id`        | `pre_dia_bp` | `post_dia_bp` |
-| ----------- | ------------ | ------------- |
-| `patient_3` | 140          | 120           |
-| row 2       |              |               |
-
-This is a logical way to enter data into a spreadsheet or database. As
-new measurements are taken, the user creates a new column and enters the
-new values into the corresponding row. This is because it’s relatively
-easy to track this information visually. We can look at `patient_3`,
-then track their information from right to left.
-
-However, these data could also be structured in the following
-arrangement.
-
-| `patient_id` | `dia_meas` | `dia_value` |
-| ------------ | ---------- | ----------- |
-| 03           | pre        | 140         |
-| 03           | post       | 120         |
-
-This arrangement is displaying the same information (i.e. the pre and
-post diastolic blood pressures for patient number 3), but now the column
-`dia_meas` contains information on blood pressure measurement type
-(`pre` or `post`), and the `dia_value` has the numerical value.
-
-This is tidy data. There is only one variable per column and one
-observation per row. We’ll build another pet example to further
-establish some basic tidying terminology.
-
-### Key value pairs
-
-The code below will create a key-value pair reference `tibble`. We are
-going to build a `tibble` from scratch, defining the variables,
-observations, and contents of each cell. By doing this, we’ll be able to
-keep track of what happens as we rearrange these data. The goal of this
-brief exercise is to make key-value pairs easier to see and understand.
 
 ``` r
-KeyValue <- tibble::tribble(
-     ~`row`, ~`key 1`, ~`key 2`, ~`key 3`, # names of the columns indicated with
-     "1", "1_value_1","1_value_2","1_value_3", # Row 1
-     "2", "2_value_1", "2_value_2", "2_value_3", # Row 2
-     "3", "3_value_1", "3_value_2", "3_value_3") # Row 3
-KeyValue
+# trt <- runif(209, min = 160, max = 200)
+# cont <- runif(206, min = 160, max = 200)
+# A <- tibble::enframe(x = trt, value = "baseline treatment")
+# B <- tibble::enframe(x = cont, value = "baseline control")
+# write_csv(as.data.frame(A), "data/A.csv")
+# write_csv(as.data.frame(B), "data/B.csv")
+# trt2 <- runif(209, min = 150, max = 190)
+# cont2 <- runif(206, min = 160, max = 200)
+# A2 <- tibble::enframe(x = trt2, value = "post treatment")
+# B2 <- tibble::enframe(x = cont2, value = "post control")
+# write_csv(as.data.frame(A2), "data/A2.csv")
+# write_csv(as.data.frame(B2), "data/B2.csv")
 ```
 
-    ## # A tibble: 3 x 4
-    ##   row   `key 1`   `key 2`   `key 3`  
-    ##   <chr> <chr>     <chr>     <chr>    
-    ## 1 1     1_value_1 1_value_2 1_value_3
-    ## 2 2     2_value_1 2_value_2 2_value_3
-    ## 3 3     3_value_1 3_value_2 3_value_3
-
-Our new object (`KeyValue`) is built with the following underlying
-logic:
-
-  - Rows are numbered with a number (1–3) and an underscore (\_), and
-    always appear at the front of a value  
-  - Columns are numbered with an underscore (\_) and a number (1–3), and
-    always appear at the end of a value
-
-## Using the tidyr package
-
-`tidyr` is a package from the tidyverse that helps you structure (or
-re-structure) your data so its easier to visualize and model. Here is a
-[link to the tidyr page](http://tidyr.tidyverse.org/). Tidying a data
-set usually involves some combination of either converting rows to
-columns (spreading), or switching the columns to rows (gathering).
-
-We can use our `KeyValue` object to explore how these functions work.
-
-### Gathering data
-
-This is how `tidyr` defines `gather`:
-
-> “Gather takes multiple columns and collapses into key-value pairs,
-> duplicating all other columns as needed. You use `gather()` when you
-> notice that you have columns that are not variables.”
-
-Let’s start by gathering the three key columns into a single column,
-with a new column value that will contain all their values. Use
-`KeyValue` as the initial object and pipe it to the `tidyr::gather()`
-function. Store this in a new object called `KeyValueGathered`.
-
-``` r
-KeyValueGathered <- KeyValue %>% 
-     tidyr::gather(key = key, # new column for the 3 key columns
-            value = value, # contains the 9 distinct values
-            `key 1`:`key 3`, # range of columns we want gathered
-            na.rm = TRUE # handles missing
-            )
-KeyValueGathered
-```
-
-![](images/gathered.png)<!-- -->
-
-Notice the new structure:
-
-  - The new `key` column is now 9 rows, with the values from the three
-    former `key 1`, `key 2`, and `key 3` columns.
-
-  - The `value` column contains all the content from the cells at each
-    intersection of row and the `key 1`, `key 2`, and `key 3` columns
-
-We’ve used `tidyr::gather()` to scoop up the data that was originally
-scattered across three columns and placed them into two columns: `key`
-and `value`.
-
-### What happened?
-
-Key-value pairs pair up keys with values. This means when we specified
-`key` as the name of the new column, the command took the three previous
-key columns and stacked them inside this variable. Then we specified
-`value` as the name of the new column with their corresponding value
-pair.
-
-What about the row column? We left this column out of the call because
-we want it to stay in the same arrangement (i.e. 1,2,3). When the `key`
-and `value` columns get stacked, these rows get repeated down the
-column,
-
-Nothing was lost in the process, either. I can still look at the
-intersection of row 3 and key 2 and see the resulting value `3_value_2`.
-
-``` r
-KeyValueGathered[ 6, 3]
-```
-
-    ## # A tibble: 1 x 1
-    ##   value    
-    ##   <chr>    
-    ## 1 3_value_2
-
-### Spreading data
-
-Now we’ll `spread` the `key` and `value` columns back into their
-original arrangement (three columns of `key 1`, `key 2`, & `key 3`). The
-`spread` description [reads](http://tidyr.tidyverse.org/):
-
-> “Spread a key-value pair across multiple columns.”
-
-Store this new arrangement in a new object called `KeyValueSpreaded`.
-
-``` r
-KeyValueSpreaded <- KeyValueGathered %>% 
-     tidyr::spread(key = key, 
-                   value = value)
-KeyValueSpreaded
-```
-
-![](images/spread.png)<!-- -->
-
-Spread moved the values that were stacked in two columns (`key` and
-`value`) into the three distinct `key` columns.
-
-The key-value pairs are the indexes we can use to rearrange the data to
-make it tidy.
-
-### Which version of the table is tidy?
-
-We stated that tidy data means, “one variable per column, one
-observation per row,” so the arrangement that satisfied this condition
-is the `KeyValueGathered` data set.
-
-But I want to stress that without some underlying knowledge of what
-these variables and observations actually contain, it’s hard to know
-which arrangement of any data set is tidy.
-
-## Why tidy data?
-
-Tidy data is the preferred data storage format in R because of how the R
-functions work. Each column in a `tibble` is a vector, so by tidying our
-data, we give R’s access to each of our variables.
-
-See this section from [Efficient R
-Programming](https://bookdown.org/csgillespie/efficientR/programming.html#top-5-tips-for-efficient-programming)
-by Colin Gillespie and Robin Lovelace for a better explanation,
-
-> Recall the golden rule in R programming, **access the underlying
-> C/Fortran routines as quickly as possible**; the fewer functions calls
-> required to achieve this, the better. With this mind, many R functions
-> are vectorised, that is the function’s inputs and/or outputs naturally
-> work with vectors, reducing the number of function calls required.
-
-If a variable is spread across multiple variables (i.e. multiple
-vectors), the functions can’t do their job.
-
-## Demonstrating tidiness
-
-The data below are similar to the example trial we introduced above,
-only I’ve added two other measurements: 1) the systolic blood pressure
-(`sys`), and 2) the group each patient was assigned to (`trt_group`).
-
-These data are stored in the `BpData` `tibble`.
-
-``` r
-BpData <- tibble::tribble(~pat_id,   ~time, ~dia, ~sys, ~trt_group,
-                                     1, "1",   63,  144,  "control",
-                                     1, "2",   54,  132,  "control",
-                                     2, "1",   60,  148,  "control",
-                                     2, "2",   54,  129,  "control",
-                                     3, "1",   72,  145,  "placebo",
-                                     3, "2",   61,  128,  "placebo",
-                                     4, "1",   68,  126,  "placebo",
-                                     4, "2",   68,  125,  "placebo",
-                                     5, "1",   75,  145,     "drug",
-                                     5, "2",   55,  127,     "drug",
-                                     6, "1",   65,  136,     "drug",
-                                     6, "2",   59,  120,     "drug")
-```
-
-We are going to use this data set to demonstrate how tidying data makes
-it easier to use `tidyverse` functions.
-
-### Quickly plot your data with qplot
-
-`ggplot2` is a comprehensive language for visualizing data (we will get
-to this in a future tutorial). It comes with the `qplot()` function
-which stands for ‘quick plot’. Below is the basic syntax to use this
-function,
-
-`ggplot2::qplot( x =` **variable 1** `, y =` **variable 2** `, data =`
-**tibble or data.frame** `)`
-
-We can use this function to plot `dia` on the `x` axis vs. `sys` on the
-`y` axis below.
-
-``` r
-ggplot2::qplot(x = dia, 
-               y = sys, 
-               data = BpData)
-```
-
-![](images/qplot-1-1.png)<!-- -->
-
-This is clear. but not very informative. I need to add more variables to
-understand if there was a difference in blood pressure between time 1
-and time 2 in the three groups. One way to do look for patterns is with
-the `color` argument. I’ll assign this to `trt_group`.
-
-``` r
-ggplot2::qplot(x = dia, 
-               y = sys, 
-               color = trt_group,
-               data = BpData)
-```
-
-![](images/qplot-2-1.png)<!-- -->
-
-Now I can start to see differences between groups, but how can I
-determine if there is a difference between time 1 and time 2? What if I
-wanted to plot all the blood pressure measurements (diastolic and
-systolic), but still show that information in the graph?
-
-That requires tidying the `BpData` data in order to get all the blood
-pressure measurements into a single column (`bp_meas`), indexed by type
-(`bp_meas_type`). I can also add the `color` argument and look at the
-`time` on the same plot.
-
-``` r
-BpData %>% 
-    tidyr::gather(key = bp_meas_type,
-                  value = bp_meas,
-                  dia:sys) %>% # we can send this directly to the 
-                                           # qplot() function 
-    ggplot2::qplot(x = bp_meas_type, 
-                   y = bp_meas, 
-                   color = time,
-                   data = .) # data becomes a dot (.) because it's coming from
-```
-
-![](images/qplot-3-1.png)<!-- -->
-
-``` r
-                             # the pipeline above.
-```
-
-This plot is much more informative than the earlier version because I
-was able to send all of the variables into the `y` argument, and then
-look at them by type and time. But I still can’t see the information in
-the `trt_group` variable.
-
-I can add this information back to the plot by using the `facets`
-argument and looking at `trt_group` by `time`.
-
-``` r
-BpData %>% 
-    tidyr::gather(key = bp_meas_type,
-                  value = bp_meas,
-                  dia:sys) %>% # we can send this directly to the 
-                                           # qplot() function with the pipe
-    ggplot2::qplot(x = bp_meas_type, 
-                   y = bp_meas, 
-                   color = time, # keep this aesthetic 
-                   facets = . ~ trt_group, # the dot argument tells qplot()
-                   # to create a different plot for each level of trt_group
-                   data = .) # data becomes dot (.) from pipeline above
-```
-
-![](images/qplot-4-1.png)<!-- -->
-
-## Recap
-
-This tutorial covered the following topics:
-
-  - Tidy data principles (one observation per row, one variable per
-    column)
-
-  - Rectangular/tabular data (`tibble`s and `data.frame`s)
-
-  - The pipe `%>%` for easier to read code
-
-  - Use key-value pairs to re-structure data
-
-  - Quickly plotting data with `qplot()` from `ggplot2`
+<div class="kable-table">
+
+| patient\_id | group   | result     |
+| ----------: | :------ | :--------- |
+|         265 | control | no outcome |
+|         344 | control | no outcome |
+|         214 | control | outcome    |
+|         320 | control | no outcome |
+|         359 | control | no outcome |
+|         277 | control | no outcome |
+
+</div>

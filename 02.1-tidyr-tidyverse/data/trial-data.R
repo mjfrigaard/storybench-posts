@@ -1,4 +1,6 @@
-TrialData <- tibble::tribble(~patient,      ~group,      ~result,
+# create TrialData data set
+
+TrialData <- tibble::tribble(~patient_id,      ~group,      ~result,
                                265,   "control", "no outcome",
                                344,   "control", "no outcome",
                                214,   "control",    "outcome",
@@ -414,3 +416,6 @@ TrialData <- tibble::tribble(~patient,      ~group,      ~result,
                                 44, "treatment", "no outcome",
                                 99, "treatment", "no outcome",
                                193, "treatment", "no outcome")
+
+# export ----
+readr::write_csv(as.data.frame(TrialData), path = "data/TrialData.csv")

@@ -13,20 +13,13 @@ ames_train <- training(ames_split)
 ames_test  <- testing(ames_split)
 
 # convert to matrix
-# model
-fit1 <- gbm(Sale_Price ~., 
-            data = ames_train, 
-            verbose = TRUE, 
-            shrinkage = 0.01, 
-            interaction.depth = 3, 
-            n.minobsinnode = 5,
+#model
+fit1 <- gbm(Sale_Price ~., data = ames_train, verbose = TRUE, shrinkage = 0.01, interaction.depth = 3, n.minobsinnode = 5,
             n.trees = 5000, cv.folds = 10)
 
 perf.gbm1 <- gbm.perf(fit1)
 
-prediction1 <- predict(fit1, 
-                       newdata = ames_test, 
-                       n.trees = perf.gbm1)
+prediction1 <- predict(fit1, newdata = ames_test, n.trees=perf.gbm1)
 
 rmse.fit1 <- rmse(ames_test$Sale_Price, prediction1)
 
@@ -44,7 +37,7 @@ plot.gbm(fit1, i.var = c(50, 46))
 
 
 # Predicted v actual
-ames_test$predicted <- as.integer(predict(fit1, newdata = ames_test, n.trees = perf.gbm1))
+ames_test$predicted <- as.integer(predict(fit1, newdata = ames_test, n.trees=perf.gbm1))
 
 # plot predicted v actual
 ggplot(ames_test) +

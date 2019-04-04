@@ -55,18 +55,21 @@ library(readr)
 The `pew` dataset stores count from a survey which (among other things) asked people about their religion and annual income:
 
 ```{r import-pew}
-pew <- read_csv("pew.csv", col_types = list())
-pew
+pew <- read_csv("pew.csv", 
+                col_types = list())
+pew %>% dplyr::glimpse(78)
 ```
 
 This is 2d table with religion in the rows, income spread across the column names, and a count stored in the cell values. To tidy it we need `pivot_longer()`:
 
-```{r pew}
+```{r pew-pivot_longer}
 pew %>% 
   pivot_longer(cols = -religion, 
                names_to = "income", 
                values_to = "count")
 ```
+
+### pivot_longer(names_to, values_to) arguments
 
 * The first argument describes which columns need to be transformed. 
   In this case, it's every column apart from `religion`.
@@ -83,65 +86,100 @@ Neither the `names_to` nor the `values_to` column exists in `pew`, so we have to
 
 For many datasets, `pivot_longer()` is all you need. But for more complex datasets it often makes sense to manually generate a data frame that precisely describes the transformation. For example, take the billboard data:
 
-```{r billboard}
-billboard <- read_csv("billboard.csv", col_types = list(time = col_skip()))
-billboard
+```{r billboard-import}
+billboard <- read_csv("billboard.csv", 
+                      col_types = list(time = col_skip()))
+billboard %>% utils::head()
 ```
 
 This records the billboard rank of songs over time. It is very similar in form to the `pew` data above, but the data encoded in the column names is really a number, not a string. This means that `pivot_longer()` works, but will require some additional cleaning afterwards:
 
-```{r}
+### Using pivot_longer(names_prefix, na.rm)
+
+> this adds the `names_prefix` and `na.rm` to the function. 
+
+```{r pivot_longer-names_prefix-na.rm}
 billboard %>% 
   pivot_longer(
     cols = starts_with("wk"), 
     names_to = "week", 
     names_prefix = "wk",
     values_to = "rank",
-    na.rm = TRUE
-  )
+    na.rm = TRUE) %>% dplyr::glimpse(78)
 ```
 
-Instead of doing that cleaning on the long data, we can tackle the problem in another way: by generating a pivot spec. (Using a pivoting spec is probably overkill for this problem, but it's a good bridge between very simple cases and the more complex cases you'll learn about shortly.) A pivoting spec is a data frame that describes the metadata stored in the column name, with one row for each column, and one column for each variable mashed into the column name. 
+Instead of doing that cleaning on the long data, we can tackle the problem in another way: by generating a pivot `spec`. (Using a pivoting spec is probably overkill for this problem, but it's a good bridge between very simple cases and the more complex cases you'll learn about shortly.) 
+
+## Pivoting spec (pivot_longer_spec())
+
+A pivoting `spec` is a data frame that describes the metadata stored in the column name, with one row for each column, and one column for each variable mashed into the column name. 
 
 We start using `pivot_longer_spec()` to generate the spec that `pivot_longer()` generates behind the scenes:
 
-```{r spec}
-spec <- billboard %>% 
+```{r billboard_spec}
+billboard_spec <- billboard %>% 
   pivot_longer_spec(
     cols = starts_with("wk"), 
     names_to = "week", 
     names_prefix = "wk",
     values_to = "rank"
   )
-spec
+billboard_spec %>% utils::str()
 ```
 
-The spec is a data frame with one row for each column, and two special columns that start with `.`:
+### The `billboard_spec` structure
+
+The `spec` is a data frame with one row for each column, and two special columns that start with `.`:
 
 * `.name` gives the name of the column.
 * `.value` gives the name of the column that the values in the cells will
   go into.
   
-All other variables are maintained in the output of the pivot.
+**All other variables are maintained in the output of the pivot.**
 
 To make this spec a more accurate rendition of the metadata that's stored in the column names, we need to turn the string into an integer:
 
-```{r spec-week}
-spec <- spec %>% 
+```{r spec-mutate-week}
+billboard_spec <- billboard_spec %>% 
   mutate(week = as.integer(week))
-spec
+billboard_spec %>% utils::str()
 ```
 
 We can now provide this spec to `pivot_longer()`:
 
-```{r spec-longer}
-billboard %>% 
-  pivot_longer(spec = spec)
+```{r spec-billboardlonger}
+billboardlonger <- billboard %>% 
+  tidyr::pivot_longer(spec = billboard_spec,
+                                na.rm = TRUE) 
+billboardlonger %>% dplyr::glimpse(78)
 ```
 
 This seems like a lot of work to get something very similar to the previous result, but as you'll see shortly, it generalises in very useful ways.
 
+
+
 The pivotting spec allows us to be more precise about exactly how `pivot_longer(df, spec = spec)` changes the shape of `df`: it will have `nrow(df) * nrow(spec)` rows, and `ncol(df) - nrow(spec) + ncol(spec) - 2` columns.
+
+### The math behind `pivot_longer(df, spec = spec)`
+
+> we can test the math on this spec in the chunk below. 
+
+```{r check-math}
+nrow(billboard) 
+nrow(billboard_spec)
+
+ncol(billboard)
+nrow(billboard_spec)
+ncol(billboard_spec)
+```
+
+```{r numbers}
+# 
+317 * 76
+# ncol(df) - nrow(spec) + ncol(spec) - 2
+80 - 76 + 3 - 2
+```
+
 
 ## Multiple value columns 
 
@@ -162,16 +200,16 @@ family
 
 Note that we have two pieces of information about each child: their gender and their date of birth. These need to go into separate columns in the result. We can do this by suppling multiple elements to `names_to`, where `.value` is a special sentinel that represent the value column in the output.
 
-```{r}
+```{r pivot-longer-with-.value}
 family %>% 
   pivot_longer(
        # everything but family
       -family,
-       # 
+       # names to is the ,value and child
        names_to = c(".value", "child"), 
-               # 
+               # the underscore
                names_sep = "_", 
-               # 
+               # remove missing
                na.rm = TRUE)
 ```
 
@@ -179,21 +217,23 @@ We use `na.rm = TRUE` here because this shape of the data forces the creation of
 
 Another case of this problem is the built-in `anscombe` dataset:
 
-```{r}
-anscombe
+```{r anscombe}
+anscombe %>% utils::str()
 ```
 
 This dataset contains four pairs of variables (`x1` + `y1`, `x2` + `y2`, etc) that underlie Anscombe's quartet, a collection of four datasets that have the same summary statistics (mean, sd, correlation etc), but have quite different data. We want to produce a dataset with columns `graph`, `x` and `y`. 
 
-```{r}
+```{r pivot-everything-names-sep}
 anscombe %>% 
-  pivot_longer(everything(), names_to = c(".value", "graph"), names_sep = 1) %>% 
-  arrange(graph)
+  tidyr::pivot_longer(everything(), 
+               names_to = c(".value", "graph"), 
+               names_sep = 1) %>% 
+  dplyr::arrange(graph)
 ```
 
 A similar situation can arise with panel data. For example, take this example dataset provided by [Thomas Leeper](http://github.com/leeper/rio/issues/193):
 
-```{r}
+```{r pnl}
 pnl <- tibble(
   x = 1:4,
   a = c(1, 1,0, 0),
@@ -205,15 +245,17 @@ pnl <- tibble(
 )
 
 pnl %>% 
-  pivot_longer(-(x:b), names_to = c(".value", "time"), names_sep = 1)
+  tidyr::pivot_longer(cols = -(x:b), 
+               names_to = c(".value", "time"), 
+               names_sep = 1)
 ```
 
 ## Many variables in column names
 
 In more complex cases, the variables encoded the column names might require more significant parsing to extract. For example, take the `who` dataset bundled with this package:
 
-```{r}
-who
+```{r who}
+who %>% glimpse(78)
 ```
 
 `country`, `iso2`, `iso3`, and `year` are already variables, so can be left as is. We want to pivot the columns from `new_sp_m014` to `newrel_f65`:
