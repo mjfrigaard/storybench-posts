@@ -1,17 +1,36 @@
-Data Science Communication using R - tidyr
+Data Journalism with R - tidyr pivoting
 ================
 Martin Frigaard
-2017-05-12
+2019-04-05
 
   - [Objectives](#objectives)
   - [Part one: Tidy data](#part-one-tidy-data)
-      - [Core tidy data principles](#core-tidy-data-principles)
+      - [The tidy data principles](#the-tidy-data-principles)
+          - [Indexed vs. Cartesian](#indexed-vs.-cartesian)
+              - [Indexed data](#indexed-data)
+              - [Cartesian data](#cartesian-data)
   - [Part two: Grouping](#part-two-grouping)
   - [Part three: Pivoting](#part-three-pivoting)
-      - [It’s like having fancy
-        footwork](#its-like-having-fancy-footwork)
-  - [Scenario 1: categorical variable across multiple
-    columns](#scenario-1-categorical-variable-across-multiple-columns)
+      - [Pivoting == fancy footwork](#pivoting-fancy-footwork)
+  - [Pivoting Example 1: Categorical/ordinal variable across multiple
+    columns](#pivoting-example-1-categoricalordinal-variable-across-multiple-columns)
+      - [Pivoting long](#pivoting-long)
+          - [What happens in
+            pivot\_longer()?](#what-happens-in-pivot_longer)
+      - [Pivoting longer (with
+        specifications)](#pivoting-longer-with-specifications)
+          - [1) Define the arguments for reshaping the
+            data](#define-the-arguments-for-reshaping-the-data)
+          - [2) Format the variable(s) in the
+            spec](#format-the-variables-in-the-spec)
+          - [3) Supply the formatted spec object to
+            pivot\_longer\_spec()
+            function](#supply-the-formatted-spec-object-to-pivot_longer_spec-function)
+      - [Pivoting wider](#pivoting-wider)
+  - [Pivoting Example 2: Moving categorical or ordinal variables across
+    columns](#pivoting-example-2-moving-categorical-or-ordinal-variables-across-columns)
+      - [Pivoting wider options](#pivoting-wider-options)
+      - [Read more](#read-more)
 
 *TLDR: This tutorial was prompted by the recent changes to the `tidyr`
 package (see the tweet from Hadley Wickham below). Two functions for
@@ -37,6 +56,7 @@ with `tidyr::pivot_longer()` and `tidyr::pivot_wider()` functions.*
 # this will require the newest version of tidyr from github
 # devtools::install_github("tidyverse/tidyr")
 library(tidyverse)
+library(here)
 ```
 
     TIDY⬢TIDY⬢TIDY⬢TIDY⬢TIDY⬢TIDY⬢TID⬢TIDY
@@ -83,12 +103,18 @@ to statistical terms. More importantly, he translated these essential
 principles into concepts and terms a broader audience can grasp and use
 for data manipulation.
 
-## Core tidy data principles
+``` r
+# source("code/data.R")
+# base::save.image("data/tidyr-data.RData")
+base::load(file = "data/tidyr-data.RData")
+```
 
-Tidy data, at least in the `tidyverse`, is referring to ‘rectangular’
-data. These are the data we typically see in spreadsheet software like
-Googlesheets, Microsoft Excel, or in a relational database like MySQL,
-PostgreSQL, or Microsoft Access, The three principles for tidy data are:
+## The tidy data principles
+
+Tidy data refers to ‘rectangular’ data. These are the data we typically
+see in spreadsheet software like Googlesheets, Microsoft Excel, or in a
+relational database like MySQL, PostgreSQL, or Microsoft Access, The
+three principles for tidy data are:
 
 1.  Variables make up the columns  
 2.  Observations (or cases) go in the rows  
@@ -97,24 +123,66 @@ PostgreSQL, or Microsoft Access, The three principles for tidy data are:
 Put them together, and these three statements make up the contents in a
 [data frame or tibble](https://tibble.tidyverse.org/). Data frame’s can
 contain any number of variables, which are used to store various
-measurements associated with each observation.
+measurements associated with each observation. While these principles
+might seem obvious at first, many of the data arrangements we encounter
+in real life don’t adhere to this guidance.
 
-While these might seem obvious at first, many of the data arrangements
-we encounter in real life don’t adhere to this guidance.
+### Indexed vs. Cartesian
 
-![](images/table-intersection.png)<!-- -->
+I prefer to refer to tidy data as “indexed”, and wide data as
+“Cartesian” (this terminology is from the
+[ggplot2](https://amzn.to/2UlyNNp) text). This helps me understand what
+is happening when the data get transformed. Two examples are below:
 
-Let’s walk through a few scenarios to show how the decisions about data
-entry can lead to many different column and row orientations.
+#### Indexed data
+
+In the `Indexed` data frame, the `group` and `number` variables are used
+to keep track of each unique value of `measure`.
+
+<div class="kable-table">
+
+| group | number | measure |
+| :---- | :----- | ------: |
+| A     | ID001  |    1098 |
+| C     | ID001  |    3049 |
+| D     | ID003  |    2394 |
+| B     | ID004  |    9301 |
+| C     | ID006  |    4092 |
+
+</div>
+
+#### Cartesian data
+
+The same data are represented in the `Cartesian` data frame, but in this
+table the `measure` values are at the intersection of `group` and each
+`number`.
+
+<div class="kable-table">
+
+| group | ID001 | ID003 | ID004 | ID006 |
+| :---- | ----: | ----: | ----: | ----: |
+| A     |  1098 |    NA |    NA |    NA |
+| B     |    NA |    NA |  9301 |    NA |
+| C     |  3049 |    NA |    NA |  4092 |
+| D     |    NA |  2394 |    NA |    NA |
+
+</div>
+
+As you can see, the `Cartesian` orientation uses up more columns (and
+fills in the gaps with missing (`NA`)
+values).
+
+![](/Users/martinfrigaard/@Working/storybenchR/02.1-tidyr-tidyverse/images/indexed-carteisan.png)<!-- -->
 
 # Part two: Grouping
 
-Grouping is a way of summarizing data with functions in the `dplyr`
+Grouping produces summary data tables using functions from the `dplyr`
 package. Similar to `GROUP BY` in SQL, `dplyr::group_by()` silently
-groups a data frame (which means we don’t see any changes to the data
-frame after applying the function).
+groups a data frame (which means we don’t see any changes) and then
+applies aggregate functions using `dplyr::summarize()`. Examples of
+these are `mean()`, `median()`, `sum()`, `n()`, `sd()`, etc.
 
-Take the data frame below, which has 5 variables:
+Take the data frame below, `DataTibble`, which has 5 variables:
 
   - `group_var` - a categorical group
   - `year` - the calendar year the measurements were collected
@@ -123,103 +191,154 @@ Take the data frame below, which has 5 variables:
   - `ordinal_x_var` - this is an ordinal variable corresponding to the
     values in `x_measurement` (greater than or equal to 75 is `"high"`
     or `3`, greater than or equal to `50` and less than `75` is `"med"`,
-    and less than `50` is `"low"`).
+    and less than `50` is
+`"low"`).
 
-<!-- end list -->
+<div class="kable-table">
 
-``` r
-DataTibble <- tibble::tribble(
-   ~group_var, ~year,   ~x_measurement,   ~y_messurement,  ~ordinal_x_var,
-          "A",  2018, 11.8159851059318, 532.373521731468,           "low",
-          "A",  2017, 28.4611755283549, 116.042412365321,           "low",
-          "A",  2016, 49.1562793264166, 304.210926492466,           "low",
-          "B",  2018, 87.5606247922406, 719.384127181955,          "high",
-          "B",  2017, 11.3308956148103, 984.383774694521,           "low",
-          "C",  2018, 15.8781699370593, 959.414658935741,           "low",
-          "C",  2017, 63.7600556015968, 962.275661041727,           "med",
-          "C",  2016, 96.0327247157693, 744.529502285644,          "high") %>% 
-    dplyr::mutate(ordinal_x_var = base::factor(ordinal_x_var, 
-                                            levels = c("high", 
-                                                        "med", 
-                                                        "low"),
-                                            labels = c(3, 2, 1)))
+| group\_var | year | x\_measurement | y\_messurement | ordinal\_y\_var |
+| :--------- | ---: | -------------: | -------------: | :-------------- |
+| A          | 2018 |          11.81 |         532.37 | med             |
+| A          | 2017 |          28.46 |         116.04 | low             |
+| A          | 2016 |          49.15 |         304.21 | low             |
+| B          | 2018 |          87.56 |         719.38 | med             |
+| B          | 2017 |          11.33 |         984.38 | high            |
+| C          | 2018 |          15.87 |         959.41 | high            |
+| C          | 2017 |          63.76 |         962.27 | high            |
+| C          | 2016 |          96.03 |         744.52 | med             |
 
-DataTibble %>% dplyr::glimpse(78)
-```
+</div>
 
 If I apply `dplyr::group_by()` to the `group_var` in `DataTibble`, I
 will see no visible result.
 
 ``` r
-DataTibble %>% 
-    dplyr::group_by(group_var)
+DataTibble %>%
+  dplyr::group_by(group_var)
 ```
 
-But if I combine `dplyr::group_by()` with `dplyr::summarize()`, I can
+<div class="kable-table">
+
+| group\_var | year | x\_measurement | y\_messurement | ordinal\_y\_var |
+| :--------- | ---: | -------------: | -------------: | :-------------- |
+| A          | 2018 |          11.81 |         532.37 | med             |
+| A          | 2017 |          28.46 |         116.04 | low             |
+| A          | 2016 |          49.15 |         304.21 | low             |
+| B          | 2018 |          87.56 |         719.38 | med             |
+| B          | 2017 |          11.33 |         984.38 | high            |
+| C          | 2018 |          15.87 |         959.41 | high            |
+| C          | 2017 |          63.76 |         962.27 | high            |
+| C          | 2016 |          96.03 |         744.52 | med             |
+
+</div>
+
+But when I combine `dplyr::group_by()` with `dplyr::summarize()`, I can
 collapse `DataTibble` into a smaller table by supplying an aggregate
-function to `summarize()`. Examples of these are `mean()`, `median()`,
-`sum()`, `n()`, `sd()`, etc.
+function to `summarize()`. Below I use `summarize()` to get the mean of
+`x_measurement` and `y_messurement` and `n()` to get the total number in
+each group.
 
 ``` r
-knitr::kable(
-DataTibble %>% 
-    dplyr::group_by(group_var) %>% 
-    dplyr::summarize(x_mean = mean(x_measurement), 
-                     y_mean = mean(y_messurement),
-                     no = n())
-)
+DataTibble %>%
+  dplyr::group_by(group_var) %>%
+  dplyr::summarize(
+    x_mean = mean(x_measurement),
+    y_mean = mean(y_messurement),
+    no = n()
+  )
 ```
 
+<div class="kable-table">
+
+| group\_var |  x\_mean |  y\_mean | no |
+| :--------- | -------: | -------: | -: |
+| A          | 29.80667 | 317.5400 |  3 |
+| B          | 49.44500 | 851.8800 |  2 |
+| C          | 58.55333 | 888.7333 |  3 |
+
+</div>
+
 Grouping can also work with categorical/factor variables. The code below
-uses `dplyr::count()` to summarize the number of `ordinal_x_var` levels
+uses `dplyr::count()` to summarize the number of `ordinal_y_var` levels
 per category of `group_var`,
 
 ``` r
-knitr::kable(
-DataTibble %>% 
-    dplyr::count(group_var, ordinal_x_var))
+DataTibble %>%
+  dplyr::count(group_var, ordinal_y_var)
 ```
 
-This table isn’t very easy to read because all of the information is
-oriented and indexed vertically. I can move the values of `group_var`
-into individual columns to make it easier on the eyes using
-`tidyr::spread`.
+<div class="kable-table">
+
+| group\_var | ordinal\_y\_var | n |
+| :--------- | :-------------- | -: |
+| A          | med             | 1 |
+| A          | low             | 2 |
+| B          | high            | 1 |
+| B          | med             | 1 |
+| C          | high            | 2 |
+| C          | med             | 1 |
+
+</div>
+
+This table isn’t as easy to read, because all of the information is
+oriented vertically. I can move the values of `group_var` into
+individual columns to make it easier on the eyes using `tidyr::spread`.
 
 ``` r
-knitr::kable(
-DataTibble %>% 
-    dplyr::count(group_var, 
-                 ordinal_x_var) %>% 
-    tidyr::spread(key = group_var, 
-                  value = n))
+DataTibble %>%
+  dplyr::count(group_var,ordinal_y_var) %>%
+  tidyr::spread(key = group_var,value = n)
 ```
 
-Notice how this creates a table with different dimensions? This can
-quickly be undone with the accompanying `tidyr::gather()` function, but
-requires us to specify that the missing values should be removed. *I
-also added a `dplyr::select()` statement to arrange these values so they
-are similar to the table above*.
+<div class="kable-table">
+
+| ordinal\_y\_var |  A |  B |  C |
+| :-------------- | -: | -: | -: |
+| high            | NA |  1 |  2 |
+| med             |  1 |  1 |  1 |
+| low             |  2 | NA | NA |
+
+</div>
+
+Notice how this creates a table with different dimensions? This
+arrangement can quickly be undone with the accompanying
+`tidyr::gather()` function.
+
+`tidyr::gather()` works a lot like the `tidyr::spread()` function, but
+also requires us to specify that the missing values should be removed
+(`na.rm = TRUE`).
+
+*I also added a `dplyr::select()` statement to arrange these values so
+they are similar to the table above*.
 
 ``` r
-knitr::kable(
-DataTibble %>% 
-    dplyr::count(group_var, 
-                 ordinal_x_var) %>% 
-    tidyr::spread(key = group_var, 
-                  value = n) %>% 
-    tidyr::gather(key = group_var, 
-                  value = "n", 
-                  -ordinal_x_var, 
-                  na.rm = TRUE) %>% 
-    dplyr::select(group_var, ordinal_x_var, n))
+DataTibble %>%
+  dplyr::count(group_var, ordinal_y_var) %>%
+  tidyr::spread(key = group_var, value = n) %>%
+  tidyr::gather(key = group_var, value = "n", 
+                -ordinal_y_var, na.rm = TRUE) %>%
+  dplyr::select(group_var, ordinal_y_var, n)
 ```
+
+<div class="kable-table">
+
+| group\_var | ordinal\_y\_var | n |
+| :--------- | :-------------- | -: |
+| A          | med             | 1 |
+| A          | low             | 2 |
+| B          | high            | 1 |
+| B          | med             | 1 |
+| C          | high            | 2 |
+| C          | med             | 1 |
+
+</div>
 
 # Part three: Pivoting
 
 All this data manipulation brings us to *pivoting*, the [recent
 additions](https://tidyr.tidyverse.org/dev/articles/pivot.html) to the
-`tidyr` package. These functions will be slowly replacing the previous
-functions for reshaping data frames, `tidyr::gather()` and
+`tidyr` package. These will be slowly replacing the functions I used
+above for reshaping data frames, `tidyr::gather()` and
 `tidyr::spread()`. I found it refreshing to learn that I wasn’t the only
 person struggling to use these functions. Hadley Wickham, the package
 developer/author, confessed he also struggles when using these
@@ -231,15 +350,16 @@ functions,
 > to these functions, meaning that many people (including me\!) have to
 > consult the documentation every time.
 
-Statements like these are examples of why I appreciate the `tidyverse`,
+Changes like these are examples of why I appreciate the `tidyverse`,
 because I can tell a lot of thought gets put into identifying verbs that
 accurately capture the users intentions. Knowing how to reshape data is
-an important skill for data scientists, and I think the `tidyr::pivot_`
-functions are great additions to data manipulation in the `tidyverse`.
+an important skill for any data scientist, and I think the
+`tidyr::pivot_` functions are great additions to data manipulation in
+the `tidyverse` because they make restructuring more explicit.
 
 -----
 
-## It’s like having fancy footwork
+## Pivoting == fancy footwork
 
 Vasily Lomachenko, the best [pound-for-pound
 boxer](https://en.wikipedia.org/wiki/Boxing_pound_for_pound_rankings) in
@@ -247,148 +367,528 @@ the world, is known for taking [traditional Ukrainian dance classes as a
 child before ever stepping into a boxing
 ring](traditional%20Ukrainian%20dance%20classes). Why would an athlete
 who punches people for a living spend time learning how to dance?
-Because having precise footwork and the ability to change direction
-sharply is so essential in boxing that these skills are often what
-separates a good fighter from an elite
-athlete.
+Because **having the ability to quickly change angles is so essential in
+boxing that these skills are often what separates a good fighter from an
+elite
+athlete**.
 
-![<http://fightland.vice.com/blog/the-pivots-and-precision-of-vasyl-lomachenko>](images/loma-pivot.gif)
+![<http://fightland.vice.com/blog/the-pivots-and-precision-of-vasyl-lomachenko>](/Users/martinfrigaard/@Working/storybenchR/02.1-tidyr-tidyverse/images/loma-pivot.gif)
 
-As you can see, Lomachenko’s pivoting abilities not only make him
-frustratingly hard to hit, but they also allow him to see openings in
-his opponents defense (which makes him incredibly successful at landing
-punches).
+Whenever we use the `pivot_` functions, we’re changing angles between
+the columns and rows. If the tables pivoting longer, the column names
+and values rotate 90˚ into an index
+row.
 
-![<http://fightland.vice.com/blog/the-pivots-and-precision-of-vasyl-lomachenko>](images/loma-pivot-strike.gif)
+![](/Users/martinfrigaard/@Working/storybenchR/02.1-tidyr-tidyverse/images/pivot-longer-image.png)<!-- -->
 
-*Why am I telling you about Vasyl Lomachenko’s footwork?*
+Pivoting from long to wide
+(or)
 
-The `tidyr::pivot_` functions give you a similar ability with your data.
-Being able to rapidly rotate your data from columns to rows (and back)
-is similar to being able to turn 90 degrees on a dime and avoid an
-incoming punch (or to see an opening and land a stiff jab).
+![](/Users/martinfrigaard/@Working/storybenchR/02.1-tidyr-tidyverse/images/pivot-wider-image.png)<!-- -->
+
+The `tidyr::pivot_` functions give you a similar ability with your
+data\! Being able to rapidly spin your data from columns to rows (and
+back) is similar to being able to rotate 90 degrees on a dime and avoid
+an incoming hook.
+
+As a skill, it’s also a great place to start because most to the data
+you’ll encounter in the `tidyverse` is going to be in columns and rows
+(or you will want to get them that way).
 
 > “I think footwork is one of the most important things to becoming a
-> great fighter. That’s where everything starts.” - Vasyl Lomachenko
+> great fighter. That’s where everything starts.” - Vasyl
+Lomachenko
+
+# Pivoting Example 1: Categorical/ordinal variable across multiple columns
 
 We’re going to start by manipulating a data set of Lomachenko’s fights
 from the [BoxRec](http://boxrec.com/en/boxer/659771) database. The fight
 information has been entered in a way that makes sense for the person
-entering the data, but it’s not ideal for analysis or modeling.
-
-# Scenario 1: categorical variable across multiple columns
-
-We will load Lomachenko’s fight record from Wikipedia and explore how to
-use these new functions. To see how these data are created, check out
-the script file
-[here](https://github.com/mjfrigaard/storybenchR/blob/master/02.1-tidyr-tidyverse/loma-fights-wikipedia.R)
+entering the data, but it’s not ideal for analysis or
+modeling.
 
 ``` r
-# fs::dir_ls("data")
-LomaFightsWide <- readr::read_csv(file = "data/2019-03-29-LomaFightsWide.csv")
-```
-
-Assume a physician wants to compare the efficacy of a new statin drug (a
-cholesterol lowering medicine) against the currently recommended
-medication.
-
-After consenting `415` patients with high cholesterol, the physician
-randomly selects a sample of `209` patients to receive the new drug for
-six months, while the other `206` patients get a six-month course of the
-current drug.
-
-*NOTE: This is a simplification of a clinical trial. In a true
-experiment, there are many other factors to consider.*
-
-Below is an example of how these data might get entered into a
-spreadsheet.
-
-``` r
-TrialDataPrePost <- read_csv("data/trial-data-pre-post.csv",
-                             col_types = list())
-knitr::kable(
-TrialDataPrePost %>% utils::head())
-```
-
-Imagine a hypothetical chain of events for this trial, starting with the
-first and following in the order they occur:
-
-1.  A patient with high cholesterol gets randomized into the `treatment`
-    condition, given an ID number (`patient id trt`), then a cholesterol
-    measurement is taken and entered into the `baseline treatment`
-    column.
-
-2.  A second patient with high cholesterol comes into the physician’s
-    office, is randomized into the `control` group, given their ID
-    (`patient id cont`), and their baseline cholesterol measurement is
-    recorded.
-
-3.  The process continues, and all `415` patients with high cholesterol
-    are assigned to a group (`treatment` or `control`), given an ID
-    (`patient id`), then prescribed the appropriate medication.
-
-4.  Six months after their initial appointment and baseline
-    measurements, both groups of patients have their cholesterol
-    measured again (in the `post` columns).
-
-Given this timeline, does it seem *that* strange to enter the data in a
-spreadsheet like the `TrialDataPrePost` data frame? I don’t think so,
-and here are some reasons why:
-
-1.  This spreadsheet starts out as a record-keeping tool, and it’s doing
-    just that: something happens, then it gets documented
-2.  Tables like this can be read left-to-right, and the columns and rows
-    are added *as they occur*
-3.  The physician (or whoever is entering the data) can see a lot of the
-    data on the screen
-
-We can actually think of the `TrialDataPrePost` data frame as containing
-*two* data frames: the `Treatment` data (with `209` patients), and the
-`Control` data (with `206` patients).
-
-A little `dplyr` action will can separate these data frames.
-
-``` r
-Treatment <- TrialDataPrePost %>% 
-    dplyr::select(pat_id_trt,
-                  `baseline treatment`,
-                  `post treatment`)
-Treatment %>% glimpse(78)
-```
-
-``` r
-Control <- TrialDataPrePost %>% 
-    dplyr::filter(!is.na(pat_id_cont)) %>% 
-    dplyr::select(pat_id_cont,
-                  `baseline control`,
-                  `post control`)
-Control %>% glimpse(78)
-```
-
-``` r
-# trt <- runif(209, min = 160, max = 200)
-# cont <- runif(206, min = 160, max = 200)
-# A <- tibble::enframe(x = trt, value = "baseline treatment")
-# B <- tibble::enframe(x = cont, value = "baseline control")
-# write_csv(as.data.frame(A), "data/A.csv")
-# write_csv(as.data.frame(B), "data/B.csv")
-# trt2 <- runif(209, min = 150, max = 190)
-# cont2 <- runif(206, min = 160, max = 200)
-# A2 <- tibble::enframe(x = trt2, value = "post treatment")
-# B2 <- tibble::enframe(x = cont2, value = "post control")
-# write_csv(as.data.frame(A2), "data/A2.csv")
-# write_csv(as.data.frame(B2), "data/B2.csv")
+LomaWideSmall %>% utils::head(10)
 ```
 
 <div class="kable-table">
 
-| patient\_id | group   | result     |
-| ----------: | :------ | :--------- |
-|         265 | control | no outcome |
-|         344 | control | no outcome |
-|         214 | control | outcome    |
-|         320 | control | no outcome |
-|         359 | control | no outcome |
-|         277 | control | no outcome |
+| opponent               | date       | fight\_1 | fight\_2 | fight\_3 | fight\_4 | fight\_5 | fight\_6 | fight\_7 | fight\_8 | fight\_9 | fight\_10 | fight\_11 | fight\_12 | fight\_13 | fight\_14 |
+| :--------------------- | :--------- | :------- | :------- | :------- | :------- | :------- | :------- | :------- | :------- | :------- | :-------- | :-------- | :-------- | :-------- | :-------- |
+| José Ramírez           | 2013-10-12 | Win      | NA       | NA       | NA       | NA       | NA       | NA       | NA       | NA       | NA        | NA        | NA        | NA        | NA        |
+| Orlando Salido         | 2014-03-01 | NA       | Loss     | NA       | NA       | NA       | NA       | NA       | NA       | NA       | NA        | NA        | NA        | NA        | NA        |
+| Gary Russell Jr.       | 2014-06-21 | NA       | NA       | Win      | NA       | NA       | NA       | NA       | NA       | NA       | NA        | NA        | NA        | NA        | NA        |
+| Chonlatarn Piriyapinyo | 2014-11-22 | NA       | NA       | NA       | Win      | NA       | NA       | NA       | NA       | NA       | NA        | NA        | NA        | NA        | NA        |
+| Gamalier Rodríguez     | 2015-05-02 | NA       | NA       | NA       | NA       | Win      | NA       | NA       | NA       | NA       | NA        | NA        | NA        | NA        | NA        |
+| Romulo Koasicha        | 2015-11-07 | NA       | NA       | NA       | NA       | NA       | Win      | NA       | NA       | NA       | NA        | NA        | NA        | NA        | NA        |
+| Román Martínez         | 2016-06-11 | NA       | NA       | NA       | NA       | NA       | NA       | Win      | NA       | NA       | NA        | NA        | NA        | NA        | NA        |
+| Nicholas Walters       | 2016-11-26 | NA       | NA       | NA       | NA       | NA       | NA       | NA       | Win      | NA       | NA        | NA        | NA        | NA        | NA        |
+| Jason Sosa             | 2017-04-08 | NA       | NA       | NA       | NA       | NA       | NA       | NA       | NA       | Win      | NA        | NA        | NA        | NA        | NA        |
+| Miguel Marriaga        | 2017-08-05 | NA       | NA       | NA       | NA       | NA       | NA       | NA       | NA       | NA       | Win       | NA        | NA        | NA        | NA        |
 
 </div>
+
+This data arrangement is *Cartesian*, because each fight number has it’s
+own column (`fight_1` through `fight_14`), and the result (`Win`/`Loss`)
+is located at the intersection between the fight numbered columns and
+the corresponding `opponent` and `date`. Having the data in this
+arrangement might seem odd to a data scientist, but this configuration
+makes sense for a fan entering the fights into a spreadsheet **as they
+happen in real time**. Consider the the chronological chain of events
+involved with a each fight,
+
+1.  An `opponent` is announced, and an excited fan enters the
+    information into the first two column/rows in a spreadsheet and
+    titles it, ’Lomachenko\`
+2.  The `date` for the first fight gets entered into the `B` column (the
+    third in the table),
+3.  In order to track an athlete’s win/loss record over the course of
+    their career, a number is also marked for each fight (starting with
+    `1`) in a column titled, `fight_1`. and the result gets put in the
+    corresponding cell (`Win` or `Loss`)
+
+As you can see, the steps above are sensible for someone wanting to
+track their favorite athlete (or sports team) over time. I’ve
+encountered many excel tables with orientations that mirror the sequence
+of events they’re capturing. This “data-entry friendly” format captures
+enough information to be useful, and it has a few computational
+abilities. For example, a fan could use filtering to count the number of
+matches against a particular `opponent`, or sort the `date` column to
+figure what Lomachenko’s late fight. Spreadsheets like these are a cross
+between a timeline and a record book, and they do a good enough job at
+both tasks to justify their current structure.
+
+The [pivot
+vignette](https://tidyr.tidyverse.org/dev/articles/pivot.html#wide-to-long)
+conveys that ‘wide’ formats or data arrangements are common because
+their primary purpose and design is centered around recording data (and
+not visualization or modeling),
+
+## Pivoting long
+
+We are going to start by pivoting the `LomaWideSmall` data frame to a
+long or ‘tidy’ format. We accomplish this using the
+`tidyr::pivot_longer()` function.
+
+``` r
+LomaWideSmall %>%
+    
+  tidyr::pivot_longer(
+      
+    cols = starts_with("fight"),
+
+    names_to = "fight_no",
+
+    values_to = "result",
+
+    names_prefix = "fight_",
+
+    na.rm = TRUE)
+```
+
+<div class="kable-table">
+
+| opponent               | date       | fight\_no | result |
+| :--------------------- | :--------- | :-------- | :----- |
+| José Ramírez           | 2013-10-12 | 1         | Win    |
+| Orlando Salido         | 2014-03-01 | 2         | Loss   |
+| Gary Russell Jr.       | 2014-06-21 | 3         | Win    |
+| Chonlatarn Piriyapinyo | 2014-11-22 | 4         | Win    |
+| Gamalier Rodríguez     | 2015-05-02 | 5         | Win    |
+| Romulo Koasicha        | 2015-11-07 | 6         | Win    |
+| Román Martínez         | 2016-06-11 | 7         | Win    |
+| Nicholas Walters       | 2016-11-26 | 8         | Win    |
+| Jason Sosa             | 2017-04-08 | 9         | Win    |
+| Miguel Marriaga        | 2017-08-05 | 10        | Win    |
+| Guillermo Rigondeaux   | 2017-12-09 | 11        | Win    |
+| Jorge Linares          | 2018-05-12 | 12        | Win    |
+| José Pedraza           | 2018-12-08 | 13        | Win    |
+
+</div>
+
+### What happens in pivot\_longer()?
+
+![](/Users/martinfrigaard/@Working/storybenchR/02.1-tidyr-tidyverse/images/tidy-pivoting-longer.png)<!-- -->
+
+`tidyr::pivot_longer()` extends the `tidyr::spread()` function by adding
+a few arguments to make this re-structuring more deliberate:
+
+  - The `cols` argument contains the columns we want to pivot (and it
+    takes
+    [`tidyselect`](https://dplyr.tidyverse.org/reference/select.html)
+    helper functions). These are going to be the new index columns.
+
+  - The `names_to` and `values_to` are the new columns we will be
+    creating from all of the `fight_` variables. The `names_to` is the
+    new index column, meaning how would you ‘look up’ the value in an
+    adjacent column. The `values_to` are the contents of the cells that
+    correspond to each value in the `names_to` variable.
+
+  - The `names_prefix` is a regular expression pattern I can use to
+    clean the old variable names as they become the values in the new
+    columns. I enter `fight_` here because is will remove the text from
+    the front the variable name and only enter the number into the new
+    `fight_no` variable.
+
+Unfortunately, we can see that the new `fight_no` variable is still
+formatted as a character. Luckily, the new `tidyr::pivot_longer()`
+function also has a `tidyr::pivot_longer_spec()`, which allows for
+additional specifications on the data transformation.
+
+## Pivoting longer (with specifications)
+
+> A pivoting `spec` is a data frame that describes the metadata stored
+> in the column name, with one row for each column, and one column for
+> each variable mashed into the column name.
+
+The `tidyr::pivot_longer_spec()` function allows even more
+specifications on what to do with the data during the transformation.
+Because we are still in the `tidyverse`, the output is a data fame.
+Explicitly creating an object that contains data about your data is not
+necessarily a novel concept in R, but it’s very handy when that object
+is similar to the other objects you’re already working with (i.e. a data
+frame or tibble).
+
+Creating a `spec` for the `LomaWideSmall` data frame is a three-step
+process:
+
+#### 1\) Define the arguments for reshaping the data
+
+I enter the same arguments I entered above in the
+`tidyr::pivot_longer()` function, with the exception of the `na.rm =
+TRUE` argument. These results get stored into an object I will name
+`LomaSpec`, which is a data frame with three variables in it: `.name`,
+`.value`, and `fight_no`.
+
+``` r
+LomaSpec <- LomaWideSmall %>%
+    
+  tidyr::pivot_longer_spec(
+      
+    cols = starts_with("fight"),
+
+    names_to = "fight_no",
+
+    values_to = "result",
+
+    names_prefix = "fight_")
+
+LomaSpec
+```
+
+<div class="kable-table">
+
+| .name     | .value | fight\_no |
+| :-------- | :----- | :-------- |
+| fight\_1  | result | 1         |
+| fight\_2  | result | 2         |
+| fight\_3  | result | 3         |
+| fight\_4  | result | 4         |
+| fight\_5  | result | 5         |
+| fight\_6  | result | 6         |
+| fight\_7  | result | 7         |
+| fight\_8  | result | 8         |
+| fight\_9  | result | 9         |
+| fight\_10 | result | 10        |
+| fight\_11 | result | 11        |
+| fight\_12 | result | 12        |
+| fight\_13 | result | 13        |
+| fight\_14 | result | 14        |
+
+</div>
+
+The three columns in `LomaSpec` contain metadata (data about our data)
+on the transformation I want to perform–specifically the originally
+columns (`.name`) and the corresponding cell values (`.value`). The
+other variable (`fight_no`) gets carried over from the transformation as
+well.
+
+#### 2\) Format the variable(s) in the spec
+
+If I want to format the `fight_no` variable, I can include those
+arguments *within* the `LomaSpec` data frame.
+
+``` r
+# format the variable
+LomaSpec <- LomaSpec %>%
+    
+  dplyr::mutate(fight_no = as.numeric(fight_no))
+
+LomaSpec$fight_no %>% glimpse(78)
+```
+
+    ##  num [1:14] 1 2 3 4 5 6 7 8 9 10 ...
+
+#### 3\) Supply the formatted spec object to pivot\_longer\_spec() function
+
+Now `LomaSpec` can get supplied to the `tidyr::pivot_longer()` function
+and the `fight_no` variable is properly formatted (note I still need to
+provide the `na.rm = TRUE` argument).
+
+``` r
+# supply it to the pivot_longer
+LomaFightsLong <- LomaWideSmall %>%
+    
+  tidyr::pivot_longer(
+      
+    spec = LomaSpec,
+    
+    na.rm = TRUE)
+
+LomaFightsLong
+```
+
+<div class="kable-table">
+
+| opponent               | date       | fight\_no | result |
+| :--------------------- | :--------- | --------: | :----- |
+| José Ramírez           | 2013-10-12 |         1 | Win    |
+| Orlando Salido         | 2014-03-01 |         2 | Loss   |
+| Gary Russell Jr.       | 2014-06-21 |         3 | Win    |
+| Chonlatarn Piriyapinyo | 2014-11-22 |         4 | Win    |
+| Gamalier Rodríguez     | 2015-05-02 |         5 | Win    |
+| Romulo Koasicha        | 2015-11-07 |         6 | Win    |
+| Román Martínez         | 2016-06-11 |         7 | Win    |
+| Nicholas Walters       | 2016-11-26 |         8 | Win    |
+| Jason Sosa             | 2017-04-08 |         9 | Win    |
+| Miguel Marriaga        | 2017-08-05 |        10 | Win    |
+| Guillermo Rigondeaux   | 2017-12-09 |        11 | Win    |
+| Jorge Linares          | 2018-05-12 |        12 | Win    |
+| José Pedraza           | 2018-12-08 |        13 | Win    |
+
+</div>
+
+These data are now in a tidy (indexed) format.
+
+-----
+
+## Pivoting wider
+
+No one wins a fight in boxing by only avoiding punches–eventually they
+have to hit someone (probably more than one). Another reason that being
+able to change angles quickly is advantageous is that it creates more
+opportunities to throw (and land) a punch. As you can see, Lomachenko’s
+pivoting abilities not only make him frustratingly hard to hit, but they
+also allow him to see openings in his opponents defenses (which makes
+him incredibly successful at landing
+punches).
+
+![<http://fightland.vice.com/blog/the-pivots-and-precision-of-vasyl-lomachenko>](/Users/martinfrigaard/@Working/storybenchR/02.1-tidyr-tidyverse/images/loma-pivot-strike.gif)
+
+# Pivoting Example 2: Moving categorical or ordinal variables across columns
+
+It’s less common, but sometimes you’ll need to move variables from an
+indexed (or tidy) column arrangement into a Cartesian (wide) format.
+
+In order to restructure a Cartesian data frame to an indexed data frame
+(or to go from “long” to “wide”), we need to use the
+`tidyr::pivot_wider()` function. This works much like the
+`pivot_longer()` function, but with a few different arguments.
+
+Consider a data frame with the same Lomachenko fight records, but this
+time arranged by date. Imagine the following events that would lead to
+the creation of the `LomaDatesWide` data:
+
+1.  It’s announced that Lomachenko will be fighting an `opponent` and
+    `location` is announced, and our fan enters the information into the
+    first two column/rows in her ’Lomachenko\` spreadsheet
+
+2.  A `fight_number` column is created to document the number of fights
+    (as they happen)
+
+3.  The date for the first fight (`12 Oct 2013`) gets entered into the
+    the fourth column in the table, and the result (`Win`) gets put in
+    the corresponding cell
+
+4.  After the scorecards are collected, the `result` is announced (see
+    key below), the `fight_record` is updated (with the official outcome
+    of the bout)
+
+5.  The official round and time (`round_time`) is recorded for when the
+    fight had to stop (or the total number of rounds if it went the
+    distance),
+
+6.  Titles and belts are listed in the `notes` section
+
+7.  When the next fight happens, our fan right-clicks on the last
+    recorded fight, and inserts a new column and date, and repeats steps
+    1-6
+
+*I tend to find tables like these when the data entry is done using
+‘Freeze Columns’ or ‘Freeze Rows’.*
+
+![freeze
+cells](/Users/martinfrigaard/@Working/storybenchR/02.1-tidyr-tidyverse/images/freeze-cells.gif)
+
+The `LomaFights` data frame has the fight records for Lomachenko from
+his [wikipedia table](https://en.wikipedia.org/wiki/Vasyl_Lomachenko).
+To create a spreadsheet like the one above, we can use the
+`tidyr::pivot_wider()` function.
+
+I add a few `dplyr` functions to get the data frame to look identical to
+the excel file above.
+
+``` r
+LomaFights %>% 
+    # the columns come from the dates
+    tidyr::pivot_wider(names_from = date, 
+                       # the values will be the result of the fight
+                       values_from = result) %>% 
+    # arrange by the fight number 
+    dplyr::arrange(no) %>% 
+    # rearrange the columns
+    dplyr::select(opponent, location,
+                  
+                  dplyr::starts_with("20"),
+                  
+                  dplyr::everything())
+```
+
+<div class="kable-table">
+
+| opponent               | location                                                          | 2013-10-12 | 2014-03-01 | 2014-06-21 | 2014-11-22 | 2015-05-02 | 2015-11-07 | 2016-06-11 | 2016-11-26 | 2017-04-08 | 2017-08-05 | 2017-12-09 | 2018-05-12 | 2018-12-08 | 2019-04-12 | no | record | type | rounds  | time | notes                                                                          |
+| :--------------------- | :---------------------------------------------------------------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | -: | :----- | :--- | :------ | :--- | :----------------------------------------------------------------------------- |
+| José Ramírez           | Thomas & Mack Center, Paradise, Nevada, US                        | Win        | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         |  1 | 1–0    | TKO  | 4 (10)  | 2:55 | Won WBO International featherweight title                                      |
+| Orlando Salido         | Alamodome, San Antonio, Texas, US                                 | NA         | Loss       | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         |  2 | 1–1    | SD   | 12      | NA   | For vacant WBO featherweight title                                             |
+| Gary Russell Jr.       | StubHub Center, Carson, California, US                            | NA         | NA         | Win        | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         |  3 | 2–1    | MD   | 12      | NA   | Won vacant WBO featherweight title                                             |
+| Chonlatarn Piriyapinyo | Cotai Arena, Macau, SAR                                           | NA         | NA         | NA         | Win        | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         |  4 | 3–1    | UD   | 12      | NA   | Retained WBO featherweight title                                               |
+| Gamalier Rodríguez     | MGM Grand Garden Arena, Paradise, Nevada, US                      | NA         | NA         | NA         | NA         | Win        | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         |  5 | 4–1    | KO   | 9 (12)  | 0:50 | Retained WBO featherweight title                                               |
+| Romulo Koasicha        | Thomas & Mack Center, Paradise, Nevada, US                        | NA         | NA         | NA         | NA         | NA         | Win        | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         |  6 | 5–1    | KO   | 10 (12) | 2:35 | Retained WBO featherweight title                                               |
+| Román Martínez         | The Theater at Madison Square Garden, New York City, New York, US | NA         | NA         | NA         | NA         | NA         | NA         | Win        | NA         | NA         | NA         | NA         | NA         | NA         | NA         |  7 | 6–1    | KO   | 5 (12)  | 1:09 | Won WBO junior lightweight title                                               |
+| Nicholas Walters       | Cosmopolitan of Las Vegas, Paradise, Nevada, US                   | NA         | NA         | NA         | NA         | NA         | NA         | NA         | Win        | NA         | NA         | NA         | NA         | NA         | NA         |  8 | 7–1    | RTD  | 7 (12)  | 3:00 | Retained WBO junior lightweight title                                          |
+| Jason Sosa             | MGM National Harbor, Oxon Hill, Maryland, US                      | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | Win        | NA         | NA         | NA         | NA         | NA         |  9 | 8–1    | RTD  | 9 (12)  | 3:00 | Retained WBO junior lightweight title                                          |
+| Miguel Marriaga        | Microsoft Theater, Los Angeles, California, US                    | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | Win        | NA         | NA         | NA         | NA         | 10 | 9–1    | RTD  | 7 (12)  | 3:00 | Retained WBO junior lightweight title                                          |
+| Guillermo Rigondeaux   | The Theater at Madison Square Garden, New York City, New York, US | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | Win        | NA         | NA         | NA         | 11 | 10–1   | RTD  | 6 (12)  | 3:00 | Retained WBO junior lightweight title                                          |
+| Jorge Linares          | Madison Square Garden, New York City, New York, US                | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | Win        | NA         | NA         | 12 | 11–1   | TKO  | 10 (12) | 2:08 | Won WBA (Super) and The Ring lightweight titles                                |
+| José Pedraza           | Hulu Theater, New York City, New York, US                         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | Win        | NA         | 13 | 12–1   | UD   | 12      | NA   | Retained WBA (Super) and The Ring lightweight titles;Won WBO lightweight title |
+| Anthony Crolla         | Staples Center, Los Angeles, California, US                       | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | NA         | 14 | NA     | NA   | NA      | NA   | Defending WBA (Super), WBO, and The Ring lightweight titles                    |
+
+</div>
+
+## Pivoting wider options
+
+The output is *very* close to identical to the excel sheet above, except
+missing values in excel are empty (not `NA` like R). I can use the
+`tidyr::pivot_wider(x, values_fill())` to include this change to the
+data.
+
+``` r
+LomaFights %>% 
+    tidyr::pivot_wider(names_from = date, 
+                       values_from = result,
+                       values_fill = list(result = "")) %>% 
+    dplyr::arrange(no) %>% 
+    dplyr::select(opponent, 
+                  location,
+                  dplyr::starts_with("20"),
+                  dplyr::everything())
+```
+
+<div class="kable-table">
+
+| opponent               | location                                                          | 2013-10-12 | 2014-03-01 | 2014-06-21 | 2014-11-22 | 2015-05-02 | 2015-11-07 | 2016-06-11 | 2016-11-26 | 2017-04-08 | 2017-08-05 | 2017-12-09 | 2018-05-12 | 2018-12-08 | 2019-04-12 | no | record | type | rounds  | time | notes                                                                          |
+| :--------------------- | :---------------------------------------------------------------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | -: | :----- | :--- | :------ | :--- | :----------------------------------------------------------------------------- |
+| José Ramírez           | Thomas & Mack Center, Paradise, Nevada, US                        | Win        |            |            |            |            |            |            |            |            |            |            |            |            |            |  1 | 1–0    | TKO  | 4 (10)  | 2:55 | Won WBO International featherweight title                                      |
+| Orlando Salido         | Alamodome, San Antonio, Texas, US                                 |            | Loss       |            |            |            |            |            |            |            |            |            |            |            |            |  2 | 1–1    | SD   | 12      | NA   | For vacant WBO featherweight title                                             |
+| Gary Russell Jr.       | StubHub Center, Carson, California, US                            |            |            | Win        |            |            |            |            |            |            |            |            |            |            |            |  3 | 2–1    | MD   | 12      | NA   | Won vacant WBO featherweight title                                             |
+| Chonlatarn Piriyapinyo | Cotai Arena, Macau, SAR                                           |            |            |            | Win        |            |            |            |            |            |            |            |            |            |            |  4 | 3–1    | UD   | 12      | NA   | Retained WBO featherweight title                                               |
+| Gamalier Rodríguez     | MGM Grand Garden Arena, Paradise, Nevada, US                      |            |            |            |            | Win        |            |            |            |            |            |            |            |            |            |  5 | 4–1    | KO   | 9 (12)  | 0:50 | Retained WBO featherweight title                                               |
+| Romulo Koasicha        | Thomas & Mack Center, Paradise, Nevada, US                        |            |            |            |            |            | Win        |            |            |            |            |            |            |            |            |  6 | 5–1    | KO   | 10 (12) | 2:35 | Retained WBO featherweight title                                               |
+| Román Martínez         | The Theater at Madison Square Garden, New York City, New York, US |            |            |            |            |            |            | Win        |            |            |            |            |            |            |            |  7 | 6–1    | KO   | 5 (12)  | 1:09 | Won WBO junior lightweight title                                               |
+| Nicholas Walters       | Cosmopolitan of Las Vegas, Paradise, Nevada, US                   |            |            |            |            |            |            |            | Win        |            |            |            |            |            |            |  8 | 7–1    | RTD  | 7 (12)  | 3:00 | Retained WBO junior lightweight title                                          |
+| Jason Sosa             | MGM National Harbor, Oxon Hill, Maryland, US                      |            |            |            |            |            |            |            |            | Win        |            |            |            |            |            |  9 | 8–1    | RTD  | 9 (12)  | 3:00 | Retained WBO junior lightweight title                                          |
+| Miguel Marriaga        | Microsoft Theater, Los Angeles, California, US                    |            |            |            |            |            |            |            |            |            | Win        |            |            |            |            | 10 | 9–1    | RTD  | 7 (12)  | 3:00 | Retained WBO junior lightweight title                                          |
+| Guillermo Rigondeaux   | The Theater at Madison Square Garden, New York City, New York, US |            |            |            |            |            |            |            |            |            |            | Win        |            |            |            | 11 | 10–1   | RTD  | 6 (12)  | 3:00 | Retained WBO junior lightweight title                                          |
+| Jorge Linares          | Madison Square Garden, New York City, New York, US                |            |            |            |            |            |            |            |            |            |            |            | Win        |            |            | 12 | 11–1   | TKO  | 10 (12) | 2:08 | Won WBA (Super) and The Ring lightweight titles                                |
+| José Pedraza           | Hulu Theater, New York City, New York, US                         |            |            |            |            |            |            |            |            |            |            |            |            | Win        |            | 13 | 12–1   | UD   | 12      | NA   | Retained WBA (Super) and The Ring lightweight titles;Won WBO lightweight title |
+| Anthony Crolla         | Staples Center, Los Angeles, California, US                       |            |            |            |            |            |            |            |            |            |            |            |            |            | NA         | 14 | NA     | NA   | NA      | NA   | Defending WBA (Super), WBO, and The Ring lightweight titles                    |
+
+</div>
+
+Another neat part of the `pivot_wider()` function is the `values_from`
+argument can take multiple columns. For example, if I wanted to see how
+man `Win`s resulted in `TKO`s (technical knock-outs) or `KO`s
+(knock-outs) and their corresponding rounds and time, I could use the
+following to see `rounds` and `time` in separate columns.
+
+``` r
+LomaFights %>% 
+    dplyr::filter(result == "Win") %>% 
+    pivot_wider(names_from = c(type),
+                values_from = c(rounds, time),
+                values_fill = list(rounds = "",
+                                   time = "")) %>% 
+    dplyr::select(opponent,
+                  dplyr::contains("_KO"),
+                  dplyr::contains("_TKO"))
+```
+
+<div class="kable-table">
+
+| opponent               | rounds\_KO | time\_KO | rounds\_TKO | time\_TKO |
+| :--------------------- | :--------- | :------- | :---------- | :-------- |
+| José Ramírez           |            |          | 4 (10)      | 2:55      |
+| Gary Russell Jr.       |            |          |             |           |
+| Chonlatarn Piriyapinyo |            |          |             |           |
+| Gamalier Rodríguez     | 9 (12)     | 0:50     |             |           |
+| Romulo Koasicha        | 10 (12)    | 2:35     |             |           |
+| Román Martínez         | 5 (12)     | 1:09     |             |           |
+| Nicholas Walters       |            |          |             |           |
+| Jason Sosa             |            |          |             |           |
+| Miguel Marriaga        |            |          |             |           |
+| Guillermo Rigondeaux   |            |          |             |           |
+| Jorge Linares          |            |          | 10 (12)     | 2:08      |
+| José Pedraza           |            |          |             |           |
+
+</div>
+
+We can also use the `tidyr::pivot_wider()` function like
+`tidyr::spread()` function above. If I want to see the fight `results`
+by type, but with `Win` and `Loss` in separate columns, I can use the
+following sequence.
+
+``` r
+LomaFights %>% 
+    dplyr::filter(!is.na(result)) %>% 
+    dplyr::count(type, result) %>% 
+    tidyr::pivot_wider(
+            names_from = result, 
+            values_from = n,
+            values_fill = list(n = 0))
+```
+
+<div class="kable-table">
+
+| type | Win | Loss |
+| :--- | --: | ---: |
+| KO   |   3 |    0 |
+| MD   |   1 |    0 |
+| RTD  |   4 |    0 |
+| SD   |   0 |    1 |
+| TKO  |   2 |    0 |
+| UD   |   2 |    0 |
+
+</div>
+
+As you can see, these new `tidyr::pivot_` functions extend
+`tidyr::gather()` and `tidyr::spread()` with more options and
+flexibility. It might take a little getting used to, but I think you’ll
+find they’re a welcome addition to all of the data manipulation in the
+`tidyverse`.
+
+## Read more
+
+  - Check out the [pivoting
+    vignette](https://tidyr.tidyverse.org/dev/articles/pivot.html) on
+    the tidyverse website.
+
+  - Alison Presmanes Hill has some great examples in this [Github
+    repo](https://github.com/apreshill/teachthat/tree/master/pivot).
+
+  - Read the [`NEWS.md`
+    file](https://github.com/tidyverse/tidyr/blob/master/NEWS.md) on the
+    `tidyr` github page for new changes to these functions (and
+    others\!)
+
+  - Be sure to check out [Vasiliy Lomachenko when he fights Anthony
+    Crolla](https://es.pn/2CUzPFl) on April 12\!

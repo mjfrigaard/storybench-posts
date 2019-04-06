@@ -260,9 +260,10 @@ who %>% glimpse(78)
 
 `country`, `iso2`, `iso3`, and `year` are already variables, so can be left as is. We want to pivot the columns from `new_sp_m014` to `newrel_f65`:
 
-```{r}
+```{r who-spec}
 spec <- who %>%
-  pivot_longer_spec(new_sp_m014:newrel_f65, values_to = "count")
+  pivot_longer_spec(new_sp_m014:newrel_f65, 
+                    values_to = "count")
 spec
 ```
 
@@ -280,9 +281,12 @@ These columns encode four variables in their names:
 
 We can extract these variables out of the `name` using `extract()`:
 
-```{r}
+```{r extract}
 spec <- spec %>%
-  extract(name, c("diagnosis", "gender", "age"), "new_?(.*)_(.)(.*)")
+  tidyr::extract(
+      col = name, 
+      into = c("diagnosis", "gender", "age"),
+      regex = "new_?(.*)_(.)(.*)")
 spec
 ```
 
@@ -290,33 +294,36 @@ spec
 
 Gender and age have fixed and known values, so it's good practice to convert these strings to factors:
 
-```{r}
+```{r factor}
 spec <- spec %>%
   mutate(
     gender = factor(gender, levels = c("f", "m")),
     age = factor(age, levels = unique(age), ordered = TRUE)
   )
-spec
+spec %>% dplyr::glimpse(78)
 ```
 
 Finally, we can use this spec to tidy the dataset:
 
-```{r}
-who %>% pivot_longer(spec = spec)
+```{r who-pivot_longer}
+who %>% 
+    pivot_longer(spec = spec) %>%
+    utils::head(10)
 ```
 
 ## Manual spec construction
 
 Sometimes it's not possible (or not convenient) to compute the spec from the column names, and instead it can be convenient to construct the spec by hand. For example, take this `construction` data, which is lightly modified from Table 5 "completions" found at <https://www.census.gov/construction/nrc/index.html>:
 
-```{r}
-construction <- read_csv("construction.csv", col_types = list("2 to 4 units" = col_integer()))
-construction
+```{r construction}
+construction <- readr::read_csv("construction.csv", 
+                         col_types = list("2 to 4 units" = col_integer()))
+construction %>% utils::head(10)
 ```
 
 This sort of data is not uncommon from government agencies: the column names actually belong to different variables, and here we have summaries for number of units (1, 2-4, 5+) and regions of the country (NE, NW, midwest, S, W). We can most easily describe that with a tibble:
 
-```{r}
+```{r spec}
 spec <- tribble(
   ~.name,            ~.value, ~units,  ~region,     
   "Total",           "n",     "total", NA,          
@@ -328,12 +335,14 @@ spec <- tribble(
   "South",           "n",     NA,      "South",     
   "West",            "n",     NA,      "West",      
 )
+spec
 ```
 
 Which yields the following long form:
 
-```{r}
-construction %>% pivot_longer(spec = spec)
+```{r construction-pivot_longer}
+construction %>% 
+    tidyr::pivot_longer(spec = spec)
 ```
 
 (Note that there is no overlap between the `units` and `region` variables; here the data would really be most naturally described in two independent tables.)
@@ -364,29 +373,34 @@ This dataset only records when a fish was detected by the station - it doesn't r
 fish_encounters %>% pivot_wider(
   names_from = station, 
   values_from = seen,
-  values_fill = list(seen = 0)
-)
+  values_fill = list(seen = 0))
 ```
 
 ## Generate column name from multiple variables
 
 Imagine, as in <http://stackoverflow.com/questions/24929954>, that we have information containing the combination of product, country, and year. In tidy form it might look like this:
 
-```{r}
-df <- expand_grid(
+```{r df-expand_grid}
+df <- tidyr::expand_grid(
     product = c("A", "B"), 
     country = c("AI", "EI"), 
-    year = 2000:2014
-  ) %>%
+    year = 2000:2014)
+df %>% dplyr::glimpse(78)
+```
+
+```{r df-rnorm}
+df <- df %>%
   filter((product == "A" & country == "AI") | product == "B") %>% 
   mutate(value = rnorm(nrow(.)))
-df
+df %>% dplyr::glimpse(78)
 ```
 
 We want to widen the data so we have one column for each combination of `product` and `country`. The key is to specify multiple variables for `names_from`:
 
 ```{r}
-df %>% pivot_wider(names_from = c(product, country), values_from = value)
+df %>% pivot_wider(names_from = 
+                       c(product, country), 
+                       values_from = value)
 ```
 
 If you want finer control over the generated columns, you can create a spec data frame. This has exactly the same format as for `pivot_longer()`: a data frame with special `.name` and `.value` columns. But when fed to `pivot_wider()` it does the opposite transformation to `pivot_longer()`: it create the columns specified in `.name`, using the information from `.value` and the other columns.
@@ -395,11 +409,17 @@ For this dataset, you might want to generate a custom spec if you wanted to ensu
 
 ```{r}
 spec <- df %>% 
-  expand(product, country, .value = "value") %>% 
-  unite(".name", product, country, remove = FALSE)
+  expand(product, 
+         country, 
+         .value = "value") %>% 
+  unite(".name",
+        product,
+        country,
+        remove = FALSE)
 spec
-
-df %>% pivot_wider(spec = spec) %>% head()
+df %>% 
+    pivot_wider(spec = spec) %>% 
+    head()
 ```
 
 ## Tidy census
