@@ -1,7 +1,7 @@
 Data Journalism with R - tidyr pivoting
 ================
 Martin Frigaard
-2019-04-05
+2019-04-06
 
   - [Objectives](#objectives)
   - [Part one: Tidy data](#part-one-tidy-data)
@@ -104,8 +104,8 @@ principles into concepts and terms a broader audience can grasp and use
 for data manipulation.
 
 ``` r
-# source("code/data.R")
-# base::save.image("data/tidyr-data.RData")
+source("code/data.R")
+base::save.image("data/tidyr-data.RData")
 base::load(file = "data/tidyr-data.RData")
 ```
 
@@ -121,18 +121,17 @@ three principles for tidy data are:
 3.  Values are in cells
 
 Put them together, and these three statements make up the contents in a
-[data frame or tibble](https://tibble.tidyverse.org/). Data frame’s can
-contain any number of variables, which are used to store various
-measurements associated with each observation. While these principles
-might seem obvious at first, many of the data arrangements we encounter
-in real life don’t adhere to this guidance.
+tidy [data frame or tibble](https://tibble.tidyverse.org/). While these
+principles might seem obvious at first, many of the data arrangements we
+encounter in real life don’t adhere to this guidance.
 
 ### Indexed vs. Cartesian
 
 I prefer to refer to tidy data as “indexed”, and wide data as
 “Cartesian” (this terminology is from the
-[ggplot2](https://amzn.to/2UlyNNp) text). This helps me understand what
-is happening when the data get transformed. Two examples are below:
+[ggplot2](https://amzn.to/2UlyNNp) text) because these terms help me
+understand what is happening when the data get transformed. Two examples
+are below:
 
 #### Indexed data
 
@@ -155,7 +154,7 @@ to keep track of each unique value of `measure`.
 
 The same data are represented in the `Cartesian` data frame, but in this
 table the `measure` values are at the intersection of `group` and each
-`number`.
+`ID###` (the `number` from the previous table).
 
 <div class="kable-table">
 
@@ -187,15 +186,15 @@ Take the data frame below, `DataTibble`, which has 5 variables:
   - `year` - the calendar year the measurements were collected
   - `x_measurement` and `y_measurement` - these are randomly generated
     numbers
-  - `ordinal_x_var` - this is an ordinal variable corresponding to the
-    values in `x_measurement` (greater than or equal to 75 is `"high"`
-    or `3`, greater than or equal to `50` and less than `75` is `"med"`,
-    and less than `50` is
-`"low"`).
+  - `ordinal_y_var` - this is an ordinal variable corresponding to the
+    values in `y_measurement` (greater than or equal to `800` is
+    `"high"` or `3`, greater than or equal to `500` and less than `750`
+    is `"med"` or `2`, and less than `500` is `"low"` or
+`1`).
 
 <div class="kable-table">
 
-| group\_var | year | x\_measurement | y\_messurement | ordinal\_y\_var |
+| group\_var | year | x\_measurement | y\_measurement | ordinal\_y\_var |
 | :--------- | ---: | -------------: | -------------: | :-------------- |
 | A          | 2018 |          11.81 |         532.37 | med             |
 | A          | 2017 |          28.46 |         116.04 | low             |
@@ -218,7 +217,7 @@ DataTibble %>%
 
 <div class="kable-table">
 
-| group\_var | year | x\_measurement | y\_messurement | ordinal\_y\_var |
+| group\_var | year | x\_measurement | y\_measurement | ordinal\_y\_var |
 | :--------- | ---: | -------------: | -------------: | :-------------- |
 | A          | 2018 |          11.81 |         532.37 | med             |
 | A          | 2017 |          28.46 |         116.04 | low             |
@@ -234,7 +233,7 @@ DataTibble %>%
 But when I combine `dplyr::group_by()` with `dplyr::summarize()`, I can
 collapse `DataTibble` into a smaller table by supplying an aggregate
 function to `summarize()`. Below I use `summarize()` to get the mean of
-`x_measurement` and `y_messurement` and `n()` to get the total number in
+`x_measurement` and `y_measurement` and `n()` to get the total number in
 each group.
 
 ``` r
@@ -242,7 +241,7 @@ DataTibble %>%
   dplyr::group_by(group_var) %>%
   dplyr::summarize(
     x_mean = mean(x_measurement),
-    y_mean = mean(y_messurement),
+    y_mean = mean(y_measurement),
     no = n()
   )
 ```
@@ -259,7 +258,7 @@ DataTibble %>%
 
 Grouping can also work with categorical/factor variables. The code below
 uses `dplyr::count()` to summarize the number of `ordinal_y_var` levels
-per category of `group_var`,
+per category of `group_var`.
 
 ``` r
 DataTibble %>%
@@ -281,7 +280,8 @@ DataTibble %>%
 
 This table isn’t as easy to read, because all of the information is
 oriented vertically. I can move the values of `group_var` into
-individual columns to make it easier on the eyes using `tidyr::spread`.
+individual columns to make it easier on the eyes using
+`tidyr::spread()`.
 
 ``` r
 DataTibble %>%
@@ -349,12 +349,11 @@ functions,
 > to these functions, meaning that many people (including me\!) have to
 > consult the documentation every time.
 
-Changes like these are examples of why I appreciate the `tidyverse`,
-because I can tell a lot of thought gets put into identifying verbs that
-accurately capture the users intentions. Knowing how to reshape data is
-an important skill for any data scientist, and I think the
-`tidyr::pivot_` functions are great additions to data manipulation in
-the `tidyverse` because they make restructuring more explicit.
+Decisions like these are examples of why I appreciate the `tidyverse`,
+because I can tell a lot of thought gets put into identifying language
+that accurately capture the users intentions. Knowing how to reshape
+data is an important skill for any data scientist, and the
+`tidyr::pivot_` functions make restructuring very clear and explicit.
 
 -----
 
@@ -364,48 +363,48 @@ Vasily Lomachenko, the best [pound-for-pound
 boxer](https://en.wikipedia.org/wiki/Boxing_pound_for_pound_rankings) in
 the world, is known for taking [traditional Ukrainian dance classes as a
 child before ever stepping into a boxing
-ring](traditional%20Ukrainian%20dance%20classes). Why would an athlete
-who punches people for a living spend time learning how to dance?
-Because **having the ability to quickly change angles is so essential in
-boxing that these skills are often what separates a good fighter from an
-elite
-athlete**.
+ring](https://sports.yahoo.com/quitting-boxing-dance-made-vasyl-lomachenko-better-fighter-195049319.html).
+Why would an athlete who punches people for a living spend time learning
+how to dance? Because dancing is an excellent way to develop movement
+with precision, and **having the ability to quickly change angles is so
+essential in boxing that these skills are often what separates a good
+fighter from an elite athlete**.
 
-![<http://fightland.vice.com/blog/the-pivots-and-precision-of-vasyl-lomachenko>](images/loma-pivot.gif)
+![‘I think footwork is one of the most important things to becoming a
+great fighter. That’s where everything starts.’ - Vasyl
+Lomachenko](images/loma-pivot.gif)
 
 Whenever we use the `pivot_` functions, we’re changing angles between
-the columns and rows. If the tables pivoting longer, the column names
-and values rotate 90˚ into an index row.
+the columns and rows. If the tables are pivoting from wide to longer,
+the column names and values rotate 90˚ into an index row.
 
 ![](images/pivot-longer-image.png)<!-- -->
 
-Pivoting from long to wide (or)
+When pivoting from long to wide, the index variable shifts across the
+column names, and the values slide in underneath the names.
 
 ![](images/pivot-wider-image.png)<!-- -->
 
-The `tidyr::pivot_` functions give you a similar ability with your
-data\! Being able to rapidly spin your data from columns to rows (and
-back) is similar to being able to rotate 90 degrees on a dime and avoid
-an incoming hook.
+The `tidyr::pivot_` functions give users the ability to quickly pivot
+(change angles) their data, and being able to rotate your data from
+columns to rows (and back) is similar to being able to rotate 90˚ on a
+dime and avoid an incoming hook.
 
 As a skill, it’s also a great place to start because most to the data
 you’ll encounter in the `tidyverse` is going to be in columns and rows
-(or you will want to get them that way).
-
-> “I think footwork is one of the most important things to becoming a
-> great fighter. That’s where everything starts.” - Vasyl
-Lomachenko
+(or you will want to get them that
+way).
 
 # Pivoting Example 1: Categorical/ordinal variable across multiple columns
 
 We’re going to start by manipulating a data set of Lomachenko’s fights
 from the [BoxRec](http://boxrec.com/en/boxer/659771) database. The fight
-information has been entered in a way that makes sense for the person
+information is oriented in a way that makes sense for the person
 entering the data, but it’s not ideal for analysis or
 modeling.
 
 ``` r
-LomaWideSmall %>% utils::head(10)
+LomaWideSmall %>% utils::head()
 ```
 
 <div class="kable-table">
@@ -418,10 +417,6 @@ LomaWideSmall %>% utils::head(10)
 | Chonlatarn Piriyapinyo | 2014-11-22 | NA       | NA       | NA       | Win      | NA       | NA       | NA       | NA       | NA       | NA        | NA        | NA        | NA        | NA        |
 | Gamalier Rodríguez     | 2015-05-02 | NA       | NA       | NA       | NA       | Win      | NA       | NA       | NA       | NA       | NA        | NA        | NA        | NA        | NA        |
 | Romulo Koasicha        | 2015-11-07 | NA       | NA       | NA       | NA       | NA       | Win      | NA       | NA       | NA       | NA        | NA        | NA        | NA        | NA        |
-| Román Martínez         | 2016-06-11 | NA       | NA       | NA       | NA       | NA       | NA       | Win      | NA       | NA       | NA        | NA        | NA        | NA        | NA        |
-| Nicholas Walters       | 2016-11-26 | NA       | NA       | NA       | NA       | NA       | NA       | NA       | Win      | NA       | NA        | NA        | NA        | NA        | NA        |
-| Jason Sosa             | 2017-04-08 | NA       | NA       | NA       | NA       | NA       | NA       | NA       | NA       | Win      | NA        | NA        | NA        | NA        | NA        |
-| Miguel Marriaga        | 2017-08-05 | NA       | NA       | NA       | NA       | NA       | NA       | NA       | NA       | NA       | Win       | NA        | NA        | NA        | NA        |
 
 </div>
 
@@ -438,7 +433,7 @@ involved with a each fight,
     information into the first two column/rows in a spreadsheet and
     titles it, ’Lomachenko\`
 2.  The `date` for the first fight gets entered into the `B` column (the
-    third in the table),
+    second in the table),
 3.  In order to track an athlete’s win/loss record over the course of
     their career, a number is also marked for each fight (starting with
     `1`) in a column titled, `fight_1`. and the result gets put in the
@@ -595,7 +590,7 @@ LomaSpec
 </div>
 
 The three columns in `LomaSpec` contain metadata (data about our data)
-on the transformation I want to perform–specifically the originally
+on the transformation I want to perform–specifically the original
 columns (`.name`) and the corresponding cell values (`.value`). The
 other variable (`fight_no`) gets carried over from the transformation as
 well.
@@ -661,25 +656,24 @@ These data are now in a tidy (indexed) format.
 
 ## Pivoting wider
 
-No one wins a fight in boxing by only avoiding punches–eventually they
-have to hit someone (probably more than one). Another reason that being
+No one wins a boxing match by only avoiding punches–eventually they have
+to hit someone (and probably more than once). Another reason that being
 able to change angles quickly is advantageous is that it creates more
-opportunities to throw (and land) a punch. As you can see, Lomachenko’s
-pivoting abilities not only make him frustratingly hard to hit, but they
-also allow him to see openings in his opponents defenses (which makes
-him incredibly successful at landing
+opportunities to throw (and land) punches. As you can see below,
+Lomachenko’s pivoting abilities not only make him frustratingly hard to
+hit, but they also allow him to see openings in his opponents defenses
+(which makes him incredibly successful at landing
 punches).
 
 ![<http://fightland.vice.com/blog/the-pivots-and-precision-of-vasyl-lomachenko>](https://raw.githubusercontent.com/mjfrigaard/storybenchR/master/02.1-tidyr-tidyverse/images/loma-pivot-strike.gif)
 
 # Pivoting Example 2: Moving categorical or ordinal variables across columns
 
-It’s less common, but sometimes you’ll need to move variables from an
-indexed (or tidy) column arrangement into a Cartesian (wide) format.
+It’s less common, but sometimes you’ll need to move variables from a
+tidy (or indexed) column arrangement into a wide (Cartesian) format.
 
-In order to restructure a Cartesian data frame to an indexed data frame
-(or to go from “long” to “wide”), we need to use the
-`tidyr::pivot_wider()` function. This works much like the
+In order to restructure from a wide to long data frame, we need to use
+the `tidyr::pivot_wider()` function. This works much like the
 `pivot_longer()` function, but with a few different arguments.
 
 Consider a data frame with the same Lomachenko fight records, but this
@@ -693,7 +687,7 @@ the creation of the `LomaDatesWide` data:
 2.  A `fight_number` column is created to document the number of fights
     (as they happen)
 
-3.  The date for the first fight (`12 Oct 2013`) gets entered into the
+3.  The date for the first fight (`2013-10-12`) gets entered into the
     the fourth column in the table, and the result (`Win`) gets put in
     the corresponding cell
 
@@ -701,9 +695,9 @@ the creation of the `LomaDatesWide` data:
     key below), the `fight_record` is updated (with the official outcome
     of the bout)
 
-5.  The official round and time (`round_time`) is recorded for when the
-    fight had to stop (or the total number of rounds if it went the
-    distance),
+5.  The official round and time (`rounds` and `time`) is recorded for
+    when the fight had to stop (or the total number of rounds if it went
+    the distance),
 
 6.  Titles and belts are listed in the `notes` section
 
@@ -722,8 +716,8 @@ his [wikipedia table](https://en.wikipedia.org/wiki/Vasyl_Lomachenko).
 To create a spreadsheet like the one above, we can use the
 `tidyr::pivot_wider()` function.
 
-I add a few `dplyr` functions to get the data frame to look identical to
-the excel file above.
+*I add a few `dplyr` functions to get the data frame to look identical
+to the excel file above.*
 
 ``` r
 LomaFights %>% 
@@ -764,8 +758,8 @@ LomaFights %>%
 
 ## Pivoting wider options
 
-The output is *very* close to identical to the excel sheet above, except
-missing values in excel are empty (not `NA` like R). I can use the
+The output is *very* close to the excel sheet above, except missing
+values in excel are empty (not an `NA` like R). I can use the
 `tidyr::pivot_wider(x, values_fill())` to include this change to the
 data.
 
@@ -777,28 +771,27 @@ LomaFights %>%
     dplyr::arrange(no) %>% 
     dplyr::select(opponent, 
                   location,
-                  dplyr::starts_with("20"),
-                  dplyr::everything())
+                  dplyr::starts_with("20"))
 ```
 
 <div class="kable-table">
 
-| opponent               | location                                                          | 2013-10-12 | 2014-03-01 | 2014-06-21 | 2014-11-22 | 2015-05-02 | 2015-11-07 | 2016-06-11 | 2016-11-26 | 2017-04-08 | 2017-08-05 | 2017-12-09 | 2018-05-12 | 2018-12-08 | 2019-04-12 | no | record | type | rounds  | time | notes                                                                          |
-| :--------------------- | :---------------------------------------------------------------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | -: | :----- | :--- | :------ | :--- | :----------------------------------------------------------------------------- |
-| José Ramírez           | Thomas & Mack Center, Paradise, Nevada, US                        | Win        |            |            |            |            |            |            |            |            |            |            |            |            |            |  1 | 1–0    | TKO  | 4 (10)  | 2:55 | Won WBO International featherweight title                                      |
-| Orlando Salido         | Alamodome, San Antonio, Texas, US                                 |            | Loss       |            |            |            |            |            |            |            |            |            |            |            |            |  2 | 1–1    | SD   | 12      | NA   | For vacant WBO featherweight title                                             |
-| Gary Russell Jr.       | StubHub Center, Carson, California, US                            |            |            | Win        |            |            |            |            |            |            |            |            |            |            |            |  3 | 2–1    | MD   | 12      | NA   | Won vacant WBO featherweight title                                             |
-| Chonlatarn Piriyapinyo | Cotai Arena, Macau, SAR                                           |            |            |            | Win        |            |            |            |            |            |            |            |            |            |            |  4 | 3–1    | UD   | 12      | NA   | Retained WBO featherweight title                                               |
-| Gamalier Rodríguez     | MGM Grand Garden Arena, Paradise, Nevada, US                      |            |            |            |            | Win        |            |            |            |            |            |            |            |            |            |  5 | 4–1    | KO   | 9 (12)  | 0:50 | Retained WBO featherweight title                                               |
-| Romulo Koasicha        | Thomas & Mack Center, Paradise, Nevada, US                        |            |            |            |            |            | Win        |            |            |            |            |            |            |            |            |  6 | 5–1    | KO   | 10 (12) | 2:35 | Retained WBO featherweight title                                               |
-| Román Martínez         | The Theater at Madison Square Garden, New York City, New York, US |            |            |            |            |            |            | Win        |            |            |            |            |            |            |            |  7 | 6–1    | KO   | 5 (12)  | 1:09 | Won WBO junior lightweight title                                               |
-| Nicholas Walters       | Cosmopolitan of Las Vegas, Paradise, Nevada, US                   |            |            |            |            |            |            |            | Win        |            |            |            |            |            |            |  8 | 7–1    | RTD  | 7 (12)  | 3:00 | Retained WBO junior lightweight title                                          |
-| Jason Sosa             | MGM National Harbor, Oxon Hill, Maryland, US                      |            |            |            |            |            |            |            |            | Win        |            |            |            |            |            |  9 | 8–1    | RTD  | 9 (12)  | 3:00 | Retained WBO junior lightweight title                                          |
-| Miguel Marriaga        | Microsoft Theater, Los Angeles, California, US                    |            |            |            |            |            |            |            |            |            | Win        |            |            |            |            | 10 | 9–1    | RTD  | 7 (12)  | 3:00 | Retained WBO junior lightweight title                                          |
-| Guillermo Rigondeaux   | The Theater at Madison Square Garden, New York City, New York, US |            |            |            |            |            |            |            |            |            |            | Win        |            |            |            | 11 | 10–1   | RTD  | 6 (12)  | 3:00 | Retained WBO junior lightweight title                                          |
-| Jorge Linares          | Madison Square Garden, New York City, New York, US                |            |            |            |            |            |            |            |            |            |            |            | Win        |            |            | 12 | 11–1   | TKO  | 10 (12) | 2:08 | Won WBA (Super) and The Ring lightweight titles                                |
-| José Pedraza           | Hulu Theater, New York City, New York, US                         |            |            |            |            |            |            |            |            |            |            |            |            | Win        |            | 13 | 12–1   | UD   | 12      | NA   | Retained WBA (Super) and The Ring lightweight titles;Won WBO lightweight title |
-| Anthony Crolla         | Staples Center, Los Angeles, California, US                       |            |            |            |            |            |            |            |            |            |            |            |            |            | NA         | 14 | NA     | NA   | NA      | NA   | Defending WBA (Super), WBO, and The Ring lightweight titles                    |
+| opponent               | location                                                          | 2013-10-12 | 2014-03-01 | 2014-06-21 | 2014-11-22 | 2015-05-02 | 2015-11-07 | 2016-06-11 | 2016-11-26 | 2017-04-08 | 2017-08-05 | 2017-12-09 | 2018-05-12 | 2018-12-08 | 2019-04-12 |
+| :--------------------- | :---------------------------------------------------------------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- | :--------- |
+| José Ramírez           | Thomas & Mack Center, Paradise, Nevada, US                        | Win        |            |            |            |            |            |            |            |            |            |            |            |            |            |
+| Orlando Salido         | Alamodome, San Antonio, Texas, US                                 |            | Loss       |            |            |            |            |            |            |            |            |            |            |            |            |
+| Gary Russell Jr.       | StubHub Center, Carson, California, US                            |            |            | Win        |            |            |            |            |            |            |            |            |            |            |            |
+| Chonlatarn Piriyapinyo | Cotai Arena, Macau, SAR                                           |            |            |            | Win        |            |            |            |            |            |            |            |            |            |            |
+| Gamalier Rodríguez     | MGM Grand Garden Arena, Paradise, Nevada, US                      |            |            |            |            | Win        |            |            |            |            |            |            |            |            |            |
+| Romulo Koasicha        | Thomas & Mack Center, Paradise, Nevada, US                        |            |            |            |            |            | Win        |            |            |            |            |            |            |            |            |
+| Román Martínez         | The Theater at Madison Square Garden, New York City, New York, US |            |            |            |            |            |            | Win        |            |            |            |            |            |            |            |
+| Nicholas Walters       | Cosmopolitan of Las Vegas, Paradise, Nevada, US                   |            |            |            |            |            |            |            | Win        |            |            |            |            |            |            |
+| Jason Sosa             | MGM National Harbor, Oxon Hill, Maryland, US                      |            |            |            |            |            |            |            |            | Win        |            |            |            |            |            |
+| Miguel Marriaga        | Microsoft Theater, Los Angeles, California, US                    |            |            |            |            |            |            |            |            |            | Win        |            |            |            |            |
+| Guillermo Rigondeaux   | The Theater at Madison Square Garden, New York City, New York, US |            |            |            |            |            |            |            |            |            |            | Win        |            |            |            |
+| Jorge Linares          | Madison Square Garden, New York City, New York, US                |            |            |            |            |            |            |            |            |            |            |            | Win        |            |            |
+| José Pedraza           | Hulu Theater, New York City, New York, US                         |            |            |            |            |            |            |            |            |            |            |            |            | Win        |            |
+| Anthony Crolla         | Staples Center, Los Angeles, California, US                       |            |            |            |            |            |            |            |            |            |            |            |            |            | NA         |
 
 </div>
 
@@ -869,9 +862,8 @@ LomaFights %>%
 
 As you can see, these new `tidyr::pivot_` functions extend
 `tidyr::gather()` and `tidyr::spread()` with more options and
-flexibility. It might take a little getting used to, but I think you’ll
-find they’re a welcome addition to all of the data manipulation in the
-`tidyverse`.
+flexibility. I think you’ll find these are a welcome addition to all of
+the data manipulation in the `tidyverse`.
 
 ## Read more
 

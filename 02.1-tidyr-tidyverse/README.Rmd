@@ -77,8 +77,8 @@ My goal is that by showing the reasoning behind the data entry process, you'll w
 If you’ve worked with SQL and relational databases, you’ll recognize most of these concepts. Hadley Wickham distilled a lot of the technical jargon from [Edgar F. Codd’s 'normal form'](https://en.wikipedia.org/wiki/Third_normal_form) and applied it to statistical terms. More importantly, he translated these essential principles into concepts and terms a broader audience can grasp and use for data manipulation. 
 
 ```{r load-data, message=FALSE, warning=FALSE}
-# source("code/data.R")
-# base::save.image("data/tidyr-data.RData")
+source("code/data.R")
+base::save.image("data/tidyr-data.RData")
 base::load(file = "data/tidyr-data.RData")
 ```
 
@@ -91,11 +91,11 @@ Tidy data refers to 'rectangular' data. These are the data we typically see in s
 2. Observations (or cases) go in the rows  
 3. Values are in cells  
 
-Put them together, and these three statements make up the contents in a [data frame or tibble](https://tibble.tidyverse.org/). Data frame's can contain any number of variables, which are used to store various measurements associated with each observation. While these principles might seem obvious at first, many of the data arrangements we encounter in real life don't adhere to this guidance.
+Put them together, and these three statements make up the contents in a tidy [data frame or tibble](https://tibble.tidyverse.org/). While these principles might seem obvious at first, many of the data arrangements we encounter in real life don't adhere to this guidance.
 
 ### Indexed vs. Cartesian
 
-I prefer to refer to tidy data as "indexed", and wide data as "Cartesian" (this terminology is from the [ggplot2](https://amzn.to/2UlyNNp) text). This helps me understand what is happening when the data get transformed. Two examples are below:
+I prefer to refer to tidy data as "indexed", and wide data as "Cartesian" (this terminology is from the [ggplot2](https://amzn.to/2UlyNNp) text) because these terms help me understand what is happening when the data get transformed. Two examples are below:
 
 #### Indexed data
 
@@ -107,7 +107,7 @@ Indexed
 
 #### Cartesian data
 
-The same data are represented in the `Cartesian` data frame, but in this table the `measure` values are at the intersection of `group` and each `number`. 
+The same data are represented in the `Cartesian` data frame, but in this table the `measure` values are at the intersection of `group` and each `ID###` (the `number` from the previous table). 
 
 ```{r Cartesian, echo=FALSE}
 Cartesian
@@ -130,7 +130,7 @@ Take the data frame below, `DataTibble`, which has 5 variables:
 * `group_var` - a categorical group 
 * `year` - the calendar year the measurements were collected 
 * `x_measurement` and `y_measurement` - these are randomly generated numbers
-* `ordinal_x_var` - this is an ordinal variable corresponding to the values in `x_measurement` (greater than or equal to 75 is `"high"` or `3`, greater than or equal to `50` and less than `75` is `"med"`, and less than `50` is `"low"`).
+* `ordinal_y_var` - this is an ordinal variable corresponding to the values in `y_measurement` (greater than or equal to `800` is `"high"` or `3`, greater than or equal to `500` and less than `750` is `"med"` or `2`, and less than `500` is `"low"` or `1`).
 
 ```{r DataTibble, echo=FALSE}
 DataTibble
@@ -143,27 +143,27 @@ DataTibble %>%
   dplyr::group_by(group_var)
 ```
 
-But when I combine `dplyr::group_by()` with `dplyr::summarize()`, I can collapse `DataTibble` into a smaller table by supplying an aggregate function to `summarize()`. Below I use `summarize()` to get the mean of `x_measurement` and `y_messurement` and `n()` to get the total number in each group.
+But when I combine `dplyr::group_by()` with `dplyr::summarize()`, I can collapse `DataTibble` into a smaller table by supplying an aggregate function to `summarize()`. Below I use `summarize()` to get the mean of `x_measurement` and `y_measurement` and `n()` to get the total number in each group.
 
 ```{r summarize}
 DataTibble %>%
   dplyr::group_by(group_var) %>%
   dplyr::summarize(
     x_mean = mean(x_measurement),
-    y_mean = mean(y_messurement),
+    y_mean = mean(y_measurement),
     no = n()
   )
 ```
 
 
-Grouping can also work with categorical/factor variables. The code below uses `dplyr::count()` to summarize the number of `ordinal_y_var` levels per category of `group_var`,
+Grouping can also work with categorical/factor variables. The code below uses `dplyr::count()` to summarize the number of `ordinal_y_var` levels per category of `group_var`.
 
 ```{r count}
 DataTibble %>%
   dplyr::count(group_var, ordinal_y_var)
 ```
 
-This table isn't as easy to read, because all of the information is oriented vertically. I can move the values of `group_var` into individual columns to make it easier on the eyes using `tidyr::spread`.
+This table isn't as easy to read, because all of the information is oriented vertically. I can move the values of `group_var` into individual columns to make it easier on the eyes using `tidyr::spread()`.
 
 ```{r spread}
 DataTibble %>%
@@ -192,49 +192,47 @@ All this data manipulation brings us to *pivoting*, the [recent additions](https
 
 > Many people don’t find the names intuitive and find it hard to remember which direction corresponds to spreading and which to gathering. It also seems surprisingly hard to remember the arguments to these functions, meaning that many people (including me!) have to consult the documentation every time.
 
-Changes like these are examples of why I appreciate the `tidyverse`, because I can tell a lot of thought gets put into identifying verbs that accurately capture the users intentions. Knowing how to reshape data is an important skill for any data scientist, and I think the `tidyr::pivot_` functions are great additions to data manipulation in the `tidyverse` because they make restructuring more explicit. 
+Decisions like these are examples of why I appreciate the `tidyverse`, because I can tell a lot of thought gets put into identifying language that accurately capture the users intentions. Knowing how to reshape data is an important skill for any data scientist, and the `tidyr::pivot_` functions make restructuring very clear and explicit. 
 
 ***
 
 ## Pivoting == fancy footwork
 
-Vasily Lomachenko, the best [pound-for-pound boxer](https://en.wikipedia.org/wiki/Boxing_pound_for_pound_rankings) in the world, is known for taking [traditional Ukrainian dance classes as a child before ever stepping into a boxing ring](traditional Ukrainian dance classes). Why would an athlete who punches people for a living spend time learning how to dance? Because **having the ability to quickly change angles is so essential in boxing that these skills are often what separates a good fighter from an elite athlete**.
+Vasily Lomachenko, the best [pound-for-pound boxer](https://en.wikipedia.org/wiki/Boxing_pound_for_pound_rankings) in the world, is known for taking [traditional Ukrainian dance classes as a child before ever stepping into a boxing ring](https://sports.yahoo.com/quitting-boxing-dance-made-vasyl-lomachenko-better-fighter-195049319.html). Why would an athlete who punches people for a living spend time learning how to dance? Because dancing is an excellent way to develop movement with precision, and **having the ability to quickly change angles is so essential in boxing that these skills are often what separates a good fighter from an elite athlete**.
 
-```{r images/loma-pivot.gif, echo=FALSE, eval=TRUE, fig.cap="http://fightland.vice.com/blog/the-pivots-and-precision-of-vasyl-lomachenko"}
+```{r images/loma-pivot.gif, echo=FALSE, eval=TRUE, fig.cap="'I think footwork is one of the most important things to becoming a great fighter. That's where everything starts.' - Vasyl Lomachenko"}
 knitr::include_graphics(path = "images/loma-pivot.gif")
 ```
 
 
-Whenever we use the `pivot_` functions, we're changing angles between the columns and rows. If the tables pivoting longer, the column names and values rotate 90˚ into an index row. 
+Whenever we use the `pivot_` functions, we're changing angles between the columns and rows. If the tables are pivoting from wide to longer, the column names and values rotate 90˚ into an index row. 
 
 ```{r pivot-longer-image, echo=FALSE, eval=TRUE}
 knitr::include_graphics(path = "images/pivot-longer-image.png")
 ```
 
-Pivoting from long to wide (or)
+When pivoting from long to wide, the index variable shifts across the column names, and the values slide in underneath the names.
 
 ```{r pivot-wider-image, echo=FALSE, eval=TRUE}
 knitr::include_graphics(path = "images/pivot-wider-image.png")
 ```
 
-The `tidyr::pivot_` functions give you a similar ability with your data! Being able to rapidly spin your data from columns to rows (and back) is similar to being able to rotate 90 degrees on a dime and avoid an incoming hook.
+The `tidyr::pivot_` functions give users the ability to quickly pivot (change angles) their data, and being able to rotate your data from columns to rows (and back) is similar to being able to rotate 90˚ on a dime and avoid an incoming hook.
 
 As a skill, it's also a great place to start because most to the data you'll encounter in the `tidyverse` is going to be in columns and rows (or you will want to get them that way).
 
-> "I think footwork is one of the most important things to becoming a great fighter. That's where everything starts." - Vasyl Lomachenko
-
 # Pivoting Example 1: Categorical/ordinal variable across multiple columns
 
-We're going to start by manipulating a data set of Lomachenko's fights from the [BoxRec](http://boxrec.com/en/boxer/659771) database. The fight information has been entered in a way that makes sense for the person entering the data, but it's not ideal for analysis or modeling.
+We're going to start by manipulating a data set of Lomachenko's fights from the [BoxRec](http://boxrec.com/en/boxer/659771) database. The fight information is oriented in a way that makes sense for the person entering the data, but it's not ideal for analysis or modeling.
 
 ```{r LomaWideSmall, echo=TRUE, message=FALSE, warning=FALSE}
-LomaWideSmall %>% utils::head(10)
+LomaWideSmall %>% utils::head()
 ```
 
 This data arrangement is *Cartesian*, because each fight number has it's own column (`fight_1` through `fight_14`), and the result (`Win`/`Loss`) is located at the intersection between the fight numbered columns and the corresponding `opponent` and `date`. Having the data in this arrangement might seem odd to a data scientist, but this configuration makes sense for a fan entering the fights into a spreadsheet **as they happen in real time**. Consider the the chronological chain of events involved with a each fight, 
 
 1. An `opponent` is announced, and an excited fan enters the information into the first two column/rows in a spreadsheet and titles it, 'Lomachenko`
-2. The `date` for the first fight gets entered into the `B` column (the third in the table), 
+2. The `date` for the first fight gets entered into the `B` column (the second in the table), 
 3. In order to track an athlete's win/loss record over the course of their career, a number is also marked for each fight (starting with `1`) in a column titled, `fight_1`. and the result gets put in the corresponding cell (`Win` or `Loss`)
 
 As you can see, the steps above are sensible for someone wanting to track their favorite athlete (or sports team) over time. I've encountered many excel tables with orientations that mirror the sequence of events they're capturing. This "data-entry friendly" format captures enough information to be useful, and it has a few computational abilities. For example, a fan could use filtering to count the number of matches against a particular `opponent`, or sort the `date` column to figure what Lomachenko's late fight. Spreadsheets like these are a cross between a timeline and a record book, and they do a good enough job at both tasks to justify their current structure.
@@ -305,7 +303,7 @@ LomaSpec <- LomaWideSmall %>%
 LomaSpec
 ```
 
-The three columns in `LomaSpec` contain metadata (data about our data) on the transformation I want to perform--specifically the originally columns (`.name`) and the corresponding cell values (`.value`). The other variable (`fight_no`) gets carried over from the transformation as well. 
+The three columns in `LomaSpec` contain metadata (data about our data) on the transformation I want to perform--specifically the original columns (`.name`) and the corresponding cell values (`.value`). The other variable (`fight_no`) gets carried over from the transformation as well. 
 
 #### 2) Format the variable(s) in the spec
 
@@ -343,7 +341,7 @@ These data are now in a tidy (indexed) format.
 
 ## Pivoting wider
 
-No one wins a fight in boxing by only avoiding punches--eventually they have to hit someone (probably more than one). Another reason that being able to change angles quickly is advantageous is that it creates more opportunities to throw (and land) a punch. As you can see, Lomachenko's pivoting abilities not only make him frustratingly hard to hit, but they also allow him to see openings in his opponents defenses (which makes him incredibly successful at landing punches). 
+No one wins a boxing match by only avoiding punches--eventually they have to hit someone (and probably more than once). Another reason that being able to change angles quickly is advantageous is that it creates more opportunities to throw (and land) punches. As you can see below, Lomachenko's pivoting abilities not only make him frustratingly hard to hit, but they also allow him to see openings in his opponents defenses (which makes him incredibly successful at landing punches).  
 
 ```{r loma-pivot-strike.gif, echo=FALSE, eval=TRUE, fig.cap="http://fightland.vice.com/blog/the-pivots-and-precision-of-vasyl-lomachenko"}
 knitr::include_graphics(path =  "https://raw.githubusercontent.com/mjfrigaard/storybenchR/master/02.1-tidyr-tidyverse/images/loma-pivot-strike.gif")
@@ -352,9 +350,9 @@ knitr::include_graphics(path =  "https://raw.githubusercontent.com/mjfrigaard/st
 
 # Pivoting Example 2: Moving categorical or ordinal variables across columns
 
-It's less common, but sometimes you'll need to move variables from an indexed (or tidy) column arrangement into a Cartesian (wide) format. 
+It's less common, but sometimes you'll need to move variables from a tidy (or indexed) column arrangement into a wide (Cartesian) format. 
 
-In order to restructure a Cartesian data frame to an indexed data frame (or to go from "long" to "wide"), we need to use the `tidyr::pivot_wider()` function. This works much like the `pivot_longer()` function, but with a few different arguments. 
+In order to restructure from a wide to long data frame, we need to use the `tidyr::pivot_wider()` function. This works much like the `pivot_longer()` function, but with a few different arguments. 
 
 Consider a data frame with the same Lomachenko fight records, but this time arranged by date. Imagine the following events that would lead to the creation of the `LomaDatesWide` data:
 
@@ -362,11 +360,11 @@ Consider a data frame with the same Lomachenko fight records, but this time arra
 
 2. A `fight_number` column is created to document the number of fights (as they happen)
 
-3. The date for the first fight (`12 Oct 2013`) gets entered into the the fourth column in the table, and the result (`Win`) gets put in the corresponding cell
+3. The date for the first fight (`2013-10-12`) gets entered into the the fourth column in the table, and the result (`Win`) gets put in the corresponding cell
 
 4. After the scorecards are collected, the `result` is announced (see key below), the `fight_record` is updated (with the official outcome of the bout)
 
-5. The official round and time (`round_time`) is recorded for when the fight had to stop (or the total number of rounds if it went the distance), 
+5. The official round and time (`rounds` and `time`) is recorded for when the fight had to stop (or the total number of rounds if it went the distance), 
 
 6. Titles and belts are listed in the `notes` section
 
@@ -381,7 +379,7 @@ knitr::include_graphics(path = "https://raw.githubusercontent.com/mjfrigaard/sto
 
 The `LomaFights` data frame has the fight records for Lomachenko from his [wikipedia table](https://en.wikipedia.org/wiki/Vasyl_Lomachenko). To create a spreadsheet like the one above, we can use the `tidyr::pivot_wider()` function. 
 
-I add a few `dplyr` functions to get the data frame to look identical to the excel file above. 
+*I add a few `dplyr` functions to get the data frame to look identical to the excel file above.* 
 
 ```{r pivot-wider}
 LomaFights %>% 
@@ -401,7 +399,7 @@ LomaFights %>%
 
 ## Pivoting wider options
 
-The output is *very* close to identical to the excel sheet above, except missing values in excel are empty (not `NA` like R). I can use the `tidyr::pivot_wider(x, values_fill())` to include this change to the data. 
+The output is *very* close to the excel sheet above, except missing values in excel are empty (not an `NA` like R). I can use the `tidyr::pivot_wider(x, values_fill())` to include this change to the data.
 
 ```{r values_fill}
 LomaFights %>% 
@@ -411,8 +409,7 @@ LomaFights %>%
     dplyr::arrange(no) %>% 
     dplyr::select(opponent, 
                   location,
-                  dplyr::starts_with("20"),
-                  dplyr::everything())
+                  dplyr::starts_with("20"))
 ```
 
 Another neat part of the `pivot_wider()` function is the `values_from` argument can take multiple columns. For example, if I wanted to see how man `Win`s resulted in `TKO`s (technical knock-outs) or `KO`s (knock-outs) and their corresponding rounds and time, I could use the following to see `rounds` and `time` in separate columns.
@@ -441,7 +438,7 @@ LomaFights %>%
             values_fill = list(n = 0))
 ```
 
-As you can see, these new `tidyr::pivot_` functions extend `tidyr::gather()` and `tidyr::spread()` with more options and flexibility. It might take a little getting used to, but I think you'll find they're a welcome addition to all of the data manipulation in the `tidyverse`.
+As you can see, these new `tidyr::pivot_` functions extend `tidyr::gather()` and `tidyr::spread()` with more options and flexibility. I think you'll find these are a welcome addition to all of the data manipulation in the `tidyverse`.
 
 ## Read more
 

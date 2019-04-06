@@ -126,7 +126,7 @@ Cartesian <- tibble::tribble(~group, ~ID001, ~ID003, ~ID004, ~ID006,
 
 # DataTibble ----
 DataTibble <- tibble::tribble(
-    ~group_var, ~year, ~x_measurement, ~y_messurement, ~ordinal_y_var,
+    ~group_var, ~year, ~x_measurement, ~y_measurement, ~ordinal_y_var,
            "A",  2018,          11.81,         532.37,            2,
            "A",  2017,          28.46,         116.04,            1,
            "A",  2016,          49.15,         304.21,            1,
