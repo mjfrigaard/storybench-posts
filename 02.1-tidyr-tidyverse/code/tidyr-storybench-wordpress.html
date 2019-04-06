@@ -73,7 +73,7 @@
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
-<p>Put them together, and these three statements make up the contents in a <a href="https://tibble.tidyverse.org/">data frame or tibble</a>. Data frame's can contain any number of variables, which are used to store various measurements associated with each observation. While these principles might seem obvious at first, many of the data arrangements we encounter in real life don't adhere to this guidance.</p>
+<p>Put them together, and these three statements make up the contents in a tidy <a href="https://tibble.tidyverse.org/">data frame or tibble</a>. While these principles might seem obvious at first, many of the data arrangements we encounter in real life don't adhere to this guidance.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":3} -->
@@ -81,7 +81,7 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>I prefer to refer to tidy data as "indexed", and wide data as "Cartesian" (this terminology is from the <a href="https://amzn.to/2UlyNNp">ggplot2</a> text). These terms help me understand what is happening when the data get transformed. Two examples are below:</p>
+<p>I prefer to refer to tidy data as "indexed", and wide data as "Cartesian" (this terminology is from the <a href="https://amzn.to/2UlyNNp">ggplot2</a> text) because these terms help me understand what is happening when the data get transformed. Two examples are below:</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":4} -->
@@ -96,21 +96,34 @@
 <pre class="wp-block-preformatted">Indexed</pre>
 <!-- /wp:preformatted -->
 
-<!-- wp:table -->
-<table class="wp-block-table"><thead><tr><th>group</th><th>number</th><th>measure</th></tr></thead><tbody><tr><td>A</td><td>ID001</td><td>1098</td></tr><tr><td>C</td><td>ID001</td><td>3049</td></tr><tr><td>D</td><td>ID003</td><td>2394</td></tr><tr><td>B</td><td>ID004</td><td>9301</td></tr><tr><td>C</td><td>ID006</td><td>4092</td></tr></tbody></table>
-<!-- /wp:table -->
+<!-- wp:syntaxhighlighter/code {"language":"r"} -->
+<pre class="wp-block-syntaxhighlighter-code brush: r; notranslate"># A tibble: 5 x 3
+  group number measure
+  &lt;chr> &lt;chr>    &lt;dbl>
+1 A     ID001     1098
+2 C     ID001     3049
+3 D     ID003     2394
+4 B     ID004     9301
+5 C     ID006     4092</pre>
+<!-- /wp:syntaxhighlighter/code -->
 
 <!-- wp:paragraph -->
-<p>The same data are represented in the <code>Cartesian</code> data frame, but in this<br> table the <code>measure</code> values are at the intersection of <code>group</code> and each<br> <code>number</code>.</p>
+<p>The same data are represented in the <code>Cartesian</code> data frame, but in this table the <code>measure</code> values are at the intersection of <code>group</code> and each <code>ID###</code> (the <code>number</code> from the previous table). </p>
 <!-- /wp:paragraph -->
 
 <!-- wp:preformatted -->
-<pre class="wp-block-preformatted">Cartesian</pre>
+<pre class="wp-block-preformatted">Cartesian<br></pre>
 <!-- /wp:preformatted -->
 
-<!-- wp:table -->
-<table class="wp-block-table"><thead><tr><th>group</th><th>ID001</th><th>ID003</th><th>ID004</th><th>ID006</th></tr></thead><tbody><tr><td>A</td><td>1098</td><td>NA</td><td>NA</td><td>NA</td></tr><tr><td>B</td><td>NA</td><td>NA</td><td>9301</td><td>NA</td></tr><tr><td>C</td><td>3049</td><td>NA</td><td>NA</td><td>4092</td></tr><tr><td>D</td><td>NA</td><td>2394</td><td>NA</td><td>NA</td></tr></tbody></table>
-<!-- /wp:table -->
+<!-- wp:syntaxhighlighter/code -->
+<pre class="wp-block-syntaxhighlighter-code brush: plain; notranslate"># A tibble: 4 x 5
+  group ID001 ID003 ID004 ID006
+  &lt;chr> &lt;dbl> &lt;dbl> &lt;dbl> &lt;dbl>
+1 A      1098    NA    NA    NA
+2 B        NA    NA  9301    NA
+3 C      3049    NA    NA  4092
+4 D        NA  2394    NA    NA</pre>
+<!-- /wp:syntaxhighlighter/code -->
 
 <!-- wp:paragraph -->
 <p>As you can see, the <code>Cartesian</code> orientation uses up more columns (and<br>fills in the gaps with missing (<code>NA</code>) values).</p>
@@ -133,64 +146,103 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
-<ul><li><code>group_var</code> - a categorical group </li><li><code>year</code> - the calendar year the measurements were collected </li><li><code>x_measurement</code> and <code>y_measurement</code> - these are randomly generated numbers</li><li><code>ordinal_x_var</code> - this is an ordinal variable corresponding to the values in <code>x_measurement</code> (greater than or equal to 75 is <code>"high"</code> or <code>3</code>, greater than or equal to <code>50</code> and less than <code>75</code> is <code>"med"</code>, and less than <code>50</code> is <code>"low"</code>).</li></ul>
+<ul><li><code>group_var</code> - a categorical group </li><li><code>year</code> - the calendar year the measurements were collected </li><li><code>x_measurement</code> and <code>y_measurement</code> - these are randomly generated numbers</li><li> <code>ordinal_y_var</code> - this is an ordinal variable corresponding to the values in <code>y_measurement</code> (greater than or equal to <code>800</code> is <code>"high"</code> or <code>3</code>, greater than or equal to <code>500</code> and less than <code>750</code> is <code>"med"</code> or <code>2</code>, and less than <code>500</code> is <code>"low"</code> or <code>1</code>). </li></ul>
 <!-- /wp:list -->
 
 <!-- wp:preformatted -->
 <pre class="wp-block-preformatted">DataTibble</pre>
 <!-- /wp:preformatted -->
 
-<!-- wp:table -->
-<table class="wp-block-table"><thead><tr><th>group_var</th><th>year</th><th>x_measurement</th><th>y_messurement</th><th>ordinal_y_var</th></tr></thead><tbody><tr><td>A</td><td>2018</td><td>11.81</td><td>532.37</td><td>med</td></tr><tr><td>A</td><td>2017</td><td>28.46</td><td>116.04</td><td>low</td></tr><tr><td>A</td><td>2016</td><td>49.15</td><td>304.21</td><td>low</td></tr><tr><td>B</td><td>2018</td><td>87.56</td><td>719.38</td><td>med</td></tr><tr><td>B</td><td>2017</td><td>11.33</td><td>984.38</td><td>high</td></tr><tr><td>C</td><td>2018</td><td>15.87</td><td>959.41</td><td>high</td></tr><tr><td>C</td><td>2017</td><td>63.76</td><td>962.27</td><td>high</td></tr><tr><td>C</td><td>2016</td><td>96.03</td><td>744.52</td><td>med</td></tr></tbody></table>
-<!-- /wp:table -->
+<!-- wp:syntaxhighlighter/code -->
+<pre class="wp-block-syntaxhighlighter-code brush: plain; notranslate"># A tibble: 8 x 5
+  group_var  year x_measurement y_measurement ordinal_y_var
+  &lt;chr>     &lt;dbl>         &lt;dbl>         &lt;dbl> &lt;fct>        
+1 A          2018          11.8          532. med          
+2 A          2017          28.5          116. low          
+3 A          2016          49.2          304. low          
+4 B          2018          87.6          719. med          
+5 B          2017          11.3          984. high         
+6 C          2018          15.9          959. high         
+7 C          2017          63.8          962. high         
+8 C          2016          96.0          745. med </pre>
+<!-- /wp:syntaxhighlighter/code -->
 
 <!-- wp:paragraph -->
 <p>If I apply <code>dplyr::group_by()</code> to the <code>group_var</code> in <code>DataTibble</code>, I will see no visible result.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:preformatted -->
-<pre class="wp-block-preformatted">DataTibble %>% <br>    dplyr::group_by(group_var)</pre>
+<pre class="wp-block-preformatted">DataTibble %&gt;% <br>    dplyr::group_by(group_var)</pre>
 <!-- /wp:preformatted -->
 
-<!-- wp:table -->
-<table class="wp-block-table"><thead><tr><th>group_var</th><th>year</th><th>x_measurement</th><th>y_messurement</th><th>ordinal_y_var</th></tr></thead><tbody><tr><td>A</td><td>2018</td><td>11.81</td><td>532.37</td><td>med</td></tr><tr><td>A</td><td>2017</td><td>28.46</td><td>116.04</td><td>low</td></tr><tr><td>A</td><td>2016</td><td>49.15</td><td>304.21</td><td>low</td></tr><tr><td>B</td><td>2018</td><td>87.56</td><td>719.38</td><td>med</td></tr><tr><td>B</td><td>2017</td><td>11.33</td><td>984.38</td><td>high</td></tr><tr><td>C</td><td>2018</td><td>15.87</td><td>959.41</td><td>high</td></tr><tr><td>C</td><td>2017</td><td>63.76</td><td>962.27</td><td>high</td></tr><tr><td>C</td><td>2016</td><td>96.03</td><td>744.52</td><td>med</td></tr></tbody></table>
-<!-- /wp:table -->
+<!-- wp:syntaxhighlighter/code {"language":"r"} -->
+<pre class="wp-block-syntaxhighlighter-code brush: r; notranslate"># A tibble: 8 x 5
+# Groups:   group_var [3]
+  group_var  year x_measurement y_measurement ordinal_y_var
+  &lt;chr>     &lt;dbl>         &lt;dbl>         &lt;dbl> &lt;fct>        
+1 A          2018          11.8          532. med          
+2 A          2017          28.5          116. low          
+3 A          2016          49.2          304. low          
+4 B          2018          87.6          719. med          
+5 B          2017          11.3          984. high         
+6 C          2018          15.9          959. high         
+7 C          2017          63.8          962. high         
+8 C          2016          96.0          745. med   </pre>
+<!-- /wp:syntaxhighlighter/code -->
 
 <!-- wp:paragraph -->
 <p>But when I combine <code>dplyr::group_by()</code> with <code>dplyr::summarize()</code>, I can collapse <code>DataTibble</code> into a smaller table by supplying an aggregate function to <code>summarize()</code>. Below I use <code>summarize()</code> to get the mean of <code>x_measurement</code> and <code>y_messurement</code> and <code>n()</code> to get the total number in each group.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:preformatted -->
-<pre class="wp-block-preformatted">DataTibble %>% <br>  dplyr::group_by(group_var) %>% <br>  dplyr::summarize(x_mean = mean(x_measurement),     <br>                   y_mean = mean(y_messurement),     <br>                   no = n())</pre>
+<pre class="wp-block-preformatted">DataTibble %&gt;% <br>  dplyr::group_by(group_var) %&gt;% <br>  dplyr::summarize(x_mean = mean(x_measurement),     <br>                   y_mean = mean(y_measurement),     <br>                   no = n())</pre>
 <!-- /wp:preformatted -->
 
-<!-- wp:table -->
-<table class="wp-block-table"><thead><tr><th>group_var</th><th>x_mean</th><th>y_mean</th><th>no</th></tr></thead><tbody><tr><td>A</td><td>29.80667</td><td>317.5400</td><td>3</td></tr><tr><td>B</td><td>49.44500</td><td>851.8800</td><td>2</td></tr><tr><td>C</td><td>58.55333</td><td>888.7333</td><td>3</td></tr></tbody></table>
-<!-- /wp:table -->
+<!-- wp:syntaxhighlighter/code {"language":"r"} -->
+<pre class="wp-block-syntaxhighlighter-code brush: r; notranslate"># A tibble: 3 x 4
+  group_var x_mean y_mean    no
+  &lt;chr>      &lt;dbl>  &lt;dbl> &lt;int>
+1 A           29.8   318.     3
+2 B           49.4   852.     2
+3 C           58.6   889.     3</pre>
+<!-- /wp:syntaxhighlighter/code -->
 
 <!-- wp:paragraph -->
 <p>Grouping can also work with categorical/factor variables. The code below uses <code>dplyr::count()</code> to summarize the number of <code>ordinal_y_var</code> levels per category of <code>group_var</code></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:preformatted -->
-<pre class="wp-block-preformatted">DataTibble %>% <br>      dplyr::count(group_var, ordinal_y_var)</pre>
+<pre class="wp-block-preformatted">DataTibble %&gt;% <br>      dplyr::count(group_var, ordinal_y_var)</pre>
 <!-- /wp:preformatted -->
 
-<!-- wp:table -->
-<table class="wp-block-table"><thead><tr><th>group_var</th><th>ordinal_y_var</th><th>n</th></tr></thead><tbody><tr><td>A</td><td>med</td><td>1</td></tr><tr><td>A</td><td>low</td><td>2</td></tr><tr><td>B</td><td>high</td><td>1</td></tr><tr><td>B</td><td>med</td><td>1</td></tr><tr><td>C</td><td>high</td><td>2</td></tr><tr><td>C</td><td>med</td><td>1</td></tr></tbody></table>
-<!-- /wp:table -->
+<!-- wp:syntaxhighlighter/code -->
+<pre class="wp-block-syntaxhighlighter-code brush: plain; notranslate"># A tibble: 6 x 3
+  group_var ordinal_y_var     n
+  &lt;chr>     &lt;fct>         &lt;int>
+1 A         med               1
+2 A         low               2
+3 B         high              1
+4 B         med               1
+5 C         high              2
+6 C         med               1</pre>
+<!-- /wp:syntaxhighlighter/code -->
 
 <!-- wp:paragraph -->
 <p>This table isn't as easy to read, because all of the information is oriented vertically. I can move the values of <code>group_var</code> into individual columns to make it easier on the eyes using <code>tidyr::spread()</code></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:preformatted -->
-<pre class="wp-block-preformatted">DataTibble %>% <br>    dplyr::count(group_var,ordinal_y_var) %>% <br>    tidyr::spread(key = group_var,value = n)</pre>
+<pre class="wp-block-preformatted">DataTibble %&gt;% <br>    dplyr::count(group_var,ordinal_y_var) %&gt;% <br>    tidyr::spread(key = group_var,value = n)</pre>
 <!-- /wp:preformatted -->
 
-<!-- wp:preformatted -->
-<pre class="wp-block-preformatted"># this is what is would look like in the console!<br># A tibble: 3 x 4<br><br> ordinal_y_var       A     B     C<br> 1 high             NA     1     2<br> 2 med               1     1     1<br> 3 low               2    NA    NA</pre>
-<!-- /wp:preformatted -->
+<!-- wp:syntaxhighlighter/code {"language":"r"} -->
+<pre class="wp-block-syntaxhighlighter-code brush: r; notranslate"># A tibble: 3 x 4
+  ordinal_y_var     A     B     C
+  &lt;fct>         &lt;int> &lt;int> &lt;int>
+1 high             NA     1     2
+2 med               1     1     1
+3 low               2    NA    NA</pre>
+<!-- /wp:syntaxhighlighter/code -->
 
 <!-- wp:paragraph -->
 <p>Notice how this creates a table with different dimensions? This arrangement can quickly be undone with the accompanying <code>tidyr::gather()</code> function. </p>
@@ -205,12 +257,20 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:preformatted -->
-<pre class="wp-block-preformatted">DataTibble %>%<br>   dplyr::count(group_var, ordinal_y_var) %>%<br>   tidyr::spread(key = group_var, value = n) %>%<br>   tidyr::gather(key = group_var, value = "n", <br>                 -ordinal_y_var, na.rm = TRUE) %>%<br>   dplyr::select(group_var, ordinal_y_var, n)</pre>
+<pre class="wp-block-preformatted">DataTibble %&gt;%<br>   dplyr::count(group_var, ordinal_y_var) %&gt;%<br>   tidyr::spread(key = group_var, value = n) %&gt;%<br>   tidyr::gather(key = group_var, value = "n", <br>                 -ordinal_y_var, na.rm = TRUE) %&gt;%<br>   dplyr::select(group_var, ordinal_y_var, n)</pre>
 <!-- /wp:preformatted -->
 
-<!-- wp:table -->
-<table class="wp-block-table"><thead><tr><th>group_var</th><th>ordinal_y_var</th><th>n</th></tr></thead><tbody><tr><td>A</td><td>med</td><td>1</td></tr><tr><td>A</td><td>low</td><td>2</td></tr><tr><td>B</td><td>high</td><td>1</td></tr><tr><td>B</td><td>med</td><td>1</td></tr><tr><td>C</td><td>high</td><td>2</td></tr><tr><td>C</td><td>med</td><td>1</td></tr></tbody></table>
-<!-- /wp:table -->
+<!-- wp:syntaxhighlighter/code {"language":"r"} -->
+<pre class="wp-block-syntaxhighlighter-code brush: r; notranslate"># A tibble: 6 x 3
+  group_var ordinal_y_var     n
+  &lt;chr>     &lt;fct>         &lt;int>
+1 A         med               1
+2 A         low               2
+3 B         high              1
+4 B         med               1
+5 C         high              2
+6 C         med               1</pre>
+<!-- /wp:syntaxhighlighter/code -->
 
 <!-- wp:heading {"level":1} -->
 <h1>Part three: Pivoting</h1>
@@ -225,7 +285,7 @@
 <!-- /wp:quote -->
 
 <!-- wp:paragraph -->
-<p>Changes like these are examples of why I appreciate the <code>tidyverse</code>, because I can tell a lot of thought gets put into identifying verbs that accurately capture the users intentions. Knowing how to reshape data is an important skill for any data scientist, and the <code>tidyr::pivot_</code> functions make restructuring very clear and explicit. </p>
+<p>Decisions like these are examples of why I appreciate the <code>tidyverse</code>, because I can tell a lot of thought gets put into identifying language that accurately capture the users intentions. Knowing how to reshape data is an important skill for any data scientist, and the <code>tidyr::pivot_</code> functions make restructuring very clear and explicit. </p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
@@ -233,11 +293,11 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Vasily Lomachenko, the best <a href="https://en.wikipedia.org/wiki/Boxing_pound_for_pound_rankings">pound-for-pound boxer</a> in the world, is known for taking [traditional Ukrainian dance classes as a child before ever stepping into a boxing ring](traditional Ukrainian dance classes). Why would an athlete who punches people for a living spend time learning how to dance? Because <strong>having the ability to quickly change angles is so essential in boxing that these skills are often what separates a good fighter from an elite athlete</strong>.</p>
+<p>Vasily Lomachenko, the best <a href="https://en.wikipedia.org/wiki/Boxing_pound_for_pound_rankings">pound-for-pound boxer</a> in the world, is known for taking <a href="https://sports.yahoo.com/quitting-boxing-dance-made-vasyl-lomachenko-better-fighter-195049319.html">traditional Ukrainian dance classes as a child before ever stepping into a boxing ring</a>. Why would an athlete who punches people for a living spend time learning how to dance? Because dancing is an excellent way to develop movement with precision, and <strong>having the ability to quickly change angles is so essential in boxing that these skills are often what separates a good fighter from an elite athlete</strong>.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:image -->
-<figure class="wp-block-image"><img src="https://github.com/mjfrigaard/storybenchR/blob/master/02.1-tidyr-tidyverse/images/loma-pivot.gif?raw=true" alt=""/></figure>
+<figure class="wp-block-image"><img src="https://github.com/mjfrigaard/storybenchR/blob/master/02.1-tidyr-tidyverse/images/loma-pivot.gif?raw=true" alt=""/><figcaption>"I think footwork is one of the most important things to becoming a great fighter. That's where everything starts." - Vasyl Lomachenko</figcaption></figure>
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
@@ -249,7 +309,7 @@
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
-<p>Pivoting from long to wide, the index variable gets spread across the column names.</p>
+<p>When pivoting from long to wide, the index variable shifts across the column names, and the values slide in underneath the names.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:image -->
@@ -257,39 +317,55 @@
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
-<p>The <code>tidyr::pivot_</code> functions give you a similar ability with your data! Being able to rapidly spin your data from columns to rows (and back) is similar to being able to rotate 90 degrees on a dime and avoid an incoming hook.</p>
+<p>The <code>tidyr::pivot_</code> functions give users the ability to quickly pivot (change angles) their data, and being able to rotate your data from columns to rows (and back) is similar to being able to rotate 90˚ on a dime and avoid an incoming hook.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
 <p>As a skill, it's also a great place to start because most to the data you'll encounter in the <code>tidyverse</code> is going to be in columns and rows (or you will want to get them that way).</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:quote -->
-<blockquote class="wp-block-quote"><p>"I think footwork is one of the most important things to becoming a great fighter. That's where everything starts." - Vasyl Lomachenko</p></blockquote>
-<!-- /wp:quote -->
-
 <!-- wp:heading {"level":1} -->
 <h1>Pivoting Example 1: Categorical/ordinal variable across multiple columns</h1>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>We're going to start by manipulating a data set of Lomachenko's fights from the <a href="http://boxrec.com/en/boxer/659771">BoxRec</a> database. The fight information has been entered in a way that makes sense for the person entering the data, but it's not ideal for analysis or modeling.</p>
+<p>We're going to start by manipulating a data set of Lomachenko's fights from the <a href="http://boxrec.com/en/boxer/659771">BoxRec</a> database. The fight information is oriented in a way that makes sense for the person entering the data, but it's not ideal for analysis or modeling.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:preformatted -->
-<pre class="wp-block-preformatted">LomaWideSmall %>% utils::head()</pre>
-<!-- /wp:preformatted -->
+<!-- wp:html -->
+<pre>
+LomaWideSmall
+</pre>
+<!-- /wp:html -->
 
-<!-- wp:table -->
-<table class="wp-block-table"><thead><tr><th>opponent</th><th>date</th><th>fight_1</th><th>fight_2</th><th>fight_3</th><th>fight_4</th><th>fight_5</th><th>fight_6</th><th>fight_7</th><th>fight_8</th><th>fight_9</th><th>fight_10</th><th>fight_11</th><th>fight_12</th><th>fight_13</th><th>fight_14</th></tr></thead><tbody><tr><td>José Ramírez</td><td>2013-10-12</td><td>Win</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td></tr><tr><td>Orlando Salido</td><td>2014-03-01</td><td>NA</td><td>Loss</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td></tr><tr><td>Gary Russell Jr.</td><td>2014-06-21</td><td>NA</td><td>NA</td><td>Win</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td></tr><tr><td>Chonlatarn Piriyapinyo</td><td>2014-11-22</td><td>NA</td><td>NA</td><td>NA</td><td>Win</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td></tr><tr><td>Gamalier Rodríguez</td><td>2015-05-02</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>Win</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td></tr><tr><td>Romulo Koasicha</td><td>2015-11-07</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>Win</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td></tr><tr><td>Román Martínez</td><td>2016-06-11</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>Win</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td></tr><tr><td>Nicholas Walters</td><td>2016-11-26</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>Win</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td></tr><tr><td>Jason Sosa</td><td>2017-04-08</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>Win</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td></tr><tr><td>Miguel Marriaga</td><td>2017-08-05</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>Win</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td></tr></tbody></table>
-<!-- /wp:table -->
+<!-- wp:syntaxhighlighter/code {"language":"r"} -->
+<pre class="wp-block-syntaxhighlighter-code brush: r; notranslate">opponent       date fight_1 fight_2 fight_3 fight_4 fight_5 fight_6 fight_7 fight_8 fight_9 fight_10 fight_11 fight_12 fight_13 fight_14
+1            José Ramírez 2013-10-12     Win    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>
+2          Orlando Salido 2014-03-01    &lt;NA>    Loss    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>
+3        Gary Russell Jr. 2014-06-21    &lt;NA>    &lt;NA>     Win    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>
+4  Chonlatarn Piriyapinyo 2014-11-22    &lt;NA>    &lt;NA>    &lt;NA>     Win    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>
+5      Gamalier Rodríguez 2015-05-02    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>     Win    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>
+6         Romulo Koasicha 2015-11-07    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>     Win    &lt;NA>    &lt;NA>    &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>
+7          Román Martínez 2016-06-11    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>     Win    &lt;NA>    &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>
+8        Nicholas Walters 2016-11-26    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>     Win    &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>
+9              Jason Sosa 2017-04-08    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>     Win     &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>
+10        Miguel Marriaga 2017-08-05    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>      Win     &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>
+11   Guillermo Rigondeaux 2017-12-09    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>     &lt;NA>      Win     &lt;NA>     &lt;NA>     &lt;NA>
+12          Jorge Linares 2018-05-12    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>     &lt;NA>     &lt;NA>      Win     &lt;NA>     &lt;NA>
+13           José Pedraza 2018-12-08    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>      Win     &lt;NA>
+14         Anthony Crolla 2019-04-12    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>    &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA>     &lt;NA></pre>
+<!-- /wp:syntaxhighlighter/code -->
 
 <!-- wp:paragraph -->
-<p>This data arrangement is <em>Cartesian</em>, because each fight number has it's own column (<code>fight_1</code> through <code>fight_14</code>), and the result (<code>Win</code>/<code>Loss</code>) is located at the intersection between the fight numbered columns and the corresponding <code>opponent</code> and <code>date</code>. Having the data in this arrangement might seem odd to a data scientist, but this configuration makes sense for a fan entering the fights into a spreadsheet <strong>as they happen in real time</strong>. Consider the the chronological chain of events involved with a each fight, </p>
+<p>This data arrangement is <em>Cartesian</em>, because each fight number has it's own column (<code>fight_1</code> through <code>fight_14</code>), and the result (<code>Win</code>/<code>Loss</code>) is located at the intersection between the fight numbered columns and the corresponding <code>opponent</code> and <code>date</code>. Having the data in this arrangement might seem odd to a data scientist, but this configuration makes sense for a fan entering the fights into a spreadsheet <strong>as they happen in real time</strong>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p> Consider the the chronological chain of events involved with a each fight, </p>
 <!-- /wp:paragraph -->
 
 <!-- wp:list {"ordered":true} -->
-<ol><li>An <code>opponent</code> is announced, and an excited fan enters the information into the first two column/rows in a spreadsheet and titles it, 'Lomachenko`</li><li>The <code>date</code> for the first fight gets entered into the <code>B</code> column (the third in the table), </li><li>In order to track an athlete's win/loss record over the course of their career, a number is also marked for each fight (starting with <code>1</code>) in a column titled, <code>fight_1</code>. and the result gets put in the corresponding cell (<code>Win</code> or <code>Loss</code>)</li></ol>
+<ol><li>An <code>opponent</code> is announced, and an excited fan enters the information into the first two column/rows in a spreadsheet and titles it, 'Lomachenko`</li><li>The <code>date</code> for the first fight gets entered into the <code>B</code> column (the second in the table), </li><li>In order to track an athlete's win/loss record over the course of their career, a number is also marked for each fight (starting with <code>1</code>) in a column titled, <code>fight_1</code>. and the result gets put in the corresponding cell (<code>Win</code> or <code>Loss</code>)</li></ol>
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
@@ -309,8 +385,26 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:preformatted -->
-<pre class="wp-block-preformatted">LomaWideSmall %>% <br>   tidyr::pivot_longer(<br>     cols = starts_with("fight"), <br>     names_to = "fight_no", <br>     values_to = "result", <br>     names_prefix = "fight_", <br>     na.rm = TRUE)<br><br><br>A tibble: 13 x 4<br> opponent               date       fight_no result                         <br>  1 José Ramírez           2013-10-12 1        Win   <br>  2 Orlando Salido         2014-03-01 2        Loss  <br>  3 Gary Russell Jr.       2014-06-21 3        Win   <br>  4 Chonlatarn Piriyapinyo 2014-11-22 4        Win   <br>  5 Gamalier Rodríguez     2015-05-02 5        Win   <br>  6 Romulo Koasicha        2015-11-07 6        Win   <br>  7 Román Martínez         2016-06-11 7        Win   <br>  8 Nicholas Walters       2016-11-26 8        Win   <br>  9 Jason Sosa             2017-04-08 9        Win   <br> 10 Miguel Marriaga        2017-08-05 10       Win   <br> 11 Guillermo Rigondeaux   2017-12-09 11       Win   <br> 12 Jorge Linares          2018-05-12 12       Win   <br> 13 José Pedraza           2018-12-08 13       Win</pre>
+<pre class="wp-block-preformatted">LomaWideSmall %>% <br>   tidyr::pivot_longer(<br>     cols = starts_with("fight"), <br>     names_to = "fight_no", <br>     values_to = "result", <br>     names_prefix = "fight_", <br>     na.rm = TRUE)<br></pre>
 <!-- /wp:preformatted -->
+
+<!-- wp:syntaxhighlighter/code {"language":"r"} -->
+<pre class="wp-block-syntaxhighlighter-code brush: r; notranslate">A tibble: 13 x 4
+ opponent               date       fight_no result                         
+  1 José Ramírez           2013-10-12 1        Win   
+  2 Orlando Salido         2014-03-01 2        Loss  
+  3 Gary Russell Jr.       2014-06-21 3        Win   
+  4 Chonlatarn Piriyapinyo 2014-11-22 4        Win   
+  5 Gamalier Rodríguez     2015-05-02 5        Win   
+  6 Romulo Koasicha        2015-11-07 6        Win   
+  7 Román Martínez         2016-06-11 7        Win   
+  8 Nicholas Walters       2016-11-26 8        Win   
+  9 Jason Sosa             2017-04-08 9        Win   
+ 10 Miguel Marriaga        2017-08-05 10       Win   
+ 11 Guillermo Rigondeaux   2017-12-09 11       Win   
+ 12 Jorge Linares          2018-05-12 12       Win   
+ 13 José Pedraza           2018-12-08 13       Win</pre>
+<!-- /wp:syntaxhighlighter/code -->
 
 <!-- wp:heading {"level":3} -->
 <h3>What happens in pivot_longer()?</h3>
@@ -357,16 +451,31 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:preformatted -->
-<pre class="wp-block-preformatted">LomaWideSmall %>% <br>   tidyr::pivot_longer_spec(<br>      cols = starts_with("fight"), <br>      names_to = "fight_no", <br>      values_to = "result", <br>      names_prefix = "fight_")<br>LomaSpec </pre>
+<pre class="wp-block-preformatted">LomaWideSmall %&gt;% <br>   tidyr::pivot_longer_spec(<br>      cols = starts_with("fight"), <br>      names_to = "fight_no", <br>      values_to = "result", <br>      names_prefix = "fight_")<br>LomaSpec </pre>
 <!-- /wp:preformatted -->
 
 <!-- wp:paragraph -->
 <p>This produces the following (if you're looking at the output in the R console).</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:preformatted -->
-<pre class="wp-block-preformatted">A tibble: 14 x 3<br> .name    .value fight_no<br>  1 fight_1  result 1       <br>  2 fight_2  result 2       <br>  3 fight_3  result 3       <br>  4 fight_4  result 4       <br>  5 fight_5  result 5       <br>  6 fight_6  result 6       <br>  7 fight_7  result 7       <br>  8 fight_8  result 8       <br>  9 fight_9  result 9       <br> 10 fight_10 result 10      <br> 11 fight_11 result 11      <br> 12 fight_12 result 12      <br> 13 fight_13 result 13      <br> 14 fight_14 result 14      </pre>
-<!-- /wp:preformatted -->
+<!-- wp:syntaxhighlighter/code {"language":"r"} -->
+<pre class="wp-block-syntaxhighlighter-code brush: r; notranslate">A tibble: 14 x 3
+ .name    .value fight_no
+  1 fight_1  result 1       
+  2 fight_2  result 2       
+  3 fight_3  result 3       
+  4 fight_4  result 4       
+  5 fight_5  result 5       
+  6 fight_6  result 6       
+  7 fight_7  result 7       
+  8 fight_8  result 8       
+  9 fight_9  result 9       
+ 10 fight_10 result 10      
+ 11 fight_11 result 11      
+ 12 fight_12 result 12      
+ 13 fight_13 result 13      
+ 14 fight_14 result 14  </pre>
+<!-- /wp:syntaxhighlighter/code -->
 
 <!-- wp:paragraph -->
 <p>The three columns in <code>LomaSpec</code> contain metadata (data about our data) on the transformation I want to perform--specifically the original columns (<code>.name</code>) and the corresponding cell values (<code>.value</code>). The other variable (<code>fight_no</code>) gets carried over from the transformation as well. </p>
@@ -381,7 +490,7 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:preformatted -->
-<pre class="wp-block-preformatted"># format the variable<br> LomaSpec &lt;- LomaSpec %>%<br> dplyr::mutate(fight_no = as.numeric(fight_no))<br> LomaSpec$fight_no %>% glimpse(78)<br># num [1:14] 1 2 3 4 5 6 7 8 9 10 ...</pre>
+<pre class="wp-block-preformatted"># format the variable<br> LomaSpec &lt;- LomaSpec %&gt;%<br> dplyr::mutate(fight_no = as.numeric(fight_no))<br> LomaSpec$fight_no %&gt;% glimpse(78)<br># num [1:14] 1 2 3 4 5 6 7 8 9 10 ...</pre>
 <!-- /wp:preformatted -->
 
 <!-- wp:heading {"level":4} -->
@@ -394,16 +503,31 @@
 
 <!-- wp:html -->
 <pre># supply it to the pivot_longer
-LomaFightsLong <- LomaWideSmall %>% 
+LomaFightsLong % 
     tidyr::pivot_longer(spec = LomaSpec, 
                         na.rm = TRUE) 
 LomaFightsLong
 </pre>
 <!-- /wp:html -->
 
-<!-- wp:table -->
-<table class="wp-block-table"><thead><tr><th>opponent</th><th>date</th><th>fight_no</th><th>result</th></tr></thead><tbody><tr><td>José Ramírez</td><td>2013-10-12</td><td>1</td><td>Win</td></tr><tr><td>Orlando Salido</td><td>2014-03-01</td><td>2</td><td>Loss</td></tr><tr><td>Gary Russell Jr.</td><td>2014-06-21</td><td>3</td><td>Win</td></tr><tr><td>Chonlatarn Piriyapinyo</td><td>2014-11-22</td><td>4</td><td>Win</td></tr><tr><td>Gamalier Rodríguez</td><td>2015-05-02</td><td>5</td><td>Win</td></tr><tr><td>Romulo Koasicha</td><td>2015-11-07</td><td>6</td><td>Win</td></tr><tr><td>Román Martínez</td><td>2016-06-11</td><td>7</td><td>Win</td></tr><tr><td>Nicholas Walters</td><td>2016-11-26</td><td>8</td><td>Win</td></tr><tr><td>Jason Sosa</td><td>2017-04-08</td><td>9</td><td>Win</td></tr><tr><td>Miguel Marriaga</td><td>2017-08-05</td><td>10</td><td>Win</td></tr><tr><td>Guillermo Rigondeaux</td><td>2017-12-09</td><td>11</td><td>Win</td></tr><tr><td>Jorge Linares</td><td>2018-05-12</td><td>12</td><td>Win</td></tr><tr><td>José Pedraza</td><td>2018-12-08</td><td>13</td><td>Win</td></tr></tbody></table>
-<!-- /wp:table -->
+<!-- wp:syntaxhighlighter/code {"language":"r"} -->
+<pre class="wp-block-syntaxhighlighter-code brush: r; notranslate"># A tibble: 13 x 4
+   opponent               date       fight_no result
+                               
+ 1 José Ramírez           2013-10-12        1 Win   
+ 2 Orlando Salido         2014-03-01        2 Loss  
+ 3 Gary Russell Jr.       2014-06-21        3 Win   
+ 4 Chonlatarn Piriyapinyo 2014-11-22        4 Win   
+ 5 Gamalier Rodríguez     2015-05-02        5 Win   
+ 6 Romulo Koasicha        2015-11-07        6 Win   
+ 7 Román Martínez         2016-06-11        7 Win   
+ 8 Nicholas Walters       2016-11-26        8 Win   
+ 9 Jason Sosa             2017-04-08        9 Win   
+10 Miguel Marriaga        2017-08-05       10 Win   
+11 Guillermo Rigondeaux   2017-12-09       11 Win   
+12 Jorge Linares          2018-05-12       12 Win   
+13 José Pedraza           2018-12-08       13 Win </pre>
+<!-- /wp:syntaxhighlighter/code -->
 
 <!-- wp:paragraph -->
 <p>These data are now in a tidy (indexed) format. </p>
@@ -426,19 +550,19 @@ LomaFightsLong
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>It's less common, but sometimes you'll need to move variables from an indexed (or tidy) column arrangement into a Cartesian (wide) format. </p>
+<p>It's less common, but sometimes you'll need to move variables from a tidy (or indexed) column arrangement into a wide (Cartesian) format. </p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>In order to restructure a Cartesian data frame to an indexed data frame (or to go from "long" to "wide"), we need to use the <code>tidyr::pivot_wider()</code> function. This works much like the <code>pivot_longer()</code> function, but with a few different arguments. </p>
+<p>In order to restructure from a wide to long data frame, we need to use the <code>tidyr::pivot_wider()</code> function. This works much like the <code>pivot_longer()</code> function, but with a few different arguments. </p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Consider a data frame with the same Lomachenko fight records, but this time arranged by date. Imagine the following events that would lead to the creation of the <code>LomaDatesWide</code> data:</p>
+<p>Consider a data frame with the same Lomachenko fight records, but this time arranged by date. Imagine the following events that would lead to the creation of the <code>LomaDatesWide</code> data:It's announced that Lomachenko will be fighting an <code>opponent</code> and the <code>location</code> is announced, and our fan enters the information into the first two column/rows in her 'Lomachenko` spreadsheet </p>
 <!-- /wp:paragraph -->
 
 <!-- wp:list {"ordered":true} -->
-<ol><li>It's announced that Lomachenko will be fighting an <code>opponent</code> and <code>location</code> is announced, and our fan enters the information into the first two column/rows in her 'Lomachenko` spreadsheet </li><li>A <code>fight_number</code> column is created to document the number of fights (as they happen)</li><li>The date for the first fight (<code>12 Oct 2013</code>) gets entered into the the fourth column in the table, and the result (<code>Win</code>) gets put in the corresponding cell</li><li>After the scorecards are collected, the <code>result</code> is announced (see key below), the <code>fight_record</code> is updated (with the official outcome of the bout)</li><li>The official round and time (<code>round_time</code>) is recorded for when the fight had to stop (or the total number of rounds if it went the distance), </li><li>Titles and belts are listed in the <code>notes</code> section</li><li>When the next fight happens, our fan right-clicks on the last recorded fight, and inserts a new column and date, and repeats steps 1-6</li></ol>
+<ol><li>It's announced that Lomachenko will be fighting an <code>opponent</code> and <code>location</code> is announced, and our fan enters the information into the first two column/rows in her 'Lomachenko` spreadsheet </li><li>A <code>fight_number</code> column is created to document the number of fights (as they happen)</li><li>The date for the first fight (<code>2013-10-12</code>) gets entered into the the fourth column in the table, and the result (<code>Win</code>) gets put in the corresponding cell</li><li>After the scorecards are collected, the <code>result</code> is announced (see key below), the <code>fight_record</code> is updated (with the official outcome of the bout)</li><li>The official round and time (<code>rounds</code> and <code>time</code>) is recorded for when the fight had to stop (or the total number of rounds if it went the distance), </li><li>Titles and belts are listed in the <code>notes</code> section</li><li>When the next fight happens, our fan right-clicks on the last recorded fight, and inserts a new column and date, and repeats steps 1-6</li></ol>
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
@@ -450,22 +574,21 @@ LomaFightsLong
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->
-<p>The <code>LomaFights</code> data frame has the fight records for Lomachenko from his <a href="https://en.wikipedia.org/wiki/Vasyl_Lomachenko">wikipedia table</a>. To create a spreadsheet like the one above, we can use the <code>tidyr::pivot_wider()</code> function. </p>
+<p>The <code>LomaFights</code> data frame has Lomachenko's fight records from his <a href="https://en.wikipedia.org/wiki/Vasyl_Lomachenko">wikipedia table</a>. To create a spreadsheet like the one above, we can use the <code>tidyr::pivot_wider()</code> function. </p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>I add a few <code>dplyr</code> functions to get the data frame to look identical to the excel file above. </p>
+<p><em>I add a few </em><code><em>dplyr</em></code><em> functions to get the data frame to look identical to the excel file above.</em> </p>
 <!-- /wp:paragraph -->
 
 <!-- wp:html -->
-<pre>
-LomaFights %>% 
+<pre>LomaFights %&gt;% 
     # the columns come from the dates
     tidyr::pivot_wider(names_from = date, 
                        # the values will be the result of the fight
-                       values_from = result) %>% 
+                       values_from = result) %&gt;% 
     # arrange by the fight number 
-    dplyr::arrange(no) %>% 
+    dplyr::arrange(no) %&gt;% 
     # rearrange the columns
     dplyr::select(opponent, location,
                   dplyr::starts_with("20"),
@@ -473,21 +596,36 @@ LomaFights %>%
 </pre>
 <!-- /wp:html -->
 
-<!-- wp:table -->
-<table class="wp-block-table"><thead><tr><th>opponent</th><th>location</th><th>2013-10-12</th><th>2014-03-01</th><th>2014-06-21</th><th>2014-11-22</th><th>2015-05-02</th><th>2015-11-07</th><th>2016-06-11</th><th>2016-11-26</th><th>2017-04-08</th><th>2017-08-05</th><th>2017-12-09</th><th>2018-05-12</th><th>2018-12-08</th><th>2019-04-12</th><th>no</th><th>record</th><th>type</th><th>rounds</th><th>time</th><th>notes</th></tr></thead><tbody><tr><td>José Ramírez</td><td>Thomas &amp; Mack Center, Paradise, Nevada, US</td><td>Win</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>1</td><td>1–0</td><td>TKO</td><td>4 (10)</td><td>2:55</td><td>Won WBO International featherweight title</td></tr><tr><td>Orlando Salido</td><td>Alamodome, San Antonio, Texas, US</td><td>NA</td><td>Loss</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>2</td><td>1–1</td><td>SD</td><td>12</td><td>NA</td><td>For vacant WBO featherweight title</td></tr><tr><td>Gary Russell Jr.</td><td>StubHub Center, Carson, California, US</td><td>NA</td><td>NA</td><td>Win</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>3</td><td>2–1</td><td>MD</td><td>12</td><td>NA</td><td>Won vacant WBO featherweight title</td></tr><tr><td>Chonlatarn Piriyapinyo</td><td>Cotai Arena, Macau, SAR</td><td>NA</td><td>NA</td><td>NA</td><td>Win</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>4</td><td>3–1</td><td>UD</td><td>12</td><td>NA</td><td>Retained WBO featherweight title</td></tr><tr><td>Gamalier Rodríguez</td><td>MGM Grand Garden Arena, Paradise, Nevada, US</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>Win</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>5</td><td>4–1</td><td>KO</td><td>9 (12)</td><td>0:50</td><td>Retained WBO featherweight title</td></tr><tr><td>Romulo Koasicha</td><td>Thomas &amp; Mack Center, Paradise, Nevada, US</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>Win</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>6</td><td>5–1</td><td>KO</td><td>10 (12)</td><td>2:35</td><td>Retained WBO featherweight title</td></tr><tr><td>Román Martínez</td><td>The Theater at Madison Square Garden, New York City, New York, US</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>Win</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>7</td><td>6–1</td><td>KO</td><td>5 (12)</td><td>1:09</td><td>Won WBO junior lightweight title</td></tr><tr><td>Nicholas Walters</td><td>Cosmopolitan of Las Vegas, Paradise, Nevada, US</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>Win</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>8</td><td>7–1</td><td>RTD</td><td>7 (12)</td><td>3:00</td><td>Retained WBO junior lightweight title</td></tr><tr><td>Jason Sosa</td><td>MGM National Harbor, Oxon Hill, Maryland, US</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>Win</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>9</td><td>8–1</td><td>RTD</td><td>9 (12)</td><td>3:00</td><td>Retained WBO junior lightweight title</td></tr><tr><td>Miguel Marriaga</td><td>Microsoft Theater, Los Angeles, California, US</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>Win</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>10</td><td>9–1</td><td>RTD</td><td>7 (12)</td><td>3:00</td><td>Retained WBO junior lightweight title</td></tr><tr><td>Guillermo Rigondeaux</td><td>The Theater at Madison Square Garden, New York City, New York, US</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>Win</td><td>NA</td><td>NA</td><td>NA</td><td>11</td><td>10–1</td><td>RTD</td><td>6 (12)</td><td>3:00</td><td>Retained WBO junior lightweight title</td></tr><tr><td>Jorge Linares</td><td>Madison Square Garden, New York City, New York, US</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>Win</td><td>NA</td><td>NA</td><td>12</td><td>11–1</td><td>TKO</td><td>10 (12)</td><td>2:08</td><td>Won WBA (Super) and The Ring lightweight titles</td></tr><tr><td>José Pedraza</td><td>Hulu Theater, New York City, New York, US</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>Win</td><td>NA</td><td>13</td><td>12–1</td><td>UD</td><td>12</td><td>NA</td><td>Retained WBA (Super) and The Ring lightweight titles;Won WBO lightweight title</td></tr><tr><td>Anthony Crolla</td><td>Staples Center, Los Angeles, California, US</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>14</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td><td>Defending WBA (Super), WBO, and The Ring lightweight titles</td></tr></tbody></table>
-<!-- /wp:table -->
+<!-- wp:syntaxhighlighter/code {"language":"r"} -->
+<pre class="wp-block-syntaxhighlighter-code brush: r; notranslate"># A tibble: 14 x 22
+   opponent   location      `2013-10-12` `2014-03-01` `2014-06-21` `2014-11-22` `2015-05-02` `2015-11-07` `2016-06-11` `2016-11-26` `2017-04-08` `2017-08-05` `2017-12-09` `2018-05-12` `2018-12-08` `2019-04-12`    no record type  rounds time  notes       
+   &lt;chr>      &lt;chr>         &lt;chr>        &lt;chr>        &lt;chr>        &lt;chr>        &lt;chr>        &lt;chr>        &lt;chr>        &lt;chr>        &lt;chr>        &lt;chr>        &lt;chr>        &lt;chr>        &lt;chr>        &lt;chr>        &lt;int> &lt;chr>  &lt;chr> &lt;chr>  &lt;chr> &lt;chr>       
+ 1 José Ramí… Thomas &amp; Mac… Win          NA           NA           NA           NA           NA           NA           NA           NA           NA           NA           NA           NA           NA               1 1–0    TKO   4 (10) 2:55  Won WBO Int…
+ 2 Orlando S… Alamodome, S… NA           Loss         NA           NA           NA           NA           NA           NA           NA           NA           NA           NA           NA           NA               2 1–1    SD    12     NA    For vacant …
+ 3 Gary Russ… StubHub Cent… NA           NA           Win          NA           NA           NA           NA           NA           NA           NA           NA           NA           NA           NA               3 2–1    MD    12     NA    Won vacant …
+ 4 Chonlatar… Cotai Arena,… NA           NA           NA           Win          NA           NA           NA           NA           NA           NA           NA           NA           NA           NA               4 3–1    UD    12     NA    Retained WB…
+ 5 Gamalier … MGM Grand Ga… NA           NA           NA           NA           Win          NA           NA           NA           NA           NA           NA           NA           NA           NA               5 4–1    KO    9 (12) 0:50  Retained WB…
+ 6 Romulo Ko… Thomas &amp; Mac… NA           NA           NA           NA           NA           Win          NA           NA           NA           NA           NA           NA           NA           NA               6 5–1    KO    10 (1… 2:35  Retained WB…
+ 7 Román Mar… The Theater … NA           NA           NA           NA           NA           NA           Win          NA           NA           NA           NA           NA           NA           NA               7 6–1    KO    5 (12) 1:09  Won WBO jun…
+ 8 Nicholas … Cosmopolitan… NA           NA           NA           NA           NA           NA           NA           Win          NA           NA           NA           NA           NA           NA               8 7–1    RTD   7 (12) 3:00  Retained WB…
+ 9 Jason Sosa MGM National… NA           NA           NA           NA           NA           NA           NA           NA           Win          NA           NA           NA           NA           NA               9 8–1    RTD   9 (12) 3:00  Retained WB…
+10 Miguel Ma… Microsoft Th… NA           NA           NA           NA           NA           NA           NA           NA           NA           Win          NA           NA           NA           NA              10 9–1    RTD   7 (12) 3:00  Retained WB…
+11 Guillermo… The Theater … NA           NA           NA           NA           NA           NA           NA           NA           NA           NA           Win          NA           NA           NA              11 10–1   RTD   6 (12) 3:00  Retained WB…
+12 Jorge Lin… Madison Squa… NA           NA           NA           NA           NA           NA           NA           NA           NA           NA           NA           Win          NA           NA              12 11–1   TKO   10 (1… 2:08  Won WBA (Su…
+13 José Pedr… Hulu Theater… NA           NA           NA           NA           NA           NA           NA           NA           NA           NA           NA           NA           Win          NA              13 12–1   UD    12     NA    Retained WB…
+14 Anthony C… Staples Cent… NA           NA           NA           NA           NA           NA           NA           NA           NA           NA           NA           NA           NA           NA              14 NA     NA    NA     NA    Defending W…</pre>
+<!-- /wp:syntaxhighlighter/code -->
 
 <!-- wp:heading -->
 <h2>Pivoting wider options</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The output is <em>very</em> close to identical to the excel sheet above, except missing values in excel are empty (not an <code>NA</code> like R). I can use the <code>tidyr::pivot_wider(x, values_fill())</code> to include this change to the data.</p>
+<p>The output is <em>very</em> close to the excel sheet above, except missing values in excel are empty (not an <code>NA</code> like R). I can use the <code>tidyr::pivot_wider(x, values_fill())</code> to include this change to the data.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:html -->
-<pre>
-LomaFights %>% <br>
+<pre>LomaFights %>% <br>
     tidyr::pivot_wider(names_from = date, <br>
                        values_from = result,<br>
                        values_fill = list(result = "")) %>% <br>
@@ -495,34 +633,36 @@ LomaFights %>% <br>
     dplyr::select(opponent, <br>
                   location,<br>
                   dplyr::starts_with("20"),<br>
-                  dplyr::everything())
-
-# A tibble: 14 x 16
-   opponent   location      `2013-10-12` `2014-03-01` `2014-06-21` `2014-11-22` `2015-05-02` `2015-11-07` `2016-06-11` `2016-11-26` `2017-04-08` `2017-08-05` `2017-12-09` `2018-05-12` `2018-12-08` `2019-04-12`
-   <chr>      <chr>         <chr>        <chr>        <chr>        <chr>        <chr>        <chr>        <chr>        <chr>        <chr>        <chr>        <chr>        <chr>        <chr>        <chr>       
- 1 José Ramí… Thomas & Mac… Win          ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           ""          
- 2 Orlando S… Alamodome, S… ""           Loss         ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           ""          
- 3 Gary Russ… StubHub Cent… ""           ""           Win          ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           ""          
- 4 Chonlatar… Cotai Arena,… ""           ""           ""           Win          ""           ""           ""           ""           ""           ""           ""           ""           ""           ""          
- 5 Gamalier … MGM Grand Ga… ""           ""           ""           ""           Win          ""           ""           ""           ""           ""           ""           ""           ""           ""          
- 6 Romulo Ko… Thomas & Mac… ""           ""           ""           ""           ""           Win          ""           ""           ""           ""           ""           ""           ""           ""          
- 7 Román Mar… The Theater … ""           ""           ""           ""           ""           ""           Win          ""           ""           ""           ""           ""           ""           ""          
- 8 Nicholas … Cosmopolitan… ""           ""           ""           ""           ""           ""           ""           Win          ""           ""           ""           ""           ""           ""          
- 9 Jason Sosa MGM National… ""           ""           ""           ""           ""           ""           ""           ""           Win          ""           ""           ""           ""           ""          
-10 Miguel Ma… Microsoft Th… ""           ""           ""           ""           ""           ""           ""           ""           ""           Win          ""           ""           ""           ""          
-11 Guillermo… The Theater … ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           Win          ""           ""           ""          
-12 Jorge Lin… Madison Squa… ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           Win          ""           ""          
-13 José Pedr… Hulu Theater… ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           Win          ""          
-14 Anthony C… Staples Cent… ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           NA   
 </pre>
 <!-- /wp:html -->
+
+<!-- wp:syntaxhighlighter/code {"language":"r"} -->
+<pre class="wp-block-syntaxhighlighter-code brush: r; notranslate"># A tibble: 14 x 16
+   opponent            location                                          `2013-10-12` `2014-03-01` `2014-06-21` `2014-11-22` `2015-05-02` `2015-11-07` `2016-06-11` `2016-11-26` `2017-04-08` `2017-08-05` `2017-12-09` `2018-05-12` `2018-12-08` `2019-04-12`
+   &lt;chr>               &lt;chr>                                             &lt;chr>        &lt;chr>        &lt;chr>        &lt;chr>        &lt;chr>        &lt;chr>        &lt;chr>        &lt;chr>        &lt;chr>        &lt;chr>        &lt;chr>        &lt;chr>        &lt;chr>        &lt;chr>       
+ 1 José Ramírez        Thomas &amp; Mack Center, Paradise, Nevada, US        Win          ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           ""          
+ 2 Orlando Salido      Alamodome, San Antonio, Texas, US                 ""           Loss         ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           ""          
+ 3 Gary Russell Jr.    StubHub Center, Carson, California, US            ""           ""           Win          ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           ""          
+ 4 Chonlatarn Piriyap… Cotai Arena, Macau, SAR                           ""           ""           ""           Win          ""           ""           ""           ""           ""           ""           ""           ""           ""           ""          
+ 5 Gamalier Rodríguez  MGM Grand Garden Arena, Paradise, Nevada, US      ""           ""           ""           ""           Win          ""           ""           ""           ""           ""           ""           ""           ""           ""          
+ 6 Romulo Koasicha     Thomas &amp; Mack Center, Paradise, Nevada, US        ""           ""           ""           ""           ""           Win          ""           ""           ""           ""           ""           ""           ""           ""          
+ 7 Román Martínez      The Theater at Madison Square Garden, New York C… ""           ""           ""           ""           ""           ""           Win          ""           ""           ""           ""           ""           ""           ""          
+ 8 Nicholas Walters    Cosmopolitan of Las Vegas, Paradise, Nevada, US   ""           ""           ""           ""           ""           ""           ""           Win          ""           ""           ""           ""           ""           ""          
+ 9 Jason Sosa          MGM National Harbor, Oxon Hill, Maryland, US      ""           ""           ""           ""           ""           ""           ""           ""           Win          ""           ""           ""           ""           ""          
+10 Miguel Marriaga     Microsoft Theater, Los Angeles, California, US    ""           ""           ""           ""           ""           ""           ""           ""           ""           Win          ""           ""           ""           ""          
+11 Guillermo Rigondea… The Theater at Madison Square Garden, New York C… ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           Win          ""           ""           ""          
+12 Jorge Linares       Madison Square Garden, New York City, New York, … ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           Win          ""           ""          
+13 José Pedraza        Hulu Theater, New York City, New York, US         ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           Win          ""          
+14 Anthony Crolla      Staples Center, Los Angeles, California, US       ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           ""           NA          </pre>
+<!-- /wp:syntaxhighlighter/code -->
 
 <!-- wp:paragraph -->
 <p>Another neat part of the <code>pivot_wider()</code> function is the <code>values_from</code> argument can take multiple columns. For example, if I wanted to see how man <code>Win</code>s resulted in <code>TKO</code>s (technical knock-outs) or <code>KO</code>s (knock-outs) and their corresponding rounds and time, I could use the following to see <code>rounds</code> and <code>time</code> in separate columns.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:html -->
-<pre>LomaFights %>% <br>
+<pre>
+LomaFights %>% <br>
     dplyr::filter(result == "Win") %>% <br>
     pivot_wider(names_from = c(type),<br>
                 values_from = c(rounds, time),<br>
@@ -534,11 +674,10 @@ LomaFights %>% <br>
 </pre>
 <!-- /wp:html -->
 
-<!-- wp:html -->
-<pre>
-# A tibble: 12 x 5
+<!-- wp:syntaxhighlighter/code {"language":"r"} -->
+<pre class="wp-block-syntaxhighlighter-code brush: r; notranslate"># A tibble: 12 x 5
    opponent               rounds_KO time_KO rounds_TKO time_TKO
-   <chr>                  <chr>     <chr>   <chr>      <chr>   
+   &lt;chr>                  &lt;chr>     &lt;chr>   &lt;chr>      &lt;chr>   
  1 José Ramírez           ""        ""      4 (10)     2:55    
  2 Gary Russell Jr.       ""        ""      ""         ""      
  3 Chonlatarn Piriyapinyo ""        ""      ""         ""      
@@ -550,9 +689,8 @@ LomaFights %>% <br>
  9 Miguel Marriaga        ""        ""      ""         ""      
 10 Guillermo Rigondeaux   ""        ""      ""         ""      
 11 Jorge Linares          ""        ""      10 (12)    2:08    
-12 José Pedraza           ""        ""      ""         ""   
-</pre>
-<!-- /wp:html -->
+12 José Pedraza           ""        ""      ""         ""   </pre>
+<!-- /wp:syntaxhighlighter/code -->
 
 <!-- wp:paragraph -->
 <p>We can also use the <code>tidyr::pivot_wider()</code> function like <code>tidyr::spread()</code> function above. If I want to see the fight <code>results</code> by type, but with <code>Win</code> and <code>Loss</code> in separate columns, I can use the following sequence. </p>
@@ -570,12 +708,20 @@ LomaFights %>% <br>
 </pre>
 <!-- /wp:html -->
 
-<!-- wp:table -->
-<table class="wp-block-table"><thead><tr><th>type</th><th>Win</th><th>Loss</th></tr></thead><tbody><tr><td>KO</td><td>3</td><td>0</td></tr><tr><td>MD</td><td>1</td><td>0</td></tr><tr><td>RTD</td><td>4</td><td>0</td></tr><tr><td>SD</td><td>0</td><td>1</td></tr><tr><td>TKO</td><td>2</td><td>0</td></tr><tr><td>UD</td><td>2</td><td>0</td></tr></tbody></table>
-<!-- /wp:table -->
+<!-- wp:syntaxhighlighter/code {"language":"r"} -->
+<pre class="wp-block-syntaxhighlighter-code brush: r; notranslate"># A tibble: 6 x 3
+  type    Win  Loss
+  &lt;chr> &lt;int> &lt;int>
+1 KO        3     0
+2 MD        1     0
+3 RTD       4     0
+4 SD        0     1
+5 TKO       2     0
+6 UD        2     0</pre>
+<!-- /wp:syntaxhighlighter/code -->
 
 <!-- wp:paragraph -->
-<p>As yAs you can see, these new <code>tidyr::pivot_</code> functions extend <code>tidyr::gather()</code> and <code>tidyr::spread()</code> with more options and flexibility. It might take a little getting used to at first, but I think you'll find these are a welcome addition to all of the data manipulation in the <code>tidyverse</code>.</p>
+<p>As you can see, these new <code>tidyr::pivot_</code> functions extend <code>tidyr::gather()</code> and <code>tidyr::spread()</code> with more options and flexibility. I think you'll find these are a welcome addition to all of the data manipulation in the <code>tidyverse</code>.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
