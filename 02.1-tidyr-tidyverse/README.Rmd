@@ -116,12 +116,9 @@ Cartesian
 As you can see, the `Cartesian` orientation uses up more columns (and fills in the gaps with missing (`NA`) values).
 
 ```{r table-intersection.png, echo=FALSE, eval=TRUE}
+# fs::dir_ls("images")
 knitr::include_graphics(
-  path =
-    fs::dir_ls(here::here("images"),
-      regexp = "index"
-    )
-)
+  path = "images/indexed-carteisan.png")
 ```
 
 # Part two: Grouping
@@ -204,22 +201,20 @@ Changes like these are examples of why I appreciate the `tidyverse`, because I c
 Vasily Lomachenko, the best [pound-for-pound boxer](https://en.wikipedia.org/wiki/Boxing_pound_for_pound_rankings) in the world, is known for taking [traditional Ukrainian dance classes as a child before ever stepping into a boxing ring](traditional Ukrainian dance classes). Why would an athlete who punches people for a living spend time learning how to dance? Because **having the ability to quickly change angles is so essential in boxing that these skills are often what separates a good fighter from an elite athlete**.
 
 ```{r images/loma-pivot.gif, echo=FALSE, eval=TRUE, fig.cap="http://fightland.vice.com/blog/the-pivots-and-precision-of-vasyl-lomachenko"}
-knitr::include_graphics(path = here::here("images", "loma-pivot.gif"))
+knitr::include_graphics(path = "images/loma-pivot.gif")
 ```
 
 
 Whenever we use the `pivot_` functions, we're changing angles between the columns and rows. If the tables pivoting longer, the column names and values rotate 90˚ into an index row. 
 
 ```{r pivot-longer-image, echo=FALSE, eval=TRUE}
-knitr::include_graphics(path = fs::dir_ls(here::here("images"),
-      regexp = "pivot-longer-image"))
+knitr::include_graphics(path = "images/pivot-longer-image.png")
 ```
 
 Pivoting from long to wide (or)
 
 ```{r pivot-wider-image, echo=FALSE, eval=TRUE}
-knitr::include_graphics(path =
-    fs::dir_ls(here::here("images"), regexp = "pivot-wider-image"))
+knitr::include_graphics(path = "images/pivot-wider-image.png")
 ```
 
 The `tidyr::pivot_` functions give you a similar ability with your data! Being able to rapidly spin your data from columns to rows (and back) is similar to being able to rotate 90 degrees on a dime and avoid an incoming hook.
@@ -269,8 +264,7 @@ LomaWideSmall %>%
 ### What happens in pivot_longer()?
 
 ```{r tidy-pivoting-longer, eval=TRUE, echo=FALSE}
-knitr::include_graphics(path = 
-                            here::here("images", "tidy-pivoting-longer.png"))
+knitr::include_graphics(path = "images/tidy-pivoting-longer.png")
 ```
 
 `tidyr::pivot_longer()` extends the `tidyr::spread()` function by adding a few arguments to make this re-structuring more deliberate:
@@ -352,7 +346,7 @@ These data are now in a tidy (indexed) format.
 No one wins a fight in boxing by only avoiding punches--eventually they have to hit someone (probably more than one). Another reason that being able to change angles quickly is advantageous is that it creates more opportunities to throw (and land) a punch. As you can see, Lomachenko's pivoting abilities not only make him frustratingly hard to hit, but they also allow him to see openings in his opponents defenses (which makes him incredibly successful at landing punches). 
 
 ```{r loma-pivot-strike.gif, echo=FALSE, eval=TRUE, fig.cap="http://fightland.vice.com/blog/the-pivots-and-precision-of-vasyl-lomachenko"}
-knitr::include_graphics(path = here::here("images", "loma-pivot-strike.gif"))
+knitr::include_graphics(path =  "https://raw.githubusercontent.com/mjfrigaard/storybenchR/master/02.1-tidyr-tidyverse/images/loma-pivot-strike.gif")
 ```
 
 
@@ -382,7 +376,7 @@ Consider a data frame with the same Lomachenko fight records, but this time arra
 
 ```{r freeze-cells.gif, echo=FALSE, eval=TRUE, fig.cap="freeze cells"}
 # fs::dir_ls("images")
-knitr::include_graphics(path = here::here("images", "freeze-cells.gif"))
+knitr::include_graphics(path = "https://raw.githubusercontent.com/mjfrigaard/storybenchR/master/02.1-tidyr-tidyverse/images/freeze-cells.gif")
 ```
 
 The `LomaFights` data frame has the fight records for Lomachenko from his [wikipedia table](https://en.wikipedia.org/wiki/Vasyl_Lomachenko). To create a spreadsheet like the one above, we can use the `tidyr::pivot_wider()` function. 

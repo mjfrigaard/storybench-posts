@@ -169,10 +169,9 @@ table the `measure` values are at the intersection of `group` and each
 </div>
 
 As you can see, the `Cartesian` orientation uses up more columns (and
-fills in the gaps with missing (`NA`)
-values).
+fills in the gaps with missing (`NA`) values).
 
-![](/Users/martinfrigaard/@Working/storybenchR/02.1-tidyr-tidyverse/images/indexed-carteisan.png)<!-- -->
+![](images/indexed-carteisan.png)<!-- -->
 
 # Part two: Grouping
 
@@ -372,19 +371,17 @@ boxing that these skills are often what separates a good fighter from an
 elite
 athlete**.
 
-![<http://fightland.vice.com/blog/the-pivots-and-precision-of-vasyl-lomachenko>](/Users/martinfrigaard/@Working/storybenchR/02.1-tidyr-tidyverse/images/loma-pivot.gif)
+![<http://fightland.vice.com/blog/the-pivots-and-precision-of-vasyl-lomachenko>](images/loma-pivot.gif)
 
 Whenever we use the `pivot_` functions, we’re changing angles between
 the columns and rows. If the tables pivoting longer, the column names
-and values rotate 90˚ into an index
-row.
+and values rotate 90˚ into an index row.
 
-![](/Users/martinfrigaard/@Working/storybenchR/02.1-tidyr-tidyverse/images/pivot-longer-image.png)<!-- -->
+![](images/pivot-longer-image.png)<!-- -->
 
-Pivoting from long to wide
-(or)
+Pivoting from long to wide (or)
 
-![](/Users/martinfrigaard/@Working/storybenchR/02.1-tidyr-tidyverse/images/pivot-wider-image.png)<!-- -->
+![](images/pivot-wider-image.png)<!-- -->
 
 The `tidyr::pivot_` functions give you a similar ability with your
 data\! Being able to rapidly spin your data from columns to rows (and
@@ -508,7 +505,7 @@ LomaWideSmall %>%
 
 ### What happens in pivot\_longer()?
 
-![](/Users/martinfrigaard/@Working/storybenchR/02.1-tidyr-tidyverse/images/tidy-pivoting-longer.png)<!-- -->
+![](images/tidy-pivoting-longer.png)<!-- -->
 
 `tidyr::pivot_longer()` extends the `tidyr::spread()` function by adding
 a few arguments to make this re-structuring more deliberate:
@@ -673,7 +670,7 @@ also allow him to see openings in his opponents defenses (which makes
 him incredibly successful at landing
 punches).
 
-![<http://fightland.vice.com/blog/the-pivots-and-precision-of-vasyl-lomachenko>](/Users/martinfrigaard/@Working/storybenchR/02.1-tidyr-tidyverse/images/loma-pivot-strike.gif)
+![<http://fightland.vice.com/blog/the-pivots-and-precision-of-vasyl-lomachenko>](https://raw.githubusercontent.com/mjfrigaard/storybenchR/master/02.1-tidyr-tidyverse/images/loma-pivot-strike.gif)
 
 # Pivoting Example 2: Moving categorical or ordinal variables across columns
 
@@ -718,7 +715,7 @@ the creation of the `LomaDatesWide` data:
 ‘Freeze Columns’ or ‘Freeze Rows’.*
 
 ![freeze
-cells](/Users/martinfrigaard/@Working/storybenchR/02.1-tidyr-tidyverse/images/freeze-cells.gif)
+cells](https://raw.githubusercontent.com/mjfrigaard/storybenchR/master/02.1-tidyr-tidyverse/images/freeze-cells.gif)
 
 The `LomaFights` data frame has the fight records for Lomachenko from
 his [wikipedia table](https://en.wikipedia.org/wiki/Vasyl_Lomachenko).
