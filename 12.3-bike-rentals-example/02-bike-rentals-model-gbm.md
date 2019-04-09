@@ -56,14 +56,14 @@ ggRentalVolByHoliday
 
 ![](images/ggRentalVolByHoliday-1.png)<!-- -->
 
-So now that we have some understanding of the variables in `BikeData`,
-we can use the [Generalized Boosted Regression Models (`gbm`)
+Now that we have some understanding of the variables in `BikeData`, we
+can use the [Generalized Boosted Regression Models (`gbm`)
 package](https://cran.r-project.org/web/packages/gbm/index.html) to
 model the bike rental data.
 
 ## The data
 
-Now check for the data in our working environment.
+Check for the data in our working environment.
 
 ``` r
 BikeData %>% glimpse()
@@ -191,15 +191,19 @@ BikeTrain <- training(BikeSplit)
 BikeTest  <- testing(BikeSplit)
 ```
 
-We can call the gbm function and select a number of parameters including
-cross-fold validation. Cross-fold validation randomly divides our
-training data into k sets that are relatively equal in size. Our model
-will be fit using all the sets with the exclusion of the first fold. The
-model error of the fit is estimated with the hold out sets. Each set is
-used to measure the model error and an average is calculated across the
-various sets. Shrinkage, interaction depth, n.minobsinnode and n.trees
-can be adjusted for model accuracy using the caret package in R
-<http://topepo.github.io/caret/index.html>.
+We can call the `gbm` function and select a number of parameters
+including cross-fold validation.
+
+Cross-fold validation randomly divides our training data into `k` sets
+that are relatively equal in size.
+
+Our model will be fit using all the sets with the exclusion of the first
+fold. The model error of the fit is estimated with the hold-out sets.
+
+Each set is used to measure the model error and an average is calculated
+across the various sets. Shrinkage, interaction depth, `n.minobsinnode`
+and `n.trees` can be adjusted for model accuracy using the caret package
+in R <http://topepo.github.io/caret/index.html>.
 
 ``` r
 # model
@@ -589,7 +593,7 @@ gbm::plot.gbm(bike_fit_1, i.var = c(5, 11))
 
 We can visualize the impact of different features on predicting bike
 rentals using the relative influence provided by GBM. First we can
-summarize our model then assign that data to a dataframe using
+summarize our model then assign these data to a `tibble` using
 `gbm::summary.gbm()` and passing this to the `tibble::as_tibble()`
 function.
 
