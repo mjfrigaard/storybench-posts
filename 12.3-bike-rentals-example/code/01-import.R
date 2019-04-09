@@ -4,13 +4,15 @@
 # MIT License
 # Version: 1.0
 #=====================================================================#
-
-
-# packages ----------------------------------------------------------------
-
 library(tidyverse)
-
+library(rsample) # data splitting
+library(randomForest) # basic implementation
+library(ranger) # a faster implementation of randomForest
+library(caret) # an aggregator package for performing many machine learning models
+library(ggthemes)
+library(scales)
+library(wesanderson)
+library(styler)
 
 # read data of bike rentals daily ----
-
 bike <- read.csv("data/day.csv")

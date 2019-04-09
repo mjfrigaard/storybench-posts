@@ -1,0 +1,320 @@
+---
+title: "Bike rentals (part 2) - modeling with GBM"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(magrittr)
+
+# create image folder ----
+if (!file.exists("images/")) {
+    dir.create("images/")
+}
+# create data folder ----
+if (!file.exists("data/")) {
+    dir.create("data/")
+}
+
+# create code folder ----
+if (!file.exists("code/")) {
+    dir.create("code/")
+}
+
+# knitr settings chunk ------
+knitr::opts_chunk$set(
+    echo = TRUE, # show all code
+    tidy = FALSE, # cleaner code printing
+    size = "small", # smaller code
+    fig.path = "images/") 
+
+#  knitr settings entire doc ------
+knitr::opts_knit$set(
+    width = 78)
+base::options(tibble.print_max = 25,
+              tibble.width = 78)
+```
+
+This tutorial is part 2 of our [#tidytuesday](https://www.youtube.com/results?search_query=%23tidytuesday) post from last week. Check it out [here.](http://www.storybench.org/exploring-bike-rental-behavior-using-r/)
+
+# Load the packages 
+
+The packages below are needed to complete this analysis. 
+
+```{r packages, message=FALSE, warning=FALSE}
+# packages --------------------------------------------------------------
+library(rsample)      
+library(caret)        
+library(ggthemes)
+library(scales)
+library(wesanderson)
+library(tidyverse)
+library(gbm)
+library(Metrics)
+library(here)
+```
+
+Run previous scripts to import and wrangle data. 
+
+```{r previous-sripts, message=FALSE, warning=FALSE}
+# fs::dir_ls("code")
+base::source("code/01-import.R")
+base::source("code/02.3-wrangle.R")
+base::source("code/03.3-visualize.R") # we don't neeed to run 03-vizualize.R,
+# because it does not change the underlying data structure, but we wantto view 
+# the EDA outputs
+```
+
+## What did we learn?
+
+The EDA showed us that Bike rentals seem to drop off at a certain temperature (~20˚C).
+
+```{r ggRentalsByTemp}
+ggRentalsByTemp
+```
+
+And that rentals were lower on holidays compared to non-holidays. 
+
+```{r ggRentalVolByHoliday}
+ggRentalVolByHoliday
+```
+
+So now that we have some understanding of the variables in `BikeData`, we can use the [Generalized Boosted Regression Models (`gbm`) package](https://cran.r-project.org/web/packages/gbm/index.html) to model the bike rental data.  
+
+## The data 
+
+Now check for the data in our working environment. 
+
+```{r BikeData, results='hold'}
+BikeData %>% glimpse()
+```
+
+
+## Variables of interest
+
+First we want build a data frame for our model, which includes our outcome variable `cnt` (the '*count of total rental bikes including both casual and registered*') and the features we want to help explain: 
+
+`season_fct` = Factor w/ 4 levels, "Spring", "Summer", "Fall", "Winter"
+
+`yr_fct` = Factor w/ 2 levels, "2011", "2012"
+
+`month_fct` = Factor w/ 12 levels, "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+
+`holiday_fct` = Factor w/ 2 levels "Non-Holiday", "Holiday"
+
+`weekday_fct`  = Factor w/ 7 levels, "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday","Saturday"
+
+`workingday_fct`  = Factor w/ 2 levels, "Non-Working Day", "Working Day"
+
+`weathersit_fct`  = Factor w/ 3 levels, "Good", "Clouds/Mist", "Rain/Snow/Storm"
+
+`temp`  = int [1:731] 8 9 1 1 2 1 1 0 -1 0
+
+`atemp`  = num [1:731] 28.4 28 22.4 23.2 23.8 ..
+
+`hum`  = int [1:731] 80 69 43 59 43 51 49 53 43 48 ...
+
+`windspeed`  = int [1:731] 10 16 16 10 12 6 11 17 24 14 ...
+
+
+```{r BikeDataModel}
+BikeDataModel <- BikeData %>% select(cnt,
+                season_fct,
+                yr_fct,
+                month_fct,
+                holiday_fct,
+                weekday_fct,
+                workingday_fct,
+                weathersit_fct,
+                temp,
+                atemp,
+                hum,
+                windspeed)
+BikeDataModel %>% dplyr::glimpse(78)
+```
+
+
+## The testing and training split 
+
+We want to build training and testing data sets that are representative of the original `bike` data set. To achieve this, we will randomly select observations for two subsets of data. We'll also specify the sampling process, so we get an equal proportion of bike rentals (`cnt`) in our `BikeTest` and `BikeTrain`  data sets (we'll randomize our data into training and test sets with a 70% / 30% split).
+
+The `BikeTrain` has the data we will use to build a model and demonstrate it's performance. However, because our goal is to generalize as much as possible using 'real world data', we'll be testing the model on data our model *hasn't* seen (i.e. the `BikeTest` data). 
+
+Having testing and training data sets allows us to 1) build and select the best model, and 2) then assess the final model's performance using 'fresh' data.
+
+```{r BikeDataSplit, results='hold'}
+# gbm
+set.seed(123)
+BikeSplit <- initial_split(BikeDataModel, prop = .7)
+BikeTrain <- training(BikeSplit)
+BikeTest  <- testing(BikeSplit)
+```
+
+We can call the gbm function and select a number of parameters including cross-fold validation. Cross-fold validation randomly divides our training data into k sets that are relatively equal in size. Our model will be fit using all the sets with the exclusion of the first fold. The model error of the fit is estimated with the hold out sets. Each set is used to measure the model error and an average is calculated across the various sets. Shrinkage, interaction depth, n.minobsinnode and n.trees can be adjusted for model accuracy using the caret package in R <http://topepo.github.io/caret/index.html>. 
+
+```{r bike_fit_1, results='hold'}
+# model
+set.seed(123)
+bike_fit_1 <- gbm::gbm(cnt ~., 
+             # the formula for the model (recall that the period means, "all 
+             # variables in the data set")
+             data = BikeTrain, 
+             # data set
+             verbose = TRUE, 
+             # Logical indicating whether or not to print
+             #  out progress and performance indicators
+             shrinkage = 0.01, 
+             # a shrinkage parameter applied to each tree in the expansion. 
+             # Also known as the learning rate or step-size reduction; 0.001 
+             # to 0.1 usually work, but a smaller learning rate typically 
+             # requires more trees.
+             interaction.depth = 3, 
+             # Integer specifying the maximum depth of each tree (i.e., the 
+             # highest level of variable interactions allowed). A value of 1 
+             # implies an additive model, a value of 2 implies a model with up
+             #  to 2-way interactions
+             n.minobsinnode = 5,
+             # Integer specifying the minimum number of observations in the 
+             # terminal nodes of the trees. Note that this is the actual number 
+             # of observations, not the total weight.
+             n.trees = 5000, 
+             # Integer specifying the total number of trees to fit. This is 
+             # equivalent to the number of iterations and the number of basis 
+             # functions in the additive expansion.
+             cv.folds = 10
+             # Number of cross-validation folds to perform. If cv.folds>1 then
+             # gbm, in addition to the usual fit, will perform a 
+             # cross-validation, calculate an estimate of generalization error
+             #  returned in cv.error
+             )
+```
+
+**NOTE:** The `gbm::gbm()` function creates a lot of output (we included the `verbose = TRUE` argument).
+
+## Store and explore
+
+Now we can inspect the model object (`bike_fit_1`) beginning with the optimal number of learners that GBM has produced and the error rate. 
+
+We can use the `gbm::gbm.perf()` function to see the the error rate at each number of learners. 
+
+```{r perf_gbm1, results='hold'}
+# model performance
+perf_gbm1 = gbm.perf(bike_fit_1, method = "cv")
+```
+
+In the visualization below we can see that the blue line represents the optimal number of trees with our cross validation (`cv`). GBM can be sensitive to over-fitting, so using the `method = "cv"` in our estimate protects against this.
+
+```{r optimal-trees}
+perf_gbm1
+```
+
+We can see that the optimal number of trees is `r perf_gbm1`.
+
+## Make predictions
+
+Now we can predict our bike rentals using the `predict()` function with our test set and the optimal number of trees based on our `perf.gbm1` estimate. 
+
+`RMSE` = The root mean squared error (`RMSE`) is used to measure the prediction error in our model(s). As the name suggests, these errors are weighted by means of squaring them. The RMSE is also pretty straightforward to interpret, because it's in the same units as our outcome variable. Additional attractive qualities include the fact equally captures the overestimates and underestimates, and the misses are penalized according to their relative size.
+
+`Metrics::rmse` computes the root mean squared error between two numeric vectors, so we will use it to compare our predicted values with the residuals to calculate the error of our model.
+
+```{r BikeDataModelPredict, results='hold'}
+bike_prediction_1 <- stats::predict(
+                           # the model from above
+                          object = bike_fit_1, 
+                          # the testing data
+                          newdata = BikeTest,
+                          # this is the number we calculated above
+                          n.trees = perf_gbm1)
+rmse_fit1 <- Metrics::rmse(actual = BikeTest$cnt, 
+                           predicted = bike_prediction_1)
+print(rmse_fit1)
+```
+
+GBM offers partial dependency plots to explore the correlations between a feature in our model and our outcome. For example, you can see in the graph below that ambient temperature is associated with increased numbers of bike rentals until close to 35 degrees when riders tend to be less likely to rent a bike.
+
+```{r BikeDataAtemp, results='hold'}
+gbm::plot.gbm(bike_fit_1, i.var = 9)
+```
+
+Similarly we can look at the interaction of two features on bike rentals. Below we can see that riders are more likely to rent a bike after Monday, despite wind speed.
+
+```{r BikeDataWeekdayWind, results='hold'}
+gbm::plot.gbm(bike_fit_1, i.var = c(5, 11))
+```
+
+We can visualize the impact of different features on predicting bike rentals using the relative influence provided by GBM. First we can summarize our model then assign that data to a dataframe using `gbm::summary.gbm()` and passing this to the `tibble::as_tibble()` function.
+
+```{r BikeEffects}
+# summarize model
+BikeEffects <- tibble::as_tibble(gbm::summary.gbm(bike_fit_1, plotit = FALSE))
+BikeEffects %>% utils::head()
+```
+
+This creates a new data set with `var`, a factor variable with the variables in our model, and `rel.inf`, the relative influence each variable had on our model predictions. 
+
+We can then plot the top ten features by impact using `ggpplot` and our new data frame containing our model summary (`BikeEffects`).
+
+```{r BikeDataEffects, message=FALSE, warning=FALSE}
+# plot effects
+BikeEffects %>% 
+  # arrange descending to get the top influencers
+  dplyr::arrange(desc(rel.inf)) %>%
+  # sort to top 10
+  dplyr::top_n(10) %>%
+  # plot these data using columns
+  ggplot(aes(x = forcats::fct_reorder(.f = var, 
+                                      .x = rel.inf), 
+             y = rel.inf, 
+             fill = rel.inf)) +
+  geom_col() +
+  # flip
+  coord_flip() +
+  # format
+  scale_color_brewer(palette = "Dark2") +
+  theme_fivethirtyeight() +
+  theme(axis.title = element_text()) + 
+  xlab('Features') +
+  ylab('Relative Influence') +
+  ggtitle("Top 10 Drivers of Bike Rentals")
+```
+
+This let's us know what is being used for selection: `Selecting by rel.inf`
+
+We can visualize the distribution of our predicted compared with actual bike rentals by predicting these values and plotting the difference.
+
+```{r BikeDatPredActual, results='hold'} 
+# Predicted bike rentals
+BikeTest$predicted <- base::as.integer(predict(bike_fit_1, 
+                                         newdata = BikeTest, 
+                                         n.trees = perf_gbm1))
+
+# plot predicted v actual
+ggplot(BikeTest) +
+  geom_point(aes(y = predicted, 
+                 x = cnt, 
+                 color = predicted - cnt), alpha = 0.7) +
+  # add theme
+  theme_fivethirtyeight() +
+  # strip text
+  theme(axis.title = element_text()) + 
+  # add format to labels
+  scale_x_continuous(labels = comma) +
+  scale_y_continuous(labels = comma) +
+  # add axes/legend titles
+  scale_color_continuous(name = "Predicted - Actual", 
+                         labels = comma) +
+  ylab('Predicted Bike Rentals') +
+  xlab('Actual Bike Rentals') +
+  ggtitle('Predicted vs Actual Bike Rentals') 
+```
+
+We can see that our model did a fairly good job predicting bike rentals. 
+
+## What did we learn?
+
+We learned the ambient temperature is the largest influencer for predicting bike rentals and that rental numbers go down when the temperature reaches ~35 degrees. We can also see holiday (or non-holiday) was not much of an influencer for predicting bike rentals. 
+
+
+
+

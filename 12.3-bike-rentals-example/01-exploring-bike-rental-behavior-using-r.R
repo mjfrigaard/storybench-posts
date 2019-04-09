@@ -1,18 +1,28 @@
-#=====================================================================#
-# This is code to create: wrangle bike share data
-# Authored by and feedback to mjfrigaard@gmail.com
-# MIT License
-# Version: 1.0
-# depends on 01-import.R
-#=====================================================================#
 
+
+## ----setup, include=FALSE---------------------------------------------------
 library(tidyverse)
-library(skimr)
-library(janitor)
+library(magrittr)
 
-source("code/01-import.R")
-ls()
 
+
+# packages --------------------------------------------------------------
+library(tidyverse)
+library(rsample) # data splitting
+library(randomForest) # basic implementation
+library(ranger) # a faster implementation of randomForest
+library(caret) # an aggregator package for performing many machine learning models
+library(ggthemes)
+library(scales)
+library(wesanderson)
+library(styler)
+
+
+## ----import-bike------------------------------------------------------------
+bike <- readr::read_csv("data/day.csv")
+
+
+## ----wrangle----------------------------------------------------------------
 # WRANGLE ---------------------------------------------------------------
 # I like to be overly cautious when it comes to wrangling because all models
 # are only as good as the underlying data. This data set came with many
@@ -20,6 +30,9 @@ ls()
 # character version of each variable (_chr) and a factor version (_fct).
 # Creating a character and factor variable will let me choose which one to 
 # use for each graph and model.
+# 
+# 
+# 
 
 # this recodes the weekday variable into a character variable
 # test 
@@ -413,18 +426,113 @@ BikeData <- BikeData %>%
     dplyr::everything())
 
 
-# export ----------------------------------------------------------------
-# first buld an object for today's data
-today_regex <- base::noquote(lubridate::today())
-today_regex
+## ----BikeData-glimpse-------------------------------------------------------
+BikeData %>% dplyr::glimpse(78)
 
-# now export data with timestamp
-write_csv(as.data.frame(BikeData), paste0(
-  "data/",
-  today_regex,
-  "-BikeData.csv"))
 
-# and double-check to make sure it's there
-fs::dir_ls(path = "data/" , regexp = today_regex)
+## ----BikeDplyrSummary, message=FALSE, warning=FALSE-------------------------
+BikeDplyrSummary <- BikeData %>%
+  select(temp, atemp, hum, windspeed, casual, registered, cnt) %>%
+  summarise_each(list(
+    min = ~min,
+    q25 = ~quantile(., 0.25),
+    median = ~median,
+    q75 = ~quantile(., 0.75),
+    max = ~max,
+    mean = ~mean,
+    sd = ~sd
+  )) %>%
+  gather(stat, val) %>%
+  separate(stat, 
+           into = c("var", "stat"), 
+           sep = "_") %>%
+  spread(stat, val) %>%
+  select(var, min, q25, median, q75, max, mean, sd)
 
-# END -----
+knitr::kable(BikeDplyrSummary)
+
+
+## ----BikeSkimrSummary-------------------------------------------------------
+BikeSkimrSummary <- bike %>%
+  skimr::skim_to_wide() %>%
+  dplyr::select(type,
+    variable,
+    missing,
+    complete,
+    min,
+    max,
+    mean,
+    sd,
+    median = p50,
+    hist)
+knitr::kable(BikeSkimrSummary)
+
+
+## ----BikeMosaicInspect-categorical------------------------------------------
+BikeMosaicInspect <- mosaic::inspect(BikeData)
+# categorical
+knitr::kable(BikeMosaicInspect$categorical)
+
+
+## ----BikeMosaicInspect-Date-------------------------------------------------
+# date 
+knitr::kable(BikeMosaicInspect$Date)
+
+
+## ----BikeMosaicInspect-quantitative-----------------------------------------
+# quantitative 
+knitr::kable(BikeMosaicInspect$quantitative)
+
+
+## ----ggRentalsByTemp--------------------------------------------------------
+# ~ rentals by temperature ----
+ggRentalsByTemp <- BikeData %>% 
+  ggplot(aes(y = cnt, 
+                 x = temp, 
+                 color = weekday_fct)) +
+  geom_point(show.legend = FALSE) +
+  geom_smooth(se = FALSE,
+              show.legend = FALSE) +
+  facet_grid(~weekday_fct) +
+  scale_color_brewer(palette = "Dark2") +
+  theme_fivethirtyeight() +
+  theme(axis.title = element_text()) +
+  ylab("Bike Rentals") +
+  xlab("Temperature (°C)") +
+  ggtitle("Bike Rental Volume By Temperature")
+ggRentalsByTemp
+
+
+## ----ggRentalVolByWindSpeed-------------------------------------------------
+# ggRentalVolByWindSpeed ----
+ggRentalVolByWindSpeed <- ggplot(bike) +
+  geom_point(aes(y = cnt, 
+                 x = windspeed, 
+                 color = weekday_fct),
+             show.legend = FALSE) +
+  facet_grid(~weekday_fct) +
+  scale_color_brewer(palette = "Dark2") +
+  theme_fivethirtyeight() +
+  theme(axis.title = element_text()) +
+  ylab("Bike Rentals") +
+  xlab("Windspeed") +
+  ggtitle("Rental Volume By Windspeed")
+ggRentalVolByWindSpeed
+
+
+## ----ggRentalVolByHoliday---------------------------------------------------
+ggRentalVolByHoliday <- ggplot(BikeData) +
+  geom_density(aes(x = cnt,
+                   fill = holiday_chr), 
+                   alpha = 0.2) +
+  scale_fill_brewer(palette = "Paired") +
+  
+  theme_fivethirtyeight() +
+  theme(axis.title = element_text()) + 
+  labs(title = "Bike Rental Density By Holiday",
+               fill = "Holiday",
+               x = "Average Bike Rentals",
+               y = "Density")
+
+ggRentalVolByHoliday
+

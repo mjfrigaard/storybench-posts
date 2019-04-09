@@ -414,17 +414,9 @@ BikeData <- BikeData %>%
 
 
 # export ----------------------------------------------------------------
-# first buld an object for today's data
-today_regex <- base::noquote(lubridate::today())
-today_regex
-
-# now export data with timestamp
 write_csv(as.data.frame(BikeData), paste0(
   "data/",
-  today_regex,
+  base::noquote(lubridate::today()),
   "-BikeData.csv"))
-
-# and double-check to make sure it's there
-fs::dir_ls(path = "data/" , regexp = today_regex)
 
 # END -----

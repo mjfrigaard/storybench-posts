@@ -419,10 +419,10 @@ today_regex <- base::noquote(lubridate::today())
 today_regex
 
 # now export data with timestamp
-write_csv(as.data.frame(BikeData), paste0(
+readr::write_rds(BikeData, paste0(
   "data/",
   today_regex,
-  "-BikeData.csv"))
+  "-BikeData.rds"))
 
 # and double-check to make sure it's there
 fs::dir_ls(path = "data/" , regexp = today_regex)
