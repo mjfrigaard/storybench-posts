@@ -1,0 +1,44 @@
+---
+title: "Working with API data in R"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(magrittr)
+# create image folder ----
+if (!file.exists("images/")) {
+    dir.create("images/")
+}
+# create data folder ----
+if (!file.exists("data/")) {
+    dir.create("data/")
+}
+# create meta folder ----
+if (!file.exists("meta/")) {
+    dir.create("meta/")
+}
+# knitr settings ------
+knitr::opts_chunk$set(
+    echo = TRUE, # show all code
+    tidy = FALSE, # cleaner code printing
+    size = "small",
+    fig.path = "images/") # smaller code
+knitr::opts_knit$set(
+    width = 78)
+base::options(tibble.print_max = 25,
+              tibble.width = 78)
+```
+
+# *Motivation*
+
+This tutorial covers collecting data from website APIs...
+
+## Opensecrets 
+
+## Dataworld
+
+## E-Utils (NCBI)
+
+https://cran.r-project.org/web/packages/rentrez/vignettes/rentrez_tutorial.html
+

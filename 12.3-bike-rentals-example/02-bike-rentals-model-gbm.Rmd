@@ -240,12 +240,12 @@ print(rmse_fit1)
 GBM offers partial dependency plots to explore the correlations between a feature in our model and our outcome. For example, you can see in the graph below that ambient temperature is associated with increased numbers of bike rentals until close to 35 degrees when riders tend to be less likely to rent a bike.
 
 ```{r BikeDataAtemp, results='hold'}
-gbm::plot.gbm(bike_fit_1, i.var = 9)
+plot.gbm(bike_fit_1, i.var = 9)
 ```
 
 Similarly we can look at the interaction of two features on bike rentals. Below we can see that riders are more likely to rent a bike after Monday, despite wind speed.
 
-```{r BikeDataWeekdayWind, results='hold'}
+```{r BikeDataWeekdayWind, results='show'}
 gbm::plot.gbm(bike_fit_1, i.var = c(5, 11))
 ```
 
