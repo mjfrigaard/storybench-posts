@@ -1,7 +1,7 @@
 Working with API data in R
 ================
 
-# Motivation
+## Motivation
 
 This tutorial covers collecting data from [application program
 interfaces](https://en.wikipedia.org/wiki/Application_programming_interface),
@@ -13,14 +13,14 @@ or APIs. Many websites offer an API to accessing their data, like
 for people to access a website’s data in a plain text format using
 multiple programming languages (Python, Ruby on Rails, etc.).
 
-## What is an API?
+### What is an API?
 
 [Website API](https://en.wikipedia.org/wiki/Web_API)s are portals for
 accessing structured data from a web server. These requests are sent in
 the form of a Hypertext Transfer Protocol, or
 [HTTP](https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol).
 
-## How do we access an API?
+### How do we access an API?
 
 Website addresses are constructed following the Uniform Resource Locator
 (URL) standard. However, when you’re accessing an API, you’ll usually be
@@ -42,7 +42,7 @@ with requests, because this means other people can’t use it.
 
 -----
 
-# Accessing APIs in R with httr
+## Accessing APIs in R with httr
 
 To access data using an API we need to 1) send the HTTP data request
 with a specific set of instructions for the web server, and 2) receive
@@ -57,7 +57,7 @@ to access APIs and interact with data requests.
 library(httr)
 ```
 
-## Ask for data with GET requests
+### Ask for data with GET requests
 
 The `httr::GET()` function sends an HTTP `GET` request to a website. The
 `httr` package also has a `POST` function, which allows users to
@@ -133,7 +133,7 @@ dusa_api_attrs_degree_GET
 ```
 
     ## Response [https://api.datausa.io/attrs/degree/]
-    ##   Date: 2019-04-19 19:55
+    ##   Date: 2019-04-19 20:49
     ##   Status: 200
     ##   Content-Type: application/json
     ##   Size: 428 B
@@ -197,7 +197,7 @@ data from `httr::GET()` to determine the best way to parse the incoming
 data. In this case, it will call the `jsonlite::fromJSON()` because we
 learned the data being returned are `application/json`.
 
-## What is ‘JavaScript Object Notation’ (JSON) data?
+### What is ‘JavaScript Object Notation’ (JSON) data?
 
 Most APIs return data in a [JavaScript Object
 Notation](https://json.org/) (JSON) format (pronounced “Jay-son”). The
@@ -209,7 +209,7 @@ Below is a schematic of a basic JSON object.
 
 ![<https://www.json.org/object.gif>](images/JSON-object.png)
 
-## Reading JSON data into R
+### Reading JSON data into R
 
 We will need to pass `dusa_api_attrs_degree` directly to
 `jsonlite::fromJSON()` and check it’s class, we see it is read into R as
@@ -251,7 +251,7 @@ Now we’ve converted the contents of the API request to a data frame\!
 Let’s repeat this process, but with a slightly more complicated request
 from a different API.
 
-# OpenSecrets data
+## Example 2) OpenSecrets API
 
 You can send more specific requests using API requests, too. To
 demonstrate this, we’ll be using the
@@ -259,7 +259,7 @@ demonstrate this, we’ll be using the
 to sign up for an access key
 [here](https://www.opensecrets.org/api/admin/index.php?function=signup).
 
-## API queries
+### API queries
 
 After you’ve signed up and have an API access key, you’ll need to read
 up on the documentation for the available data. For this example, I’ll
@@ -414,7 +414,7 @@ opensecrets_candContribCall <- stringr::str_c(
 )
 ```
 
-## Check the API GET request
+### Check the API GET request
 
 Now I can use the `httr::http_status()` function on my
 `opensecrets_candContribCall` string.
@@ -441,7 +441,7 @@ httr::http_error(httr::GET(opensecrets_candContribCall))
 
     ## [1] FALSE
 
-## Pass GET requests directly to fromJSON()
+### Pass GET requests directly to fromJSON()
 
 I also have the option to pass my API path to the `jsonlite::fromJSON()`
 function. I will store this in the `opensec_json_query` object.
@@ -475,11 +475,6 @@ I can see the actual data are embedded inside a few layers.
 This is where RStudio comes in handy. I can use `dplyr::glimpse()` in an
 Rmarkdown code chunk to quickly view the multiple objects inside the
 `opensec_json_query` list.
-
-``` r
-# fs::dir_ls("images")
-knitr::include_graphics("images/explore-embedded-list.gif")
-```
 
 ![](images/explore-embedded-list.gif)<!-- -->
 
@@ -617,9 +612,9 @@ BookerCont2018 %>%
 There we have it\! This looks similar to the data we see on the
 [Opensecrets Cory
 Booker](https://www.opensecrets.org/members-of-congress/summary?cid=N00035267)
-prole page.
+profile page.
 
-# Recap
+## Recap
 
 We’ve walked through how to access API data using `httr` and `jsonlite`
 packages. This tutorial only scratched the surface, so be sure to check
