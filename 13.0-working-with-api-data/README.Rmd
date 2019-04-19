@@ -8,37 +8,428 @@ library(tidyverse)
 library(magrittr)
 # create image folder ----
 if (!file.exists("images/")) {
-    dir.create("images/")
+  dir.create("images/")
 }
 # create data folder ----
 if (!file.exists("data/")) {
-    dir.create("data/")
+  dir.create("data/")
 }
 # create meta folder ----
 if (!file.exists("meta/")) {
-    dir.create("meta/")
+  dir.create("meta/")
 }
 # knitr settings ------
 knitr::opts_chunk$set(
-    echo = TRUE, # show all code
-    tidy = FALSE, # cleaner code printing
-    size = "small",
-    fig.path = "images/") # smaller code
+  echo = TRUE, # show all code
+  tidy = FALSE, # cleaner code printing
+  size = "small",
+  fig.path = "images/"
+) # smaller code
 knitr::opts_knit$set(
-    width = 78)
-base::options(tibble.print_max = 25,
-              tibble.width = 78)
+  width = 78
+)
+base::options(
+  tibble.print_max = 25,
+  tibble.width = 78
+)
 ```
 
-# *Motivation*
+# Motivation
 
-This tutorial covers collecting data from website APIs...
+This tutorial covers collecting data from [application program interfaces](https://en.wikipedia.org/wiki/Application_programming_interface), or APIs. Many websites offer an API to accessing their data, like [Twitter](https://help.twitter.com/en/rules-and-policies/twitter-api), [Wikipedia](https://www.mediawiki.org/wiki/API:Tutorial), [Reddit](https://www.reddit.com/dev/api/), and [OpenSecrets](https://www.opensecrets.org/open-data/api). APIs are a way for people to access a website's data in a plain text format using multiple programming languages (Python, Ruby on Rails, etc.).
 
-## Opensecrets 
+## What is an API?
 
-## Dataworld
+[Website API](https://en.wikipedia.org/wiki/Web_API)s are portals for accessing structured data from a web server. These requests are sent in the form of a Hypertext Transfer Protocol, or [HTTP](https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol). 
 
-## E-Utils (NCBI)
+## How do we access an API?
 
-https://cran.r-project.org/web/packages/rentrez/vignettes/rentrez_tutorial.html
+Website addresses are constructed following the Uniform Resource Locator (URL) standard. However, when you're accessing an API, you'll usually be using the Uniform Resource Identifier (URI) standards. These two look similar, but have a few important differences: 
+
+1. The URIs can include things like `ports` and `query` specifications 
+2. We typically use URLs to navigate the internet and render different websites, but URIs are used to access *specific* resources via a web server (or API)
+
+### API manners and etiquette
+
+When a website has an API, it's very important to **read all the documentation**. Most APIs require you to provide an email address, and some even require a justification for requesting and using their data. It's also good manners to make sure you're not overloading the server with requests, because this means other people can't use it. 
+
+***
+
+# Accessing APIs in R with httr
+
+To access data using an API we need to 1) send the HTTP data request with a specific set of instructions for the web server, and 2) receive and parse the response, which typically contains the data in either JSON or XML.
+
+We'll use the [`httr` package](https://cran.r-project.org/web/packages/httr/vignettes/quickstart.html) to access APIs and interact with data requests.
+
+```{r httr}
+library(httr)
+```
+
+## Ask for data with GET requests
+
+The `httr::GET()` function sends an HTTP `GET` request to a website. The `httr` package also has a `POST` function, which allows users to **transmit data to** a web server (provided they have sufficient permissions). We will cover `POST` requests in a separate tutorial.
+
+## Example 1) the DataUSA.io API
+
+We will start with an example from the [DataUSA.io](https://datausa.io/) API. Read the documentation [here](https://github.com/DataUSA/datausa-api/wiki). 
+
+As we learned in the wiki, there are two three endpoints in this API: Data, Attributes, and Search. The first table we will be accessing is the `Attributes` table, which stores information on the variables in the `data` table, "*such as their name and profile image*". 
+
+Let's look into the Degrees (`degree`) attributes by building an API request as a string vector and placing it inside the `httr::GET()` function. 
+
+**NOTE:** The `httr::GET()` function takes a `url` argument (not a `uri` argument), but it's important to know the difference because of specific purposes they serve. More on this later...
+
+### Putting together your `GET` request
+
+We'll start by combining the http standard request for APIs with some specific information from the DataUSA website  (`http://api.datausa.io`) into a single object, `dusa_root_api`.
+
+```{r dusa_root_api}
+dusa_root_api <- "http://api.datausa.io"
+```
+
+We then specify two additional components in the API request path:
+
+1. The attributes (`attrs`) resource for the data we'll be requesting  
+2. The degrees (`degree`) path or sub-resource from attributes API 
+
+These are all separated by a forward slash, `"/"`.
+
+These two portions make up the domain and directory URI. 
+
+```{r uniform-resource-identifier, echo=FALSE}
+# fs::dir_ls("images")
+knitr::include_graphics(path = "images/uniform-resource-identifier.png")
+```
+
+Now we'll combine these using `stringr::str_c()` into a `dusa_api_attr_geo`.
+
+```{r dusa_api_attrs_degree}
+# combine these elements
+dusa_api_attrs_degree <- stringr::str_c(dusa_root_api,
+  # add attributes
+  "attrs",
+  # add degree data
+  "degree",
+  # separate by slash (like web URL)
+  sep = "/"
+)
+dusa_api_attrs_degree
+```
+
+By passing the API GET request (`dusa_api_attrs_degree`) to `httr::GET()` and assigning the output to another object (`dusa_api_attrs_degree_GET`), we can see the following information gets provided about our request:
+
+```{r dusa_api_attrs_degree_GET}
+dusa_api_attrs_degree_GET <- httr::GET(url = dusa_api_attrs_degree)
+dusa_api_attrs_degree_GET
+```
+
+### What is in the httr::GET() results 
+
+The following elements are included in this `htrr::GET()` result:
+
++ `Date` = time and date for the GET request
+
++ `Status` = Numerical code: `200` is a 'successful request', `404` is 'file not found', `403` is 'permission denied'
+
++ `Content-Type` = tells us the data file type from the API. In this case `JSON`. 
+
++ `Size` = the size of the data file
+
+This is a high-level overview of what is contained in the request, but we will have to dig deeper to understand more about extracting the data.
+
+### Check the status of the GET request with httr::http_status()
+
+It's also good practice to check the status of an API request with the `httr::http_status()` function. 
+
+```{r check-status}
+httr::http_status(dusa_api_attrs_degree_GET)
+```
+
+Now that we can see the `GET` request was successful, we should double-check the response using `httr::content()` to make sure the data are what we're expecting. I want to specify `as = text` to make the output easier to read. 
+
+```{r check-content}
+httr::content(dusa_api_attrs_degree_GET,
+  as = "text"
+)
+```
+
+The message tells me the response is using the default text encoding (`UTF-8`). The good news is that the data look like college degrees, so we can be confident the API request is working! 
+
+**How it works:** The `httr::content()` function uses the `Content-Type` data from `httr::GET()` to determine the best way to parse the incoming data. In this case, it will call the `jsonlite::fromJSON()` because we learned the data being returned are `application/json`.
+
+## What is 'JavaScript Object Notation' (JSON) data?
+
+Most APIs return data in a [JavaScript Object Notation](https://json.org/) (JSON) format (pronounced "Jay-son"). The JSON format is beneficial because 1) it's a plain text file, and 2) it doesn't need to be structured in a tabular data frame (i.e. is can store 'non-rectangular' or unstructured text easily). 
+
+Below is a schematic of a basic JSON object. 
+
+```{r JSON-object, echo=FALSE, fig.cap="https://www.json.org/object.gif"}
+# fs::dir_ls("images")
+knitr::include_graphics(path = "images/JSON-object.png")
+```
+
+
+## Reading JSON data into R
+
+We will need to pass `dusa_api_attrs_degree` directly to `jsonlite::fromJSON()` and check it's class, we see it is read into R as a list ()
+
+```{r from-json-import, warning=FALSE, message=FALSE}
+library(jsonlite)
+degree_attributes <- jsonlite::fromJSON(dusa_api_attrs_degree)
+base::class(degree_attributes)
+```
+
+The `degree_attributes` list has two elements, `data` and `headers`. 
+
+```{r degree_attributes}
+degree_attributes %>% str()
+```
+
+We will pass the `data` to `tibble::as_tibble()` and assign the `headers` to the column names with `magrittr::set_colnames()`.
+
+```{r DegreeAttr, message=FALSE, warning=FALSE}
+DegreeAttr <- tibble::as_tibble(degree_attributes$data) %>%
+  magrittr::set_colnames(value = degree_attributes$headers)
+DegreeAttr %>% glimpse(78)
+```
+
+Now we've converted the contents of the API request to a data frame! Let's repeat this process, but with a slightly more complicated request from a different API.
+
+# OpenSecrets data 
+
+You can send more specific requests using API requests, too. To demonstrate this, we'll be using the [opensecrets.org](https://www.opensecrets.org/) API. This requires you to sign up for an access key [here](https://www.opensecrets.org/api/admin/index.php?function=signup).
+
+## API queries 
+
+After you've signed up and have an API access key, you'll need to read up on the documentation for the available data. For this example, I'll be downloading the data from the `candContrib` table, which contains information on the "*top contributors to specified candidate for a House or Senate seat or member of Congress.*".
+
+In the documentation, an example API query is presented and I've represented each component in the figure below:
+
+```{r query-parameters.png, echo=FALSE}
+knitr::include_graphics(path = "images/query-parameters.png")
+```
+
+API queries follow a general syntax (called [query parameters](https://en.wikipedia.org/wiki/Query_string)) for accessing various resources on the web server. We will build a new request using the same method as above,but with a few additional specifications. 
+
+### The base domain (API)
+
+The first portion of this should be familiar from the previous request we built--it contains the http and domain information. 
+
+```{r opensec_root}
+opensec_root <- stringr::str_c("https://", "www.opensecrets.org/api/")
+opensec_root
+```
+
+
+Our query will start at the end of the domain api (`opensec_root` in our case) with a question mark (`?`). Next we will add the data source we are interested in `candContrib`.
+
+```{r add-candContrib}
+opensec_candContrib <- stringr::str_c(opensec_root, "?method=candContrib")
+opensec_candContrib
+```
+
+We will add the cycle information (`cycle`) to limit the amount of data to the year `2018`.
+
+```{r add-cycle}
+opensec_candContrib18 <- stringr::str_c(opensec_candContrib, "&cycle=2018")
+opensec_candContrib18
+```
+
+Next we need to specify the kind of data we want the request to return by including an `output=json` parameter. 
+
+```{r add-json}
+opensec_candContrib18JSON <- stringr::str_c(
+  opensec_candContrib18,
+  "&output=json"
+)
+opensec_candContrib18JSON
+```
+
+Now I will include the API key, which was given to me when I signed up on opensecrets. This API key should be stored in a separate file, so it doesn't get unintentionally shared or distributed. 
+
+```{r aki-key}
+# fs::dir_ls("code")
+source("code/api-key.R")
+```
+
+The `api-key.R` file contains my API key in a string `opensecrets_api_key` that I can combine with `opensec_candContrib18JSON`
+
+```{r opensec_candContrib18JSONapi}
+opensec_candContrib18JSONapi <- stringr::str_c(
+  opensec_candContrib18JSON,
+  "&apikey=",
+  opensecrets_api_key
+)
+```
+
+Finally, I'll include the `cid` which is the unique identifier for candidates. These are available for download here in the [data documentation](https://www.opensecrets.org/open-data/api-documentation). We'll import the 2018 candidates sheet from this file below. 
+
+```{r CRPID2018}
+library(readxl)
+CRPID2018 <- read_excel("meta/CRP_IDs.xls",
+  sheet = "Candidate Ids - 2018",
+  range = "B14:F3676"
+)
+CRPID2018 %>% glimpse(78)
+```
+
+I am interested in Cory Booker, so we'll use this lookup table to try and find his `cid`.
+
+```{r look-for-booker}
+CRPID2018 %>%
+  dplyr::filter(stringr::str_detect(
+    string = CRPName,
+    pattern = "Booker"
+  ))
+```
+
+This shows a `Tykiem Booker`, but this isn't who I am looking for. Fortunately, I just learned a bit about how url's get built. I will return to the opensecrets website and search for Cory Booker. 
+
+```{r open-secrets-search}
+# fs::dir_ls("images")
+knitr::include_graphics("images/open-secrets-search.png")
+```
+
+This gives us the following search results, and I want to choose the second result down titled, "Sen. Cory Booker - Campaign Finance Summary • OpenSecrets". 
+
+```{r open-secrets-search-booker, echo=FALSE}
+# fs::dir_ls("images")
+knitr::include_graphics("images/open-secrets-search-booker.png")
+```
+
+I chose this option because I can see `cid` is listed in the url. After clicking on the link, I can see that the url contains syntax that looks like the query parameters I've been building. 
+
+```{r open-secrets-url-booker-cid, echo=FALSE}
+# fs::dir_ls("images")
+knitr::include_graphics("images/open-secrets-url-booker-cid.png")
+```
+
+I can include the `cid=N00035267` in my string vector. 
+
+```{r opensecrets_candContrib18JSON}
+opensecrets_candContribCall <- stringr::str_c(
+  opensec_candContrib18JSONapi,
+  "&cid=N00035267"
+)
+```
+
+## Check the API GET request 
+
+Now I can use the `httr::http_status()` function on my `opensecrets_candContribCall` string.
+
+```{r check-GET}
+httr::http_status(httr::GET(opensecrets_candContribCall))
+```
+
+Check the status of the `GET` request with `httr::http_status()` and for any errors with `httr::http_error()`.
+
+```{r check-opensec_get}
+httr::http_error(httr::GET(opensecrets_candContribCall))
+```
+
+
+## Pass GET requests directly to fromJSON() 
+
+I also have the option to pass my API path to the `jsonlite::fromJSON()` function. I will store this in the `opensec_json_query` object.
+
+```{r opensec_json_query}
+opensec_json_query <- jsonlite::fromJSON(txt = opensecrets_candContribCall)
+utils::str(opensec_json_query)
+```
+
+We can see this is a list of one, and each object inside the list has data on Cory Booker. If I start investigating the contents of this list, I can see the actual data are embedded inside a few layers. 
+
+This is where RStudio comes in handy. I can use `dplyr::glimpse()` in an Rmarkdown code chunk to quickly view the multiple objects inside the `opensec_json_query` list. 
+
+```{r explore-embedded-list.gif}
+# fs::dir_ls("images")
+knitr::include_graphics("images/explore-embedded-list.gif")
+```
+
+
+As you may have seen, there are two objects with `@attributes` in the `opensec_json_query` list. The first contains information on our candidate and is stored in the object below.  
+
+```{r candidate-attributes}
+# note the special notation for objects starting with @
+opensec_json_query$response$contributors$`@attributes`
+```
+
+We can store this in a tibble using `tibble::as_tibble()`
+
+```{r CandAttributes}
+CandAttributes <- tibble::as_tibble(opensec_json_query$response$contributors$`@attributes`)
+CandAttributes %>% dplyr::glimpse(78)
+```
+
+The other `@attributes` object is a data frame with four variables: `org_name`, `total`, `pacs`, `indivs`. I will use the same function to create a `tibble` from donors and call it `BookContribs`.
+
+```{r BookContribs}
+BookContribs <- tibble::as_tibble(opensec_json_query$response$contributors$contributor$`@attributes`)
+BookContribs
+```
+
+I want to add a few elements from `BookAttributes` to `BookContribs` and call it `BookerCont2018`
+
+```{r BookerCont2018}
+BookerCont2018 <- BookContribs %>%
+  add_column(
+    cand_name = as_vector(CandAttributes$cand_name),
+    origin = as_vector(CandAttributes$origin),
+    source = as_vector(CandAttributes$source)
+  )
+BookerCont2018 %>% dplyr::glimpse(78)
+```
+
+Now we can do a little tidying and visualizing to create something that looks like data on the opensecrets page.
+
+```{r visualize-spending, message=FALSE, warning=FALSE}
+library(scales)
+BookerCont2018 %>%
+  # tidy these data
+  tidyr::pivot_longer(
+    cols = total:indivs,
+    names_to = c("cont_type"),
+    values_to = "cont_amount"
+  ) %>%
+  # convert to numeric
+  dplyr::mutate(
+      # recode missing
+    cont_amount = if_else(cont_amount == "0",
+      true = NA_character_,
+      false = cont_amount),
+    # convert to numeric
+    cont_amount = as.numeric(cont_amount),
+    # factor org_name
+    org_name_fct = factor(org_name)
+    ) %>% 
+  dplyr::filter(cont_type != "total") %>%
+  ggplot(data = .) +
+  geom_col(aes(x = org_name_fct,
+               y = cont_amount,
+               fill = cont_type), position = "dodge") + 
+    labs(
+        title = "2018 Contributions to Cory Booker (D)",
+        y = "Contribution amount",
+        x = "Contributor",
+        caption = "opensecrets.org",
+        fill = "Contributor types") +
+    theme(axis.text.x = element_text(angle = -40, 
+                                     vjust = 0.7, 
+                                     hjust = 0)) +
+    scale_y_continuous(labels = scales::dollar_format(prefix = "$"))
+```
+
+There we have it! This looks similar to the data we see on the [Opensecrets Cory Booker](https://www.opensecrets.org/members-of-congress/summary?cid=N00035267) prole page.
+
+# Recap
+
+We've walked through how to access API data using `httr` and `jsonlite` packages. This tutorial only scratched the surface, so be sure to check out the links below for more details. 
+
+* [jsonlite package vignettes](https://cran.r-project.org/web/packages/jsonlite/vignettes/json-apis.html)
+
+* [httr package vignette](https://cran.r-project.org/web/packages/httr/vignettes/quickstart.html)
+
+* [twitter api data](https://rtweet.info/)
+
+* [great tutorial on APIs from earthdatascience.org](https://www.earthdatascience.org/courses/earth-analytics/get-data-using-apis/API-data-access-r/)
 

@@ -1,0 +1,12 @@
+---
+title: "rentrez - NCBI data"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## E-Utils (NCBI)
+
+https://cran.r-project.org/web/packages/rentrez/vignettes/rentrez_tutorial.html
