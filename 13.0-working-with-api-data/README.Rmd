@@ -419,7 +419,7 @@ BookerCont2018 %>%
     scale_y_continuous(labels = scales::dollar_format(prefix = "$"))
 ```
 
-There we have it! This looks similar to the data we see on the [Opensecrets Cory Booker](https://www.opensecrets.org/members-of-congress/summary?cid=N00035267) prole page.
+There we have it! This looks similar to the data we see on the [Opensecrets Cory Booker](https://www.opensecrets.org/members-of-congress/summary?cid=N00035267) profile page.
 
 # Recap
 
