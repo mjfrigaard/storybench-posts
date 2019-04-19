@@ -341,7 +341,7 @@ We can see this is a list of one, and each object inside the list has data on Co
 
 This is where RStudio comes in handy. I can use `dplyr::glimpse()` in an Rmarkdown code chunk to quickly view the multiple objects inside the `opensec_json_query` list. 
 
-```{r explore-embedded-list.gif}
+```{r explore-embedded-list.gif, echo=FALSE}
 # fs::dir_ls("images")
 knitr::include_graphics("images/explore-embedded-list.gif")
 ```
