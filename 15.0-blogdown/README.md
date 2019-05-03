@@ -313,3 +313,61 @@ of World War II fighter pilots from Wikipedia.
 
 The new posts go in the `content` folder. The structure for this folder
 is organized according to the options on the sidebar.
+
+I will start by creating a new post using the **Addins**. Clicking on
+**New Post** will generate a dialogue box for me to enter the title.
+After entering the **Title**, I see the file path and name get made in
+the **Filename** portion–telling me where the new file is being created.
+
+I also wanted to write in Rmarkdown, so I selected `.Rmd` in the
+**Format** section.
+
+![](images/blogdown-new-post-01.png)<!-- --> This opens a new .Rmd file
+in the RStudio source pane. After writing a portion of my blogpost, I
+decide I need to insert an image. Fortunately, `blogdown` has an option
+for this under the **Addins** too.
+
+I navigate to the file on my computer, determine the display size, and
+insert some text for the title of the image. All of this gets converted
+into markdown in the source `.Rmd` file. If I look in the console, I see
+a message telling me the image has been added to
+`static/post/2019-05-03-ww2-fighter-pilots-scraping-html-tables_files/`
+folder.
+
+![](images/blogdown-new-post-02.png)<!-- -->
+
+Next, we need to manage the changes with Git. First, we can check with
+`git status` in Terminal. These files are also visible in the Git
+pane–we can add the changes using the Git pane (clicking the small
+checkbox and then clicking ‘Commit’).
+
+![](images/blogdown-new-post-03.png)<!-- -->
+
+This opens RStudio’s Git management window. I enter a message in the
+‘**Commit message**’ window, click ‘**Commit**’, and watch the changes
+get tracked.
+
+![](images/blogdown-new-post-04.png)<!-- -->
+
+Now that these changes have been committed, we need to see how things
+will look on the website. I can check using `blogdown::serve_site()`.
+
+`blogdown::serve_site()` renders the following output in the
+‘**Console**’ and ‘**Viewer**’,
+
+![](images/blogdown-new-post-05.png)<!-- -->
+
+The new site looks great\! I will repeat the Git processes (adding and
+committing any changes generated from `blogdown::serve_site()`), but I
+also want to make sure I push these changes to the Github repository, so
+they end up on the website.
+
+I can do this by clicking on the ‘**Push**’ icon and waiting for the
+message to tell me that the changes have been pushed to Github (`HEAD ->
+master`)
+
+![](images/blogdown-new-post-06.png)<!-- -->
+
+If I navigate to the domain I should see the new post I just created.
+
+![](images/blogdown-new-post-07.png)<!-- -->
