@@ -26,17 +26,13 @@ knitr::opts_knit$set(
 options(max.print = 99999)
 ```
 
-Original version: `03.2`
+Original version: `"2017-05-12"`
 
 Current version: `r Sys.Date()`
 
-The [fivethirtyeight](https://cran.r-project.org/web/packages/fivethirtyeight/vignettes/fivethirtyeight.html) R package – released by Albert Y. Kim, Chester Ismay, and Jennifer Chunn – contains dozens of datasets used in FiveThirtyEight news articles like [The Best MLB All-Star Teams Ever](https://fivethirtyeight.com/features/the-best-mlb-all-star-teams-ever/), and [The Dallas Shooting Was Among The Deadliest For Police In U.S. History.](https://fivethirtyeight.com/features/the-dallas-shooting-was-among-the-deadliest-for-police-in-u-s-history/)
+The [fivethirtyeight](https://cran.r-project.org/web/packages/fivethirtyeight/vignettes/fivethirtyeight.html) R package – released by Albert Y. Kim, Chester Ismay, and Jennifer Chunn – contains dozens of datasets used in FiveThirtyEight news articles like [The Best MLB All-Star Teams Ever](https://fivethirtyeight.com/features/the-best-mlb-all-star-teams-ever/), and [The Dallas Shooting Was Among The Deadliest For Police In U.S. History.](https://fivethirtyeight.com/features/the-dallas-shooting-was-among-the-deadliest-for-police-in-u-s-history/) 
 
-## Objectives
-
-* In this tutorial we will explore the new fucntions in the `tidyr` package, `pivot_longer()` and `pivot_wider()`. The predecessors to the `pivot_` functions, `gather()` and `spread()`, will not be deprecated (although bugs for these functions will not be addressed in versions > 0.8.3.9000). 
-
-* We will also cover other functions from the `tidyverse` including `dplyr::arrange`, `tidyr::separate`, and `tidyr::separate_rows` in our previous [tutorial.](http://www.storybench.org/getting-started-with-tidyverse-in-r/). It will also introduce basic visualizations with `ggplot2` geoms.
+This tutorial will explore a few datasets from the `fivethirtyeight` package using `tidyverse` packages and functions like `arrange`, `separate`, `separate_rows`, `gather`, and `spread` in our previous [tutorial.](http://www.storybench.org/getting-started-with-tidyverse-in-r/). It will also introduce basic visualizations with `ggplot2` geoms.
 
 ## Install and load packages
 

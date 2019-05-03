@@ -265,8 +265,8 @@ Click on the **Deploy site** and Netlify will put everything together
 into a website.
 
 This website gets a random Netlify address (something like
-`https://random-words-da9023.netlify.com/`). In the next section, I will
-go over how to change the domain.
+`https://random-words-blablabla.netlify.com/`). In the next section, I
+will go over how to change the domain.
 
 ## Step 7) Domains
 
@@ -285,7 +285,7 @@ DNS stands for [Domain Name
 Servers](https://en.wikipedia.org/wiki/Domain_Name_System). These help
 direct web traffic to your website, sort of like the phone book or
 yellow pages. We need to change the randomly generated domain name
-(`https://jolly-lumiere-ca3019.netlify.com/`) to the domain I’ve
+(`https://random-words-blabla.netlify.com/`) to the domain I’ve
 purchased (`https://www.martinfrigaard.io/`).
 
 I can do this by following the instructions on the Netlify website. The
@@ -325,10 +325,11 @@ the **Filename** portion–telling me where the new file is being created.
 I also wanted to write in Rmarkdown, so I selected `.Rmd` in the
 **Format** section.
 
-![](images/blogdown-new-post-01.png)<!-- --> This opens a new .Rmd file
-in the RStudio source pane. After writing a portion of my blogpost, I
-decide I need to insert an image. Fortunately, `blogdown` has an option
-for this under the **Addins** too.
+![](images/blogdown-new-post-01.png)<!-- -->
+
+This opens a new .Rmd file in the RStudio source pane. After writing a
+portion of my blogpost, I decide I need to insert an image. Fortunately,
+`blogdown` has an option for this under the **Addins** too.
 
 I navigate to the file on my computer, determine the display size, and
 insert some text for the title of the image. All of this gets converted
@@ -360,10 +361,12 @@ will look on the website. I can check using `blogdown::serve_site()`.
 
 ![](images/blogdown-new-post-05.png)<!-- -->
 
-The new site looks great\! I will repeat the Git processes (adding and
-committing any changes generated from `blogdown::serve_site()`), but I
-also want to make sure I push these changes to the Github repository, so
-they end up on the website.
+It worked\!
+
+I will repeat the Git processes (adding and committing any changes
+generated from `blogdown::serve_site()`), but I also want to make sure I
+push these changes to the Github repository, so they end up on the
+website.
 
 I can do this by clicking on the ‘**Push**’ icon and waiting for the
 message to tell me that the changes have been pushed to Github (`HEAD ->
