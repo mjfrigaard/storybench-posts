@@ -174,7 +174,7 @@ The command you’ll use the most (if you use Git from the command line)
 is `git status`. `git status` checks to see what’s going on with the
 files in your repository.
 
-```` sh
+``` sh
 $ git status
 On branch master
 
@@ -193,21 +193,24 @@ Untracked files:
         themes/
 
 nothing added to commit but untracked files present (use "git add" to track)
-`"
+```
 
-The untracked files are the ones with a yellow question mark in the image below. 
+The untracked files are the ones with a yellow question mark in the
+image below.
 
 ![](images/blogdown-git-add.png)<!-- -->
 
-The output shows that Git isn't tracking the files, and we can change this with `git add --all`-- it's a 'going nuclear' option for monitoring all of the changed files in a project. 
+The output shows that Git isn’t tracking the files, and we can change
+this with `git add --all`– it’s a ‘going nuclear’ option for monitoring
+all of the changed files in a project.
 
-### 5.2) Add the files to be tracked 
+### 5.2) Add the files to be tracked
 
 At the command line, it looks like this:
 
-```sh
+``` sh
 git add --all
-````
+```
 
 Then I will use `git status` to check and see what is happening with the
 files in this repository.

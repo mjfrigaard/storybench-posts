@@ -185,7 +185,7 @@ Untracked files:
         themes/
 
 nothing added to commit but untracked files present (use "git add" to track)
-`"
+```
 
 The untracked files are the ones with a yellow question mark in the image below. 
 
