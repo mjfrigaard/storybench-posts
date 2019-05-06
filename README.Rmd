@@ -53,4 +53,35 @@ https://github.com/mjfrigaard/storybenchR/tree/master/02.1-tidyr-tidyverse
 
 This has been updated with `pivot_` functions. 
 
+## 3) How to explore and manipulate a dataset from the fivethirtyeight package in R
+
+
+###  Orginal post:
+
+http://www.storybench.org/how-to-explore-a-dataset-from-the-fivethirtyeight-package-in-r/
+
+### Github repo: 
+
+This was updated to include `ggplot2::qplot()`.
+
+https://github.com/mjfrigaard/storybenchR/tree/master/03.2-tidyr-2-qplot
+
+## 4) How to manipulate data with dplyr in R
+
+###  Orginal post:
+
+http://www.storybench.org/how-to-manipulate-data-with-dplyr-in-r/
+
+### Github repo:
+
+This was broken into two tutorials:
+
+One for manipulating variables:
+https://github.com/mjfrigaard/storybenchR/tree/master/05.1-dplyr-vars
+
+And another for observations:
+https://github.com/mjfrigaard/storybenchR/tree/master/05.2-dplyr-obs
+
+
+
 
