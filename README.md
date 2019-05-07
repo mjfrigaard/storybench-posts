@@ -23,7 +23,7 @@ are discovered. Previous Versions are in the `archive` folder.
 
 # Table of Contents
 
-## 1\) Getting Started With R in RStudio Notebooks (R markdown)
+## Title: Getting Started With R in RStudio Notebooks (R markdown)
 
 ### Description:
 
@@ -37,7 +37,7 @@ Rmarkdown is the foundation for sharing/using code.
 
 <https://github.com/mjfrigaard/storybenchR/tree/master/01-r-markdown>
 
-## 2\) Getting Started with tidyverse in R
+## Title: Getting Started with tidyverse in R
 
 Intro to data structures and tidy data format.
 
@@ -51,7 +51,7 @@ Intro to data structures and tidy data format.
 
 This has been updated with `pivot_` functions.
 
-## 3\) How to explore and manipulate a dataset from the fivethirtyeight package in R
+## Title: How to explore and manipulate a dataset from the fivethirtyeight package in R
 
 ### Orginal post:
 
@@ -63,7 +63,7 @@ This was updated to include `ggplot2::qplot()`.
 
 <https://github.com/mjfrigaard/storybenchR/tree/master/03.2-tidyr-2-qplot>
 
-## 4\) How to manipulate data with dplyr in R
+## Title: How to manipulate data with dplyr in R
 
 ### Orginal post:
 
@@ -78,3 +78,51 @@ One for manipulating variables:
 
 And another for observations:
 <https://github.com/mjfrigaard/storybenchR/tree/master/05.2-dplyr-obs>
+
+## Title: Getting started with data visualization in R using ggplot2
+
+### Original post:
+
+<http://www.storybench.org/getting-started-data-visualization-r-using-ggplot2/>
+
+### Github repo:
+
+<https://github.com/mjfrigaard/storybenchR/tree/master/06.1-ggolot2-adv>
+
+## Title: Twitter + R
+
+### Original post:
+
+<http://www.storybench.org/twitter-r/>
+
+### Github repo:
+
+This was not put on Github. Contact author at:
+<http://www.storybench.org/author/jonfitz/>
+
+## Title: Sentiment analysis of (you guessed it\!) Donald Trump’s tweets
+
+### Original post:
+
+<http://www.storybench.org/sentiment-analysis-of-you-guessed-it-donald-trumps-tweets/>
+
+### Github repo:
+
+This was not put on Github. Contact author at:
+<http://www.storybench.org/author/jonfitz/>
+
+## Title: How to merge and clean up multiple CSVs using R
+
+### Original post:
+
+<http://www.storybench.org/merge-clean-multiple-csvs-using-r/>
+
+### Github repo:
+
+**Needs to be created\!**
+
+## Title:
+
+### Original post:
+
+### Github repo:
