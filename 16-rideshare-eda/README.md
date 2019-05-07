@@ -49,8 +49,8 @@ customers to bring them a useful product.
 ### Import
 
 These files are huge, so we took a 10% sample. We also removed all
-missing data because some rides occured outside Chicago. Read more about
-this in the data dictionary
+missing data because some rides occurred outside Chicago. Read more
+about this in the data dictionary
 [here](https://data.cityofchicago.org/Transportation/Transportation-Network-Providers-Trips/m6dm-c72p).
 
 ![](images/pickup-centroid-latitude.png)<!-- -->
@@ -70,64 +70,77 @@ week, and date variables for the trips.
 
 ``` r
 # filter for only Chicago rides
-# Based on our data dictionary Pickup.Centroid.Latitude will be left blank for 
+# Based on our data dictionary Pickup.Centroid.Latitude will be left blank for
 # locations outside Chicago
 rides.chicago <- rides %>%
-  tidyr::drop_na() 
+  tidyr::drop_na()
 
 # rides.chicago %>% dplyr::glimpse(78)
 
 # drop original data for convenience
 # rm(rides)
 
-# convert 12 hour format to 24 hr format and extract date features of our 
+# convert 12 hour format to 24 hr format and extract date features of our
 # ride events
-rides.chicago$ride_start <- as.POSIXct(rides.chicago$Trip.Start.Timestamp, 
-                                       format = '%m/%d/%Y %I:%M:%S %p', 
-                                       tz = "America/Chicago") 
+rides.chicago$ride_start <- as.POSIXct(rides.chicago$Trip.Start.Timestamp,
+  format = "%m/%d/%Y %I:%M:%S %p",
+  tz = "America/Chicago"
+)
 
-# create ride_hour, dow, weekday, week, date_week, trip.mins 
+# create ride_hour, dow, weekday, week, date_week, trip.mins
 rides.chicago$ride_hour <- lubridate::hour(rides.chicago$ride_start)
 rides.chicago$dow <- base::weekdays(rides.chicago$ride_start)
 rides.chicago$week <- lubridate::week(rides.chicago$ride_start)
 
-rides.chicago$date_week = as.Date(cut(rides.chicago$ride_start, "week"))
-rides.chicago$trip.mins = as.Date(cut(rides.chicago$ride_start, "week"))
+rides.chicago$date_week <- as.Date(cut(rides.chicago$ride_start, "week"))
+rides.chicago$trip.mins <- as.Date(cut(rides.chicago$ride_start, "week"))
 
 
-# create category for each ride's time of day 
+# create category for each ride's time of day
 rides.chicago <- rides.chicago %>%
-  mutate(ride_category = 
-           case_when(
-             ride_hour >= 5 & ride_hour <= 10 ~ "morning commute",
-             ride_hour > 10 & ride_hour <= 12 ~ "late morning",
-             ride_hour > 12 & ride_hour <= 17 ~ "afternoon",
-             ride_hour %in% c(18,19) ~ "evening commute",
-             ride_hour %in%  c(0, 1,2,3,4,20,21,22,23,24) ~ "night life")) 
+  mutate(
+    ride_category =
+      case_when(
+        ride_hour >= 5 & ride_hour <= 10 ~ "morning commute",
+        ride_hour > 10 & ride_hour <= 12 ~ "late morning",
+        ride_hour > 12 & ride_hour <= 17 ~ "afternoon",
+        ride_hour %in% c(18, 19) ~ "evening commute",
+        ride_hour %in% c(0, 1, 2, 3, 4, 20, 21, 22, 23, 24) ~ "night life"
+      )
+  )
 
 # set levels for ride_category
-rides.chicago$ride_category <- factor(rides.chicago$ride_category , 
-                                      levels = c("morning commute", 
-                                                 "late morning", 
-                                                 "afternoon", 
-                                                 "evening commute", 
-                                                 "night life"))
+rides.chicago$ride_category <- factor(rides.chicago$ride_category,
+  levels = c(
+    "morning commute",
+    "late morning",
+    "afternoon",
+    "evening commute",
+    "night life"
+  )
+)
 
 # set levels for day of week
-rides.chicago$dow <- factor(rides.chicago$dow , levels = c("Monday", 
-                                                           "Tuesday",
-                                                           "Wednesday", 
-                                                           "Thursday", 
-                                                           "Friday", 
-                                                           "Saturday", 
-                                                           "Sunday"))
+rides.chicago$dow <- factor(rides.chicago$dow, levels = c(
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday"
+))
 
 # create tippers and non-tippers
-rides.chicago <- rides.chicago %>%# count(Tip)
-  dplyr::mutate(tipper = 
-                  case_when(Tip == 0 ~ "no tip",
-                            TRUE ~ "tip"),
-                tipper = factor(tipper))
+rides.chicago <- rides.chicago %>% # count(Tip)
+  dplyr::mutate(
+    tipper =
+      case_when(
+        Tip == 0 ~ "no tip",
+        TRUE ~ "tip"
+      ),
+    tipper = factor(tipper)
+  )
 ```
 
 ### Visualize
@@ -208,26 +221,30 @@ days of the week to show the rides-per-hour breakdown across each day.
 library(ggthemes)
 # trips by hour of day
 ggRideCountPerHour <- rides.chicago %>%
-  
-  ggplot(aes(x = ride_hour)) + 
-  
-  geom_bar() + 
-  
-  facet_grid( ~ dow) +
-  
+
+  ggplot(aes(x = ride_hour)) +
+
+  geom_bar() +
+
+  facet_grid(~dow) +
+
   ggthemes::theme_fivethirtyeight() +
-  
+
   theme(axis.title = element_text()) +
-  
-  labs(title = "Rideshare Rides By Hour of Day",
-       
-       x = 'Hour of Day',
-       
-       y = 'Trip Count') +
-  
-  theme(axis.text.x  = element_text(size = 8, 
-                                    
-                                    angle = 90)) 
+
+  labs(
+    title = "Rideshare Rides By Hour of Day",
+
+    x = "Hour of Day",
+
+    y = "Trip Count"
+  ) +
+
+  theme(axis.text.x = element_text(
+    size = 8,
+
+    angle = 90
+  ))
 
 ggRideCountPerHour
 ```
@@ -238,49 +255,60 @@ ggRideCountPerHour
 
 The scatterplot below shows the tips given at different trip durations.
 We can sample our data using `dplyr::sample_frac()` function from for a
-more managable data set. We group these data by the two variables of
+more manageable data set. We group these data by the two variables of
 interest (`tipper` and `ride_category`), then create a mean of the trip
-duration (`mean_trip_mins`) for a more interpretable vizualization
+duration (`mean_trip_mins`) for a more interpretable visualization
 across these groups.
 
 ``` r
 rides.chicago %>%
   # create trip_mins
-  mutate(trip_mins = (Trip.Seconds/60)) %>% 
+  mutate(trip_mins = (Trip.Seconds / 60)) %>%
   # get sample
-  dplyr::sample_frac(size = .05) %>% 
+  dplyr::sample_frac(size = .05) %>%
   # group by two variables of interest
-  group_by(tipper, ride_category) %>% 
-  # 
-  summarize(mean_trip_mins = mean(trip_mins),
-            rides = n()) %>% 
+  group_by(tipper, ride_category) %>%
+  #
+  summarize(
+    mean_trip_mins = mean(trip_mins),
+    rides = n()
+  ) %>%
   # ungroup
-  ungroup() %>% 
-  
-  ggplot(aes(x = mean_trip_mins, 
-             
-             y = ride_category,
-             
-             label = rides)) +
-  
-        geom_line(aes(group = ride_category), 
-                  color = "gray50") +
-  
-        geom_point(aes(color = tipper),
-                   size = 1.5) + 
-  
-        geom_text(aes(label = rides), nudge_y = 0.2, size = 3) +
-  
-    ggthemes::theme_fivethirtyeight() +
-  
-    theme(axis.title = element_text(size = 10)) +
-  
-    theme(axis.text.x  = element_text(size = 8, angle = 45)) +
-  
-    ggplot2::labs(x = "Average trip in minutes",
-                y = "Time of day",
-               title = "The Ride time gap",
-               subtitle = "difference in average trip times by tippers")
+  ungroup() %>%
+
+  ggplot(aes(
+    x = mean_trip_mins,
+
+    y = ride_category,
+
+    label = rides
+  )) +
+
+  geom_line(aes(group = ride_category),
+    color = "gray50"
+  ) +
+
+  geom_point(aes(color = tipper),
+    size = 1.5
+  ) +
+
+  geom_text(aes(label = rides), nudge_y = 0.2, size = 3) +
+
+  ggthemes::theme_fivethirtyeight() +
+
+  theme(axis.title = element_text(size = 10)) +
+
+  theme(axis.text.x = element_text(size = 8, angle = 45)) +
+
+  ggplot2::labs(
+    x = "Average trip in minutes",
+
+    y = "Time of day",
+
+    title = "The Ride time gap",
+
+    subtitle = "difference in average trip times by tippers"
+  )
 ```
 
 ![](images/mean-trip-duration-tipper-1.png)<!-- -->
@@ -303,36 +331,44 @@ displays these two variables across time of day.
 # tips by ride duration
 ggTipsRideDuration <- rides.chicago %>%
   # get sample
-  dplyr::sample_frac(size = .05) %>% 
+  dplyr::sample_frac(size = .05) %>%
   # remove people who didn't tip at all
-  dplyr::filter(tipper == "tip") %>% 
+  dplyr::filter(tipper == "tip") %>%
   # create a trip.mins for converting duration of secs to mins
-  mutate(trip.mins = (Trip.Seconds/60)) %>%
+  mutate(trip.mins = (Trip.Seconds / 60)) %>%
   # plot Tip by trip.mins
-  ggplot(aes(x = trip.mins, 
-             y = Tip,
-             # color = tipper,
-             group = ride_category)) + 
+  ggplot(aes(
+    x = trip.mins,
+    y = Tip,
+    # color = tipper,
+    group = ride_category
+  )) +
   # points
-  geom_point(aes(color = ride_category), 
-             alpha = 1/2,
-             size = 0.7,
-             show.legend = FALSE) +
+  geom_point(aes(color = ride_category),
+    alpha = 1 / 2,
+    size = 0.7,
+    show.legend = FALSE
+  ) +
   # facet by ride_category
-  facet_wrap(~ ride_category,
-             ncol = 3,
-             scales = "free_x") +
+  facet_wrap(~ride_category,
+    ncol = 3,
+    scales = "free_x"
+  ) +
   # add linear smoothing line
-  stat_smooth(se = TRUE, 
-              col = "blue") +
-  
+  stat_smooth(
+    se = TRUE,
+    col = "blue"
+  ) +
+
   ggthemes::theme_fivethirtyeight() +
-  
+
   theme(axis.title = element_text()) +
-  
-  labs(title = "Rideshare Tips By Ride Duration",
-       x = 'Ride Duration (minutes)',
-       y = 'Tip')
+
+  labs(
+    title = "Rideshare Tips By Ride Duration",
+    x = "Ride Duration (minutes)",
+    y = "Tip"
+  )
 
 ggTipsRideDuration
 ```
@@ -349,11 +385,9 @@ ggTripDistance <- rides.chicago %>% group_by(ride_category, dow) %>% summarize(m
     ggplot(aes(y = median_trip_dist, x = ride_category)) + geom_point(aes(color = ride_category), 
     size = 4, show.legend = TRUE) + geom_line(aes(group = 1), linetype = "dotted") + 
     facet_wrap(~dow, nrow = 2) + scale_color_brewer(palette = "Dark2") + theme_fivethirtyeight() + 
-    
-theme(axis.title = element_text(), axis.text.x = element_blank(), legend.text = element_text(size = 8)) + 
-    
-guides(color = guide_legend(title = "Ride Category", labels = c("morning commute", 
-    "late morning", "afternoon", "evening commute", "night life"))) + # this is for the legend on the graph
+    theme(axis.title = element_text(), axis.text.x = element_blank(), legend.text = element_text(size = 8)) + 
+    guides(color = guide_legend(title = "Ride Category", labels = c("morning commute", 
+        "late morning", "afternoon", "evening commute", "night life"))) + # this is for the legend on the graph
 ylab("Median Trip (Miles)") + xlab("Day of Week") + ggtitle("Median Trip Distance")
 ggTripDistance
 ```
