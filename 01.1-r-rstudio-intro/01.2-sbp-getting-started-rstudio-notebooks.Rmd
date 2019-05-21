@@ -1,7 +1,7 @@
 ---
 title: "Getting Started in RStudio Notebooks"
 author: "Martin Frigaard"
-date: "9/10/2017"
+date: "`r Sys.Date()`"
 output: github_document
 ---
 
@@ -36,7 +36,8 @@ The IDE environment has four panes (seen below),
 
 
 ```{r 01-studio-setup, echo=FALSE}
-knitr::include_graphics(path = "01-rstudio_setup.png")
+# fs::dir_ls(".")
+knitr::include_graphics(path = "images/01-rstudio_setup.png")
 ```
 
 
@@ -51,13 +52,13 @@ To get started, click on "**File**" > "**New File**" > "**R Notebook**". R Noteb
 
 
 ```{r 02-play-button, echo=FALSE}
-knitr::include_graphics(path = "02-play-button.png")
+knitr::include_graphics(path = "images/02-play-button.png")
 ```
 
 
 ```{r 03-preview-button, echo=FALSE}
 # fs::dir_ls(".")
-knitr::include_graphics(path = "03-preview-button.png")
+knitr::include_graphics(path = "images/03-preview-button.png")
 ```
 
 
