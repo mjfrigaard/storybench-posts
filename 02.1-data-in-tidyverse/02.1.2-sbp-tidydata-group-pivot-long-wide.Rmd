@@ -77,7 +77,7 @@ My goal is that by showing the reasoning behind the data entry process, you'll w
 If you’ve worked with SQL and relational databases, you’ll recognize most of these concepts. Hadley Wickham distilled a lot of the technical jargon from [Edgar F. Codd’s 'normal form'](https://en.wikipedia.org/wiki/Third_normal_form) and applied it to statistical terms. More importantly, he translated these essential principles into concepts and terms a broader audience can grasp and use for data manipulation. 
 
 ```{r load-data, message=FALSE, warning=FALSE}
-source("code/data.R")
+source("code/R/data.R")
 base::save.image("data/tidyr-data.RData")
 base::load(file = "data/tidyr-data.RData")
 ```
@@ -256,7 +256,7 @@ LomaWideSmall %>%
 
     names_prefix = "fight_",
 
-    na.rm = TRUE)
+    values_drop_na = TRUE)
 ```
 
 ### What happens in pivot_longer()?
@@ -330,7 +330,7 @@ LomaFightsLong <- LomaWideSmall %>%
       
     spec = LomaSpec,
     
-    na.rm = TRUE)
+    values_drop_na = TRUE)
 
 LomaFightsLong
 ```
@@ -344,7 +344,7 @@ These data are now in a tidy (indexed) format.
 No one wins a boxing match by only avoiding punches--eventually they have to hit someone (and probably more than once). Another reason that being able to change angles quickly is advantageous is that it creates more opportunities to throw (and land) punches. As you can see below, Lomachenko's pivoting abilities not only make him frustratingly hard to hit, but they also allow him to see openings in his opponents defenses (which makes him incredibly successful at landing punches).  
 
 ```{r loma-pivot-strike.gif, echo=FALSE, eval=TRUE, fig.cap="http://fightland.vice.com/blog/the-pivots-and-precision-of-vasyl-lomachenko"}
-knitr::include_graphics(path =  "https://raw.githubusercontent.com/mjfrigaard/storybenchR/master/02.1-tidyr-tidyverse/images/loma-pivot-strike.gif")
+knitr::include_graphics(path =  "images/loma-pivot-strike.gif")
 ```
 
 
@@ -374,7 +374,7 @@ Consider a data frame with the same Lomachenko fight records, but this time arra
 
 ```{r freeze-cells.gif, echo=FALSE, eval=TRUE, fig.cap="freeze cells"}
 # fs::dir_ls("images")
-knitr::include_graphics(path = "https://raw.githubusercontent.com/mjfrigaard/storybenchR/master/02.1-tidyr-tidyverse/images/freeze-cells.gif")
+knitr::include_graphics(path = "images/freeze-cells.gif")
 ```
 
 The `LomaFights` data frame has the fight records for Lomachenko from his [wikipedia table](https://en.wikipedia.org/wiki/Vasyl_Lomachenko). To create a spreadsheet like the one above, we can use the `tidyr::pivot_wider()` function. 
