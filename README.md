@@ -89,6 +89,8 @@ using the `tidyverse`.
     ## \__/_/\_,_/\_, /|___/\__/_/ /___/\__/ 
     ##      ⬢  . /___/      ⬡      .       ⬢
 
+![](images/tidyverse2.1.png)<!-- -->
+
 All tutorials are listed below (in order). Some of these posts have been
 updated with current package usage/functions. In this case, the code for
 these tutorials might be different from what is in the Storybench post.
@@ -100,7 +102,7 @@ Slug: 01-getting-started-with-r-in-rstudio-notebooks
 Storybench post: [Getting Started With R in RStudio
 Notebooks](http://www.storybench.org/getting-started-r-rstudio-notebooks/)
 
-nothing to change on this
+Nothing to change on this–two versions because of typos.
 
 Updates: NA
 
@@ -114,13 +116,17 @@ slug: 02-getting-started-with-tidyverse-in-r
 Storybench post: [Getting Started with tidyverse in
 R](http://www.storybench.org/getting-started-with-tidyverse-in-r/)
 
-This has been changed a lot with the new `tidyr` functions
+This covers the key value pairs in `tidyr` and tidy data. Updates:
+[Pivoting data from columns to rows (and back\!) in the
+tidyverse](http://www.storybench.org/pivoting-data-from-columns-to-rows-and-back-in-the-tidyverse/)
 
-Updates: [Data Journalism with R - Storybench tidyr
-pivoting](https://github.com/mjfrigaard/storybenchR/tree/master/02.1-data-in-tidyverse)
+This new post covers the new
 
-    ## 02-getting-started-with-tidyverse-in-r.Rmd
-    ## 02-getting-started-with-tidyverse-in-r.md
+    ## 02.0-getting-started-with-tidyverse-in-r.Rmd
+    ## 02.1-tidydata-pipes-vars-obs-spread-gather-qplot.Rmd
+    ## 02.2-tidydata-group-pivot-long-wide.Rmd
+    ## 02.3-tidydata-group-pivot-long-wide.Rmd
+    ## 02.4-tidydata-group-pivot-long-wide.Rmd
 
 ## 3\) How to explore and manipulate a dataset from the fivethirtyeight package in R
 
@@ -131,21 +137,11 @@ Storybench post: [How to explore and manipulate a dataset from the
 fivethirtyeight package in
 R](http://www.storybench.org/how-to-explore-a-dataset-from-the-fivethirtyeight-package-in-r/)
 
-changes were made to expand these functions and examples
+Changes were made to expand these functions and examples
 
-Updates: [How to explore and manipulate a dataset from the
-fivethirtyeight package in
-R](https://github.com/mjfrigaard/storybenchR/tree/master/03.1-tidyr-separate-unite-spread-gather)
+Update:
 
-    ## 02-getting-started-with-tidyverse-in-r.Rmd
-    ## 02-getting-started-with-tidyverse-in-r.md
-    ## 02.1-tidydata-pipes-vars-obs-spread-gather-qplot.Rmd
-    ## 02.1-tidydata-pipes-vars-obs-spread-gather-qplot.md
-    ## 02.2-tidydata-group-pivot-long-wide.Rmd
-    ## 02.2-tidydata-group-pivot-long-wide.md
-    ## 02.3-tidydata-group-pivot-long-wide.Rmd
-    ## 02.4-tidydata-group-pivot-long-wide.Rmd
-    ## 02.4-tidydata-group-pivot-long-wide.md
+    ## 03.0-how-to-explore-manipulate-dataset-from-538-package.Rmd
 
 ## 4\) How to manipulate data with dplyr in R
 
@@ -154,12 +150,10 @@ Slug: 04-how-to-manipulate-data-with-dplyr-in-r
 Storybench post: [How to manipulate data with dplyr in
 R](http://www.storybench.org/how-to-manipulate-data-with-dplyr-in-r/)
 
-Nothing has changed on this tutorial.
-
 Updates: NA
 
-    ## 05.1-manipulate-variables-with-dplyr.Rmd
-    ## 05.2-manipulate-cases-with-dplyr.Rmd
+    ## 04.1-manipulate-variables-with-dplyr.Rmd
+    ## 04.2-manipulate-cases-with-dplyr.Rmd
 
 ## 5\) Getting started with data visualization in R using ggplot2
 
@@ -172,14 +166,10 @@ This is now a two-part intro. Part one is on Github (expanded a bit).
 
 updates(s):
 
-    ## 04-ggplot2-for-viz.Rmd
-    ## 04-ggplot2-for-viz.md
-    ## 04.1-ggplot2-qplot.Rmd
-    ## 04.1-ggplot2-qplot.md
-    ## 04.2-ggplot2-extras.Rmd
-    ## 04.2-ggplot2-extras.md
-    ## 04.3-ggplot2-intro-to-visualizations.Rmd
-    ## 04.3-ggplot2-intro-to-visualizations.md
+    ## 05.0-ggplot2-for-viz.Rmd
+    ## 05.1-ggplot2-qplot.Rmd
+    ## 05.2-ggplot2-extras.Rmd
+    ## 05.3-ggplot2-intro-to-visualizations.Rmd
 
 Part 1: [Getting started with data visualization in R using ggplot2
 (part 1)](https://github.com/mjfrigaard/storybenchR/tree/master/04.1-ggplot2-intro)

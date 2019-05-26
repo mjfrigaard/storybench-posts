@@ -16,6 +16,11 @@ This is a series of tutorials from Data Journalism in R from [Storybench.org](ht
 crayon::strip_style(tidyverse::tidyverse_logo())
 ```
 
+```{r tidyverse2.1, echo=FALSE}
+knitr::include_graphics(path = "images/tidyverse2.1.png")
+```
+
+
 All tutorials are listed below (in order). Some of these posts have been updated with current package usage/functions. In this case, the code for these tutorials might be different from what is in the Storybench post. 
 
 ## 1) Getting Started With R in RStudio Notebooks
