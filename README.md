@@ -3,86 +3,11 @@ Data Journalism in R (storybench.org)
 Martin Frigaard
 compiled on 2019-05-25
 
-  - [Welcome to `StorybenchR`](#welcome-to-storybenchr)
-      - [1) Getting Started With R in RStudio
-        Notebooks](#getting-started-with-r-in-rstudio-notebooks)
-      - [2) Getting Started with tidyverse in
-        R](#getting-started-with-tidyverse-in-r)
-      - [3) How to explore and manipulate a dataset from the
-        fivethirtyeight package in
-        R](#how-to-explore-and-manipulate-a-dataset-from-the-fivethirtyeight-package-in-r)
-      - [4) How to manipulate data with dplyr in
-        R](#how-to-manipulate-data-with-dplyr-in-r)
-      - [5) Getting started with data visualization in R using
-        ggplot2](#getting-started-with-data-visualization-in-r-using-ggplot2)
-      - [6) Welcome to Data Journalism in
-        R](#welcome-to-data-journalism-in-r)
-      - [7) Twitter + R](#twitter-r)
-      - [8) Sentiment analysis of (you guessed it\!) Donald Trump’s
-        tweets](#sentiment-analysis-of-you-guessed-it-donald-trumps-tweets)
-      - [9) How to merge and clean up multiple CSVs using
-        R](#how-to-merge-and-clean-up-multiple-csvs-using-r)
-      - [10) Working with The New York Times API in
-        R](#working-with-the-new-york-times-api-in-r)
-      - [11) Getting started with stringr for textual analysis in
-        R](#getting-started-with-stringr-for-textual-analysis-in-r)
-      - [12) How to plot state-by-state data on a map of the U.S. in
-        R](#how-to-plot-state-by-state-data-on-a-map-of-the-u.s.-in-r)
-      - [13) How to build an animated map of tweets about the NBA finals
-        in
-        R](#how-to-build-an-animated-map-of-tweets-about-the-nba-finals-in-r)
-      - [14) Using French wine reviews to understand TF-IDF, a measure
-        of how unique a word is to a
-        document](#using-french-wine-reviews-to-understand-tf-idf-a-measure-of-how-unique-a-word-is-to-a-document)
-      - [15) Mapping search data from Google Trends in
-        R](#mapping-search-data-from-google-trends-in-r)
-      - [16) Exploring Beto O’Rourke and Ted Cruz ads on Facebook using
-        R](#exploring-beto-orourke-and-ted-cruz-ads-on-facebook-using-r)
-      - [17) How to get Twitter data with rtweet in
-        R](#how-to-get-twitter-data-with-rtweet-in-r)
-      - [18) How to install R on a Jupyter
-        notebook](#how-to-install-r-on-a-jupyter-notebook)
-      - [19) A Data History of Popular
-        Hip-Hop](#a-data-history-of-popular-hip-hop)
-      - [20) How to map point data and polygon shapefiles in
-        R](#how-to-map-point-data-and-polygon-shapefiles-in-r)
-      - [21) Bringing textual analysis tools to Judge Brett Kavanaugh’s
-        latest
-        opinion](#bringing-textual-analysis-tools-to-judge-brett-kavanaughs-latest-opinion)
-      - [22) Scraping HTML tables and downloading files with
-        R](#scraping-html-tables-and-downloading-files-with-r)
-      - [23) From deep learning to `clean_names()`, resources from Data
-        Journalism in
-        R](#from-deep-learning-to-clean_names-resources-from-data-journalism-in-r)
-      - [24) Why Sharon Machlis wrote a book on R for
-        journalists](#why-sharon-machlis-wrote-a-book-on-r-for-journalists)
-      - [25) Pivoting data from columns to rows (and back\!) in the
-        tidyverse](#pivoting-data-from-columns-to-rows-and-back-in-the-tidyverse)
-      - [26) Exploring bike rental behavior using
-        R](#exploring-bike-rental-behavior-using-r)
-      - [27) How to model with gradient boosting machine in
-        R](#how-to-model-with-gradient-boosting-machine-in-r)
-      - [28) How to access APIs in R](#how-to-access-apis-in-r)
-      - [29) How to build a bubble chart of individuals mentioned in the
-        Mueller
-        report](#how-to-build-a-bubble-chart-of-individuals-mentioned-in-the-mueller-report)
-      - [30) How to build a website with Blogdown in
-        R](#how-to-build-a-website-with-blogdown-in-r)
-      - [31) Exploring Chicago rideshare data in
-        R](#exploring-chicago-rideshare-data-in-r)
-      - [32) Web scraping with Python](#web-scraping-with-python)
-
 # Welcome to `StorybenchR`
 
 This is a series of tutorials from Data Journalism in R from
 [Storybench.org](http://www.storybench.org/category/data-journalism-in-r/)
 using the `tidyverse`.
-
-    ## Registered S3 methods overwritten by 'ggplot2':
-    ##   method         from 
-    ##   [.quosures     rlang
-    ##   c.quosures     rlang
-    ##   print.quosures rlang
 
     ## ⬢ __  _    __   .    ⬡           ⬢  . 
     ##  / /_(_)__/ /_ ___  _____ _______ ___ 

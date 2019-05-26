@@ -2,16 +2,14 @@
 title: "Data Journalism in R (storybench.org)"
 author: "Martin Frigaard"
 date: "compiled on `r Sys.Date()`"
-output: 
-  github_document: 
-    toc: yes
+output: github_document
 ---
 
 # Welcome to `StorybenchR`
 
 This is a series of tutorials from Data Journalism in R from [Storybench.org](http://www.storybench.org/category/data-journalism-in-r/) using the `tidyverse`. 
 
-```{r tidyverse_logo, echo=FALSE}
+```{r tidyverse_logo, echo=FALSE, message=FALSE, warning=FALSE}
 crayon::strip_style(tidyverse::tidyverse_logo())
 ```
 
