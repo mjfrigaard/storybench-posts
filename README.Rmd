@@ -318,6 +318,10 @@ Updates:
 Storybench post: [How to model with gradient boosting machine in R](http://www.storybench.org/tidytuesday-bike-rentals-part-2-modeling-with-gradient-boosting-machine/)
 
 
+```{r rideshare}
+fs::dir_ls(regexp = "rideshare")
+```
+
 
 Updates:
 
@@ -326,6 +330,10 @@ Updates:
 Slug: 28-how-to-access-apis-in-r
 
 Storybench post: [How to access APIs in R](http://www.storybench.org/how-to-access-apis-in-r/)
+
+```{r api-data}
+fs::dir_ls(regexp = "api")
+```
 
 Updates:
 
@@ -343,6 +351,10 @@ Slug: 30-how-to-build-a-website-with-blogdown-in-r
 
 Storybench post: [How to build a website with Blogdown in R](http://www.storybench.org/how-to-build-a-website-with-blogdown-in-r/)
 
+```{r blogdown}
+fs::dir_ls(regexp = "blogdown")
+```
+
 
 Updates:
 
@@ -352,5 +364,18 @@ Slug: 31-exploring-chicago-rideshare-data-in-r
 
 Storybench post: [Exploring Chicago rideshare data in R](http://www.storybench.org/exploring-chicago-rideshare-data/)
 
+
+Updates:
+
+## 32) Web scraping with Python
+
+```{r python}
+fs::dir_ls(regexp = "python")
+```
+
+
+Slug: 
+
+Storybench post: 
 
 Updates:
