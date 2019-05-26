@@ -1,0 +1,1246 @@
+---
+title: "Getting started with stringr for textual analysis in R"
+author: "Martin Frigaard"
+date: '2018-02-15'
+output: github_document
+---
+
+
+```{r setup, include=FALSE}
+require(tidyverse)
+require(mosaic)
+require(magrittr)
+knitr::opts_chunk$set(
+    echo = TRUE, # show all code
+    tidy = FALSE, # cleaner code printing
+    size = "small") # smaller code
+```
+
+This code chunk will create a file name for the document. 
+
+**PACKAGES:**  
+
+```{r pre_packages}
+library(dplyr) # Data wrangling, glimpse(75) and tbl_df().
+library(ggplot2) # Visualise data.
+library(lubridate) # Dates and time.
+library(readr) # Efficient reading of CSV data.
+library(stringr) # String operations.
+library(tibble) # Convert row names into a column.
+library(tidyr) # Prepare a tidy dataset, gather().
+library(magrittr) # Pipes %>%, %T>% and equals(), extract().
+library(tidyverse) # all tidyverse packages
+library(mosaic) # favstats and other summary functions
+library(fs) # file management functions
+library(stringi) # more strings
+library(tidytext) # tidying text data for analysis
+library(maps) # maps for us.cities
+```
+
+**HEADER:**  
+
+* **File name:** `r file_name`    
+* **Created date:** `r Sys.Date()`    
+* **R version:** `r R.version.string`   
+* `tidyverse` package version: `r packageVersion("tidyverse")` 
+* `magrittr` package version: `r packageVersion("magrittr")`  
+* `mosaic` package version: `r packageVersion("mosaic")`  
+* `dplyr` package version: `r packageVersion("dplyr")`
+* `ggplot2` package version: `r packageVersion("ggplot2")`
+* `lubridate` package version: `r packageVersion("lubridate")`
+* `readr` package version: `r packageVersion("readr")`
+* `stringr` package version: `r packageVersion("stringr")`
+* `tibble` package version: `r packageVersion("tibble")`
+* `tidyr` package version: `r packageVersion("tidyr")`
+* `fs` package version: `r packageVersion("fs")`
+* `stringi` package version: `r packageVersion("stringi")`
+
+*** 
+
+
+> Post starts here:
+
+
+# Getting started with stringr for textual analysis in R
+
+Manipulating characters – a.k.a. non-numerical data – is an essential skill for anyone looking to visualize or analyze text data. This tutorial will go over a few of the base R functions for manipulating strings in R, and introduce the stringr package from the [tidyverse.](http://tidyverse.org/) The datasets being used are being analyzed as part of the [Reinventing Local TV News Project](http://www.storybench.org/category/tvnews/) at Northeastern University’s School of Journalism.  The full RMarkdown file can be found [here.](http://storybench.org/reinventingtv/string_manipulation_in_r.Rmd)
+
+
+
+Manipulating characters (non-numerical data) is an essential skill for anyone looking to visualize or analyze text data. This tutorial will go over a few of the base R functions for manipulating strings in R, and introduce the `stringr` package from the [tidyverse](http://tidyverse.org/).
+
+<!---
+
+```r
+tidyverse::tidyverse_logo()
+⬢ __  _    __   .    ⬡           ⬢  . 
+ / /_(_)__/ /_ ___  _____ _______ ___ 
+/ __/ / _  / // / |/ / -_) __(_-</ -_)
+\__/_/\_,_/\_, /|___/\__/_/ /___/\__/ 
+     ⬢  . /___/      ⬡      .       ⬢
+```
+
+-->
+
+### Load the Packages
+
+Start by loading the packages we will be using in this tutorial.
+
+```{r packages}
+library(dplyr) # Data wrangling, glimpse(75) and tbl_df().
+library(ggplot2) # Visualise data.
+library(lubridate) # Dates and time.
+library(readr) # Efficient reading of CSV data.
+library(stringr) # String operations.
+library(tibble) # Convert row names into a column.
+library(tidyr) # Prepare a tidy dataset, gather().
+library(magrittr) # Pipes %>%, %T>% and equals(), extract().
+library(tidyverse) # all tidyverse packages
+library(mosaic) # favstats and other summary functions
+library(fs) # file management functions
+library(forcats) # manipulate data for visualization
+library(cowplot) # visualization
+library(stringi) # more strings
+library(tidytext) # tidying text data for analysis
+library(maps) # maps for us.cities
+```
+
+
+### Load the Data
+
+We will be using 6 months of news article data from [ABC7NY](http://abc7ny.com/) in New York and [KCRA](http://www.kcra.com/) in California, spanning July 18 to January 16 (headline, date-time, teaser, url). All times are Eastern Standard Time. You can find the files here: [abc7ny.csv](https://github.com/mjfrigaard/storybenchR/blob/master/stringr_4_strings/data/abc7ny.csv) and [kcra.csv](https://github.com/mjfrigaard/storybenchR/blob/master/stringr_4_strings/data/kcra.csv).
+
+```{r news_data, message=FALSE, warning=FALSE}
+Abc7 <- read_csv("Data/abc7ny.csv")
+Kcra <- read_csv("Data/kcra.csv")
+```
+
+
+#### Inspect the data sets
+
+Take a quick look at each data set with `dplyr::glimpse(78)`
+
+```{r Abc7}
+Abc7 %>% glimpse(78)
+```
+
+```{r Kcra}
+Kcra %>% glimpse(78)
+```
+
+We can see these data frames contain the same variables, but if we had many, many columns we could use `base::identical()` and `base::names()` to test if the columns are the same.  
+
+```{r identical}
+base::identical(names(Abc7), names(Kcra))
+```
+
+### Combine Data Sets
+
+We want to combine these data sets into a single data frame `NewsData`. As with most operations in R, there are multiple ways to approach combining data frames. I prefer to use `dplyr` for merging and joining because 1) the functions are fast and efficient and 2) the arguments are somewhat intuitive. 
+
+I say *somewhat* because `dplyr::bind_rows()` sticks two data frames together **top-to-bottom**, and `dplyr::bind_cols()` puts two data frames together **side-by-side**. If you look at the figure below, you can see what I mean. Combining two data frames together **top-to-bottom** means the data gets added into the matched columns (and un-matched columns get filled with `NA`).
+
+But if I want to combine data frames together **side-by-side**, they will be matched on their row position (so I would need to make sure the same number of rows are in each data frame). 
+
+![](./image/dplyr_binds.png)
+
+**NOTE:** The tiny object in the rows are chairs, because for some reason, whenever I think of rows, I think of a row of chairs. The same goes for columns (except I think about a Roman pillar).
+
+***
+
+
+#### ***Which one do I want to use?***
+
+I can see from the code chunks above that both data frames have identical column names, but an unequal number of rows. This makes `dplyr::bind_rows()` the correct option. I might want to separate each data frame again later, so including an ID (like `data_id`) that allows me to see what data set each headline originally came from is a good idea. Fortunately, there is an argument in `dplyr::bind_rows()` for including an id (`.id =`). 
+
+Before I start executing functions, I should think about to expect in `NewsData`. The `Abc7` data frame has 9,745 and 6 variables, and `Kcra` has 13,020 observations and 6 variables. If I use `dplyr::bind_rows()`, I'm expecting a data frame with the sum of all observations (i.e. 22,765) and 6 variables. 
+
+```{r bind_rows}
+# test 
+dplyr::bind_rows(Abc7, Kcra, .id = "data_id") %>% 
+    dplyr::count(data_id)
+```
+
+**NOTE:** I'm going to introduce a little sequence I go through for most data manipulation tasks. It includes three steps: 1) *test*, 2) *assign*, and 3) *verify*. These steps are for making sure I am getting what I expect from each task. In the *test* step, I set up some way of verifying the function or pipeline is doing what I want. For this example, I used `dplyr::count()` to see if `"data_id"` is the new data frame and if it can distinguish the original data sets.
+
+Now I will *assign* the new variables to `NewsData` and *verify* it gives the same information. 
+
+```{r NewsData}
+# assign
+NewsData <- dplyr::bind_rows(Abc7, Kcra, .id = "data_id")
+# verify
+NewsData %>% 
+    dplyr::count(data_id)
+```
+
+Great! I just need to remember that `1` is the id for `Abc7` and `2` is the id for `Kcra`. Now I can start with the string manipulations. 
+
+```{r NewsData_glimpse}
+NewsData %>% 
+    glimpse(75)
+```
+
+### String Manipulation with Base R
+
+There are a few functions in base R that come in handy when dealing with strings. These first functions we will cover are basic, but they introduce important concepts like how strings are printed, and the kinds of manipulations that are possible with R. I'll demo these by taking the first five lines of the `headline` column and putting it into it's object (`headlines_var`) using `dplyr::select()` and `Matrix::head()`.
+
+```{r headlines_var}
+headlines_var <- NewsData %>% 
+    dplyr::select(headline) %>% 
+    Matrix::head(5) 
+```
+
+#### Testing Characer Strings
+
+The base functions in R takes a character vector, so the first thing I'll need to do is test and see if `headlines_var` satisfies that condition. I can do this with `base::is.character()`.
+
+```{r base::is.character}
+base::is.character(headlines_var)
+```
+
+`FALSE`!?!? But this looked like a character vector when I used `dplyr::glimpse(75)` above. What kind of object this *is* `headlines_var`? 
+
+I can test that with `base::typeof()`.
+
+```{r base::typeof}
+base::typeof(headlines_var)
+```
+
+Ahhhh `headlines_var` is a `list`. This means I'll need to use `base::unlist()` to convert the `headlines_var` list to a character vector. 
+
+```{r base::unlist}
+headlines_var <- headlines_var %>% base::unlist() 
+base::is.character(headlines_var)
+```
+
+**NOTE:** *Other options for converting objects to strings include `base::is.character()` and `base::toString()`.* 
+
+I'll take a look at this vector and see what the contents look like with `utils::str()`.
+
+```{r check_headlines_var}
+headlines_var %>% utils::str()
+```
+
+We can see the `unlist()` function retains the `"names"` attribute in the `headlines_var` vector. 
+
+```{r headlines_var_names}
+headlines_var
+```
+
+### Removing Characters 
+
+I can see from the contents of `headlines_var` that it is a vector with all five headlines. I'll demonstrate the `base::sub()` function by removing the `-` characters.
+
+```{r base::sub}
+base::sub(pattern = "-", replacement = " ", x = headlines_var)
+```
+
+The first pass with `base::sub()` only finds the first instance of `-` and replaces it with a blank space `" "`. If I want to remove ALL instances of `-`, I can use `base::gsub()`.
+
+```{r base::gsub}
+base::gsub(pattern = "-", replacement = " ", x = headlines_var)
+```
+
+Another option for replacing every instance of a character is `base::chartr()`, but this requires that the `old` argument is the same length of the `new` argument (otherwise you will see `'old' is longer than 'new'`). 
+
+```{r base::chartr}
+base::chartr(old = "-", new = " ", x = headlines_var)
+```
+
+### Pasting 
+
+Whenever you need to combine or "stick" string elements together, you can either use `base::paste()` or `base::paste0()`. For example, if I wanted to combine all of these headlines into a single, long, character vector, I could use the following
+
+```{r base::paste}
+base::paste(headlines_var, collapse = "; ")
+```
+
+Or if I wanted to combine all the headlines but not include any whitespace between the characters, I could use `base::paste0()`
+
+```{r base::paste0}
+base::paste0(headlines_var, sep = "", collapse = "; ")
+```
+
+### Printing
+
+I typically use [RStudio Notebooks](https://rmarkdown.rstudio.com/r_notebooks.html), so I like to have some flexibility with my printing options. There are a few base R printing options you should know for printing strings (or anything) to the R console. 
+
+If you want to see the results of a vector printed without quotes, use `base::noquote()`
+
+```{r base::noquote}
+base::noquote(headlines_var)
+```
+
+Another option is `base::cat()`. This also comes with a `sep = ` argument.
+
+```{r base::cat}
+base::cat(headlines_var, sep = ", ")
+```
+
+### The `stringr` package
+
+The `tidyverse` comes with `stringr`, a handy package for handling string manipulations. You can find it on the `tidyverse` [website](http://stringr.tidyverse.org/) or you can read about here in [R for Data Science](http://r4ds.had.co.nz/strings.html).
+
+`stringr` (like other packages in the `tidyverse`) is very convenient because all of the functions have a common prefix, `str_`
+
+![str_.png](./image/stringr_str_.png)
+
+Everything we just did with base R is possible with `stringr`, so I'm going to go through some of this package's lesser-known functions. 
+
+***
+
+# **ALESZU!! (removed the `headline` from below--it wasn't showing up on Storybench)**
+
+## Changing Case
+
+  
+It's often useful to convert the entire corpus of text to lowercase so future string matching is a little easier. I can do this by changing the case of `headlines` and storing it in a new variable `headline_low` using `stringr::str_to_lower()` and `dplyr::mutate()`.
+
+**NOTE:** I'm going to perform the remaining functions with the `NewsData` data frame (because that is the preferred object in the `tidyverse`).
+
+```{r stringr::str_to_lower}
+NewsData %>% 
+    dplyr::mutate(headline_low = stringr::str_to_lower(headline)) %>% 
+    dplyr::select(headline_low) %>% 
+    head(1)
+```
+
+Then again, these are headlines, so maybe we want another variable that converts all `headlines` to **Title Case** using `stringr::str_to_title()`.
+
+```{r stringr::str_to_title}
+NewsData %>% 
+    dplyr::mutate(headline_title = stringr::str_to_title(headline)) %>% 
+    dplyr::select(headline_title) %>% 
+    head(1)
+```
+
+### Finding `words` 
+
+I might also curious about the first few words in the `teaser` associated with each `headline`. Let's assume I want to see the frequency of each word by news feed (or `data_id`). I can use the `stringr::word()` function to extract the first three words and store it in a new variable `teaser_3_words`.   
+
+```{r stringr::word}
+# test
+NewsData %>% 
+    dplyr::mutate(teaser_3_words = stringr::word(NewsData$teaser, 1, 3)) %>% 
+    count(teaser_3_words, sort = TRUE) %>% 
+    head(10)
+```
+
+This looks like it's working, so I'll assign `teaser_3_words` to the `NewsData` data frame.
+
+```{r assign_teaser_3_words}
+NewsData <- NewsData %>% 
+    dplyr::mutate(teaser_3_words = stringr::word(NewsData$teaser, 1, 3))
+```
+
+
+Now I can verify this new variable is behaving the way it should by using the same `dplyr::count()` function above. 
+
+```{r verify_teaser_3_words}
+NewsData %>% 
+    dplyr::count(teaser_3_words, sort = TRUE) %>% 
+    utils::head(10)
+```
+
+Sometimes I like to verify a new variable using a visualization instead of a table. I find it helpful to think of the data I am manipulating as a distribution (or shape) instead of just a set of numbers in a table. A figure has more attributes I can think about (shape, size, color, position, etc.), where a table just has lines and text.  
+
+# **ALESZU!! (added 'over time' below)**
+
+For example, when I created `teaser_3_words` with the first three words from the `teaser`, I was thinking about how those words might vary by station (ABC7NY or KCRA) and over time. I assume there is some overlap in `teaser_3_words` between these stations. I can see this if I run `dplyr::distinct()` and `base::nrow()`.
+
+```{r dplyr::distinct}
+NewsData %>% 
+    dplyr::distinct(teaser_3_words) %>% 
+    base::nrow()
+```
+
+If there are `15415` distinct `teaser_3_words` and `22765` observations in `NewsData`, I can safely assume there is some overlap between these two stations. 
+
+## Create a visualization with a pipeline
+
+If I want to visualize this, I need to add a column to the `NewsData` data frame that has the results from `dplyr::count()`. This is possible with `dplyr::add_count()`. Then I want to `dplyr::arrange()` the data so the largest numbers are on top. `n` isn't a very descriptive variable name, so I will `dplyr::rename()` this to `tease_3rd_count`. 
+
+Things get a little trickier here, because I also want to add a total N by news feed *and* a proportion variable that will tell me how many times `teaser_3_words` showed up in that `teaser` relative to the total number of teasers in the feed (`tease_3rd_prop`). 
+
+# **ALESZU!! (removed 'little trick')**
+
+This can be accomplished using the following steps:
+
+1. Use `dplyr::group_by()`, `dplyr::add_tally()`, and `dplyr::ungroup()` to collapse the data frame on the two news feeds in `data_id`, create a summary `n` variable, and then expand this data frame back to it's original shape (plus one variable).
+
+2. Change the name of `n` to `newsfeed_n` with `dplyr::rename()`
+
+3. Finally, use `dplyr::mutate()` to create the proportion variable `tease_3rd_prop`, a factor version of `data_id`, and convert the existing `teaser_3_words` variable to a factor. 
+
+When I test a long pipeline like this, I do it iteratively. At the end of each step, I add a `%>% dplyr::glimpse(75)` or another viewing function to see what I am getting. 
+
+```{r pipeline_demo}
+NewsData <- NewsData %>% 
+    dplyr::add_count(teaser_3_words) %>% # count this variable and add it
+    dplyr::arrange(desc(n)) %>% # arrange the new n data with largest on top
+    dplyr::rename(tease_3rd_count = n) %>%  # get rid of n variable
+    dplyr::group_by(data_id) %>% # collapse the data frame by news feed
+    dplyr::add_tally() %>% # add the total count 
+    dplyr::ungroup() %>% # expand the data to all variables again
+    dplyr::rename(newsfeed_n = n) %>% # rename n to newsfeed_n
+    dplyr::mutate(tease_3rd_prop = tease_3rd_count/newsfeed_n, # create prop
+            data_id_fct = factor(data_id, # create factor for ID
+                                   levels = c(1, 2),
+                                   labels = c("Abc7", 
+                                          "Kcra")),
+            teaser_3_words = factor(teaser_3_words)) 
+NewsData %>% 
+    dplyr::glimpse(75)
+```
+
+Now I can create a Cleveland Plot that shows the proportion of the first three word occurrence by news station. Note that I also use a few `dplyr` functions to make the plot a little clearer.  
+
+```{r NewsDataTeaserClevelandPlot}
+NewsDataTeaserClevelandPlot <- NewsData %>% 
+    dplyr::arrange(desc(tease_3rd_prop)) %>% # sort desc by the proportion
+    dplyr::filter(tease_3rd_count >= 50) %>% # only keep frequecies above 50
+    dplyr::filter(!is.na(teaser_3_words)) %>% # remove missing
+    # Make the plot
+    ggplot2::ggplot(aes(x = tease_3rd_prop, # plot the prop
+                        y = fct_reorder(teaser_3_words, # reorder words
+                                        tease_3rd_count), # by counts
+                     fill = data_id_fct,
+                    group = teaser_3_words)) + # fill by feed
+    ggplot2::geom_segment(aes(yend = teaser_3_words), 
+                     xend = 0, 
+                    color = "grey50") +
+    ggplot2::geom_point(size = 3, 
+                   aes(color = data_id_fct), 
+                 show.legend = FALSE) + 
+    ggplot2::facet_wrap( ~ data_id_fct, # arrange in 2 columns
+           nrow = 2, 
+         scales = "free", # free scales
+       labeller = as_labeller( # add custom lables
+       c(`Abc7` = "ABC7NY News Feed", 
+         `Kcra` = "KCRA Sacramento News Feed"))) +
+            ggplot2::scale_x_continuous(labels = scales::percent) + # use %
+            ggplot2::theme(strip.text.x = element_text(face = "bold")) + # bold type
+            ggplot2::labs( # labels and captions
+                  x = "Percent First Three Words Appeared", 
+                  y = NULL,
+            caption = "These are the first three words from headline teasers 
+            appearing in ABC7NY and KCRA (from Sacramento)",
+              title = "TEAS3RS - Trump, Weather, Police",
+           subtitle = "The First Three Words From News Headlines Teasers")
+NewsDataTeaserClevelandPlot
+```
+
+```{r ggsave_NewsDataTeaserClevelandPlot}
+ggsave("./image/NewsDataTeaserClevelandPlot.png", width = 7, height = 5, units = "in")
+```
+
+
+As you can see, these pipelines provide a lot of flexibility for manipulating and visualizing data.
+
+***
+
+## Joins
+
+When you want to combine data frame one data set into another, but match these data on a common variable, you need to perform a **join**. Broadly speaking, there are two types of joins: **inner** and **outer.** 
+
+### Inner joins
+
+Inner joining comes in handy when you need to combine two tables, but only want keep the observations that are present in both tables. Read more about these [here](http://r4ds.had.co.nz/relational-data.html).
+
+### Outer joins
+
+Outer joins can come in three types: left, right , and full outer joins. The `left_join()` gets all the rows from the left table, including those with `NA` values in the join field. 
+
+The important thing about `dplyr::left_join()` is the *order the tables are listed in the function*. Inside the  `dplyr::left_join()` function, the first table listed is the primary table, and the second table is the secondary table. The `dplyr::left_join()` will join the secondary table to the primary table by matching on the rows from the primary table, even if there aren't matches with rows in the secondary table.
+
+I'll demonstrate a join using the data from the `maps` package. 
+
+## Joining `NewsData` and `maps` data
+
+# **ALESZU!! (here is where it comes off the rails)**
+
+<!---
+
+If I want to look at the `headline` or `teaser` data by location, I have to join it to a data frame that has data I can map. This information is found in the `maps` and `ggplot2` packages. 
+
+-->
+
+```{r UsCity}
+UsCity <- maps::us.cities
+UsCity %>% glimpse(75)
+```
+
+I want to join the name of the city in `NewsData` to the city in `maps::us.cities` (now `UsCity`). First I want to know how many city names are in `UsCity`.
+
+```{r dplyr::distinct_city_names}
+UsCity %>% dplyr::distinct(name) %>% base::nrow()
+```
+
+There are 1005 distinct cities in this data frame. The city information I want to use from NewsData is stored in the headline. In order to join these data frames, they need to joined on an ID that is the *same case and string* in each data frame. In order to do this, I need to talk a little about regular expressions.
+
+
+# **ALESZU!! (this is the section that was removed/added)**
+
+<!--
+
+### Create State level data
+
+I want to create a data frame called `States` from `ggplot2::map_data()`. I can see that now I have `region` in `States` that contains the state names. I will rename this to `state_name` (its already the correct case).
+
+```{r ggplot2::map_data}
+State <- ggplot2::map_data("state")
+State <- State %>% 
+    dplyr::select(state_name = region,
+                  state_long = long, 
+                  state_lat = lat, 
+                  state_group = group, 
+                  state_order = order,
+                  state_subregion = subregion) 
+State %>% 
+    dplyr::glimpse(75)
+```
+
+#### Create `City` data
+
+Now I want a data frame with US cities. I can get this from `maps::us.cities`. The state from the `name` variable using the information stored in `country.etc`. I can do this by putting using the state information in `country.etc` and `stringr::str_replace_all()` to create `city`. I will also trim any additional whitespace from this variable with `stringr::str_trim()` and convert it to lower case using `stringr::str_to_lower()`. 
+
+```{r city_id}
+City <- maps::us.cities
+City <- City %>% 
+    mutate(city_id = stringr::str_replace_all(string = City$name, 
+                         pattern = City$country.etc, 
+                         replacement = ""),
+           city_id = stringr::str_trim(city_id),
+           city_id = stringr::str_to_lower(city_id),
+           state_abbrev = str_to_lower(country.etc)) %>% 
+    dplyr::select(
+        city_id,
+        city_state_name = name,
+        city_lat = lat,
+        city_long = long,
+        city_pop = pop, 
+        city_capital = capital,
+        dplyr::everything())
+City %>% glimpse(75)
+```
+
+### Create `StateAbbLkUp` table
+
+Now I have city data in `City` and state data in `State`. I want to join these together into `CityState` on `state_name`. But I also want to create `StateAbbLkUp`, which contains state abbreviations from `state.abb` and state names from `state.name`.
+
+```{r StateAbbLkUp}
+StateAbbLkUp <- data_frame("state_abbrev" = as.character(state.abb),
+                            "state_name" = as.character(state.name))
+StateAbbLkUp <- StateAbbLkUp %>% 
+    dplyr::mutate(state_name = str_to_lower(state_name), 
+                  state_abbrev = str_to_lower(state_abbrev)) 
+StateAbbLkUp %>% glimpse(78)
+```
+
+### Join `City` and `States` data
+
+Now I can join these three tables together using `dplyr::left_join()` statements. 
+
+```{r left_join_StateAbbLkUp}
+StateAbbLkUp <- dplyr::left_join(StateAbbLkUp, 
+                                 City, 
+                                 by = "state_abbrev") %>% 
+                dplyr::left_join(State, by = "state_name") 
+StateAbbLkUp %>% 
+       dplyr::glimpse(75) 
+```
+
+### Creating a `city_id` in the `NewsData` data frame
+
+In order to create a `city_id` in `NewsData`, I will need to check all the words in the `headline` to see how many mention the cities. To do this I need to put the `StateAbbLkUp$city_id` into it's own vector `city_id_vec`. I can do this with `base::unlist()` and `base::paste()`. But I can't just list the city names separated like a comma in a normal character vector:
+
+```r
+city_id <- c("abilene", "akron", "alameda", "albany") # this wouldn't work
+```
+
+The `pattern` argument in `stringr::str_detect()` takes a regular expression (regex) pattern. Regular expressions are strings that encode a specific pattern I'm searhing for. More on those later.
+
+For now just notice that I add spaces around the pipe operator in the `collapse = " | "` argument so I can get a match for the city `mission` (for Mission, TX) and not `commissioned`.
+
+```{r original_city_id_vec}
+city_id_vec <- StateAbbLkUp %>% 
+    distinct(city_state_name, .keep_all = TRUE) %$% unlist(unique(sort(StateAbbLkUp$city_id)))
+city_id_vec <- paste(city_id_vec, sep = "", collapse = " | ")
+```
+
+This new vector should look like this:
+
+```r
+[1] "abilene | akron | alameda | albany | albuquerque | alexandria | 
+alhambra | aliso viejo | allen | allentown | aloha | altadena | 
+altamonte springs | altoona | amarillo | ames | anaheim | anchorage |
+anderson | andover | ann arbor | annandale | annapolis | antioch |
+apple valley | appleton | arcadia | arden-arcade | arlington |
+arlington heights | arvada | asheville | aspen hill | athens-clarke |
+atlanta | atlantic city | attleboro | auburn | augusta | augusta-richmond |
+aurora | austin | avondale | azusa |
+```
+
+#### Create `city_id` in `NewsData`
+
+Before I can match `city_id_vec` to the headlines in `NewsData`, I need to make sure the contents of `headline` in `NewsData` are all lower case. 
+
+```{r headline_stringr::str_to_lower}
+NewsData <- NewsData %>% 
+    mutate(headline = stringr::str_to_lower(headline))
+NewsData %$% head(headline, 1)
+```
+
+### Finding cities within headlines 
+
+The trick here is to see which `headline`s in `NewsData` contains cities from `city_id`. I do this by dropping `stringr::str_detect()` inside `dplyr::filter()` to only include the data with a match from `city_id`. The `stringr::str_detect()` function takes `string` vector (or character column) as an input and check for matches provided by the `pattern` argument. 
+
+
+```{r MapNewsData}
+MapNewsData <- NewsData %>% 
+    filter(stringr::str_detect(string = headline, 
+                               pattern = city_id_vec)) %>% 
+    dplyr::select(headline, 
+            dplyr::everything())
+MapNewsData %>% dplyr::glimpse(75)
+```
+
+Now that I've filtered the data set down to only those 2,285 observations with cities in their `headline`, I need to join these data back to `StateAbbLkUp`. 
+
+But first I need to create a `city_id` variable in `MapNewsData` using `stringr::str_extract()`. This function takes a `string` vector, a `pattern` to match on (which I create with `paste(city_id_vec, collapse = "|")`).
+
+
+```{r MapNewsData_city_id}
+MapNewsData <- MapNewsData %>% 
+    mutate(city_id = str_extract(string = MapNewsData$headline, 
+                     pattern = paste(city_id_vec, collapse = "|")),
+           city_id = stringr::str_trim(city_id)) 
+MapNewsData %>% 
+    count(city_id, sort = TRUE) %>% 
+    head(10)
+```
+
+This looks like it worked, so I am going to use `dplyr::inner_join()` to combine `MapNewsData` and `StateAbbLkUp` by `city_id`. The result should *only be observations with data in both tables* (hopefully cities in both tables). I can check this with a combination of `dplyr::count()` and `tidyr::spread()`.
+
+
+```{r test_dplyr::inner_join}
+dplyr::inner_join(MapNewsData, StateAbbLkUp, by = "city_id") %>% 
+    dplyr::count(city_id, city_state_name) %>% 
+    utils::head(9) %>% 
+    tidyr::spread(city_state_name, n)
+```
+
+I can see one potential problem here: `allen` in `MapNewsData` could refer to a person (`woody allen`) and not a city (like `Allen TX`). The best way to distinguish between cases like this is to ***know your data***. Computers can't replace brains when it comes to content knowledge (yet).
+
+I am going to go ahead and join these data frames together and clean the dates. 
+
+```{r MapNewsData_assign_inner_join}
+MapNewsData <- dplyr::inner_join(MapNewsData, StateAbbLkUp, by = "city_id")
+MapNewsData %>% glimpse(75)
+```
+
+-->
+
+***
+
+## Regular Expressions (regex)
+
+Regular expressions are "pattern[s] which specifies a set of strings of characters". They are used for pattern matching in many programming languages. If you're going to be analyzing mostly textual data, I recommend the excellent texts from [O'Reilly](https://ssearch.oreilly.com/?q=Regular+expressions) and the [introduction](https://www.oreilly.com/ideas/an-introduction-to-regular-expressions) from [Thomas Nield](https://twitter.com/thomasnield9727).
+
+
+An example of a regular expression to extract all the numerical characters in `headlines_var` would be:
+
+```{r stringr::str_extract_all}
+stringr::str_extract_all(string = headlines_var, pattern = "[\\d]")
+```
+
+If this looks strange to you, it's because regular expressions are a bit of a nightmare. They were originally created in the 1940s as a way to describe languages, but now their primary purpose is to test the frustration threshold for programmers and analysts. 
+
+# **ALESZU!! (need to include str_view/str_view_all)**
+
+<!--
+
+### Review Regular Expressions with `str_view()`
+
+If I wanted to check and see if the regular expression pattern match I created was working, I can use `stringr::str_view` and `stringr::str_view_all()`
+
+
+I want to match on `allen` (not `allendale`)
+
+```{r stringr::str_view}
+stringr::str_view_all(string = "woody allen from allendale", pattern = "allen")
+```
+
+I need to tweak this slightly. 
+
+```{r stringr::str_view_all}
+stringr::str_view_all(string = "woody allen from allendale", pattern = "\\ballen\\b")
+```
+
+We can see what `headline` matches the regular expression and look to see if the first three words in the `teaser` match the `city_id` and `statename`.
+
+
+```{r woody_allen_not_allen_tx}
+MapNewsData %>% 
+    dplyr::filter(stringr::str_detect(string = headline, 
+                      pattern = "\\ballen\\b")) %>% 
+    dplyr::select(teaser_3_words,
+                  city_id,
+                  state_name) %>% 
+    head(10)
+```
+
+-->
+
+#### ***Why are regular expressions so awful/powerful?***
+
+Regular expressions are highly [**composable**](https://en.wikipedia.org/wiki/Composability), which only adds to their complexity. The composability of a system or language refers to how many ways we can mix and match it's elements together to satisfy our needs (which in this case means to 'match a string or character'). For any given string or set of strings, there are countless ways of matching it with regular expressions. 
+
+> "The composability of the language is the degree to which the various methods of composition can be applied uniformly to all the various objects of the language, both atomic and compound." - [James Clark](https://tinyurl.com/y8bhefe8)
+
+## Regular Expressions in R 
+
+R has some funny quirks that add the fun of using regular expressions. In real life (outside of R), we would've used the following abstract sequence to match any digit from 0 to 9 in `headlines_var`.
+
+```{r single_escape, eval=FALSE}
+stringr::str_extract_all(string = headlines_var, pattern = "[\d]")
+# Error: '\d' is an unrecognized escape in character string starting ""[\d"
+```
+
+But in R we have to "escape the escape" character `\`, which means `"[\d]"` becomes `"[\\d]"`. This is important if you are using a regular expression testing website. These websites allow you check a regular expression on some sample text, but they might match your needs within R.
+
+```{r double_escape, eval=FALSE}
+stringr::str_extract_all(string = headlines_var, pattern = "[\\d]")
+# Error: '\d' is an unrecognized escape in character string starting ""[\d"
+```
+
+***
+
+## Common Regular Expressions
+
+Below is a quick list of regular expressions I use often. I've coupled them with both base R and `stringr` functions that are useful to know. 
+
+***`Symbol` = What it does***
+
+`$` = Matches the end of the line
+
+`^` = Matches the beginning of the line
+
+`+` = Matches one or more of the specified characters
+
+`*` = Matches 0 or more of the specified characters
+
+`\\w` = Matches any word character (`0-9`, `A-z`). To match non-word characters, use `\\W`
+
+`\\s` = Matches any whitespace character (tab, line feed, or carriage return). To match non-whitespace characters, use `\\S`
+
+`\\t` = Matches a tab character
+
+`\\r` = Matches a carriage return. Use `\\n` for line feed.
+
+`\\` = This is the escape character. It matches the exact character that follows, not the regex pattern character.
+
+
+# **ALESZU!! (these implement the patterns above, and some more advanced matching)**
+
+<!---
+
+#### Match a word at the end of a line
+
+`$` = Matches the end of the line. Look for `teaser_3_words` where the third word ends with `police`. 
+
+```{r end_of_line}
+MapNewsData %>% 
+    dplyr::filter(stringr::str_detect(
+        string = teaser_3_words,
+        pattern = "police$")) %>% 
+    dplyr::select(teaser_3_words) %>% 
+    utils::head(5)
+```
+
+#### Replace the word at the end of a line
+
+```{r replace_police}
+MapNewsData %>% 
+    dplyr::filter(stringr::str_detect(
+        string = teaser_3_words,
+        pattern = "police$")) %>% 
+    dplyr::select(teaser_3_words) %>% 
+    utils::head(5) %>% 
+    dplyr::mutate(replace_police = 
+    stringr::str_replace_all(string = teaser_3_words,
+         pattern = "police$",
+         replacement = "Royal Gendarmerie of Canada")) %>% 
+    utils::head(5)
+```
+
+#### Matches a word at the beginning of a line
+
+`^` = Matches the beginning of the line. Look in `teaser_3_words` where the first word starts with `Trump`.
+
+```{r begin_of_line}
+MapNewsData %>% 
+    dplyr::filter(stringr::str_detect(
+        string = teaser_3_words,
+        pattern = "^Trump")) %>% 
+    dplyr::select(teaser_3_words) %>% 
+    utils::head(5)
+```
+
+#### Replace the word at the beginning of a line
+
+```{r replace_begin_of_line}
+MapNewsData %>% 
+    dplyr::filter(stringr::str_detect(
+        string = teaser_3_words,
+        pattern = "^Trump")) %>% 
+    dplyr::select(teaser_3_words) %>% 
+    utils::head(5) %>% 
+    dplyr::mutate(replace_trump = 
+    stringr::str_replace_all(string = teaser_3_words,
+         pattern = "^Trump",
+         replacement = "The Wu Tang Clan")) %>% 
+    utils::head(5)
+```
+
+
+#### Match one or more numbers
+
+`+` = Matches one or more of the specified characters. Wrap in brackets `[]` and include a range of numbers to check for all digits in the `teaser_3_words` variable. 
+
+```{r one_or_more}
+MapNewsData %>% 
+    dplyr::filter(stringr::str_detect(
+        string = teaser_3_words,
+        pattern = "[0-9]+")) %>% 
+    dplyr::select(teaser_3_words) %>% 
+    utils::head(5)
+```
+
+#### Replaces one or more numbers
+
+Now we can replace the numbers with the word `"NUMBAS!!"`.
+
+```{r replace_numbers}
+MapNewsData %>% 
+    dplyr::filter(stringr::str_detect(
+        string = teaser_3_words,
+        pattern = "[0-9]+")) %>% 
+    dplyr::select(teaser_3_words) %>% 
+    utils::head(5) %>% 
+    dplyr::mutate(replace_numbers = 
+    stringr::str_replace_all(string = teaser_3_words,
+         pattern = "[0-9]+",
+         replacement = "NUMBAS!!")) %>% 
+    utils::head(5)
+```
+
+Now we can get into some more advanced pattern matches with `stringr`. 
+
+#### ADVANCED: Match first noun phrase in teasers 
+
+I want to identify and match the nouns in `teaser`s. First I will create the `noun` pattern. Check out the regex to understand what it's matching.  
+
+```{r noun}
+noun <- "(a|the) ([^ ]+)"
+noun
+```
+
+Now I will use a combination of `stringr::str_subset()` and `stringr::str_extract()`  to see what is being matched with `noun`. 
+
+```{r stringr::str_subset}
+MapNewsData %$% 
+    stringr::str_subset(string = teaser, 
+                        pattern = noun) %>%
+    stringr::str_extract(noun) %>% 
+    utils::head(5)
+```
+
+It works, but the problem is this currently returns a vector (check with `purrr::is_vector()`).  
+
+```{r check_is_vector}
+MapNewsData %$% 
+    stringr::str_subset(string = teaser, 
+                        pattern = noun) %>%
+    stringr::str_extract(noun) %>% 
+    purrr::is_vector()
+```
+
+But I need a column for a data frame. Well I can create a column by passing this to `tibble::as_data_frame()`. 
+
+```{r tibble::as_data_frame}
+MapNewsData %$% 
+    stringr::str_extract(string = teaser, 
+                         pattern = noun) %>% 
+    tibble::as_data_frame() %>% 
+    utils::head(10)
+```
+
+But why would I stop here? I just went over how to use `dplyr::bind_cols()` to attach this to `NewsData` and I can use `dplyr::rename()` to change the title of this new column to `tease_noun_phrase`.
+
+```{r dplyr::bind_cols}
+MapNewsData <- MapNewsData %$% 
+    stringr::str_extract(string = teaser, 
+                         pattern = noun) %>% 
+    tibble::as_data_frame() %>% 
+    dplyr::bind_cols(MapNewsData) %>% 
+    dplyr::rename(tease_noun_phrase = value) 
+MapNewsData %>% 
+    dplyr::select(tease_noun_phrase, 
+                  teaser) %>% 
+    utils::head(10)
+```
+
+
+#### ADVANCED: Match words ending with `ing`
+
+This pattern will match all words in each `headline` that end with `ing`. Look at the pattern closely--note what is happening with the escape characters `\\` and the matching pattern `[A-Za-z]+ing`.
+
+```{r find_ing}
+MapNewsData %>% 
+    dplyr::filter(stringr::str_detect(
+        string = headline,
+        pattern = "\\b[A-Za-z]+ing\\b")) %>% 
+    dplyr::select(headline) %>% 
+    utils::head(5)
+```
+
+#### ADVANCED: Replace the `ing` with `in'`
+
+Now we can replace the `ing` with `in'`.
+
+```{r replace_ing}
+MapNewsData %>% 
+    dplyr::filter(stringr::str_detect(
+        string = headline,
+        pattern = "\\b[A-Za-z]+ing\\b")) %>% 
+    dplyr::select(headline) %>% 
+    utils::head(5) %>% 
+    dplyr::mutate(replace_ing = 
+    stringr::str_replace_all(string = headline,
+         pattern = "ing",
+         replacement = "in'")) %>% 
+    utils::head(5)
+```
+
+#### ADVANCED: Find articles, indefinite aricles, and nouns. 
+
+I want to find the articles (`a` and `the`) and the nouns that follow (`[^ ]+`) in the `teaser`, but I want to add these to `NewsData` as new columns (`teaser_article` and `teaser_noun`). Then I want to get the indefinite article (` an`) and the word that follows (`[^ ]+`) in the `headline`. In order to do this, I need to use regex but not with `stringr`. The `tidyr::extract()` function lets me use pattern matches *and* specify what columns I want to split these pattern matches into. I also throw in some `dplyr::everything()` to reorganize my data frame. 
+
+```{r tidyr::extract}
+MapNewsData <- MapNewsData %>%
+    tidyr::extract(
+        col = teaser, 
+        into = c("teaser_article", 
+                 "teaser_noun"), 
+        regex = "( a|the) ([^ ]+)", 
+        remove = FALSE) %>% 
+    dplyr::select(teaser_article,
+                  teaser_noun, 
+    dplyr::everything()) %>% 
+    tidyr::extract(
+        col = headline, 
+        into = c("headline_indef_art", 
+                 "headline_indef_noun"), 
+        regex = "( an) ([^ ]+)", 
+        remove = FALSE) %>% 
+    dplyr::select(teaser_article,
+        teaser_noun,
+        headline_indef_art,
+        headline_indef_noun, 
+        tease_noun_phrase, 
+        headline, 
+    dplyr::everything()) %>%
+    dplyr::arrange(desc(headline_indef_art))
+MapNewsData %>% 
+    dplyr::select(headline_indef_art,
+                  headline_indef_noun,
+                  headline) %>% head(10)
+```
+
+***
+-->
+
+# **ALESZU!! picks up again here**
+
+Create `city_id` in `UsCity`
+
+Remove the `state` from the `name` variable using the information stored in `country.etc`. I can do this by putting using the state information in `country.etc` and `stringr::str_replace_all()` to create `city`. I will also trim any additional whitespace from this variable with `stringr::str_trim()` and convert it to lower case using `stringr::str_to_lower()`.
+
+```{r city_id_UsCity}
+UsCity <- UsCity %>% 
+    mutate(city_id = stringr::str_replace_all(string = UsCity$name, 
+                         pattern = UsCity$country.etc, 
+                         replacement = ""),
+           city_id = stringr::str_trim(city_id),
+           city_id = stringr::str_to_lower(city_id))
+UsCity %>% glimpse(75)
+```
+
+I will need to check all the words in the headline to see how many mention the cities in `city_id`. To do this I need to put the `UsCity$city_id` into it’s own vector `city_id_vec`. I can do this with `base::unlist()` and `base::paste()`. I should consider how I’ll be searching for a pattern match, though. Take the example headline below:
+
+`"Trump to attend commissioning of USS Gerald R. Ford warship"`
+
+If I don’t include spaces around the `collapse = " | "` argument I would get a match for the city `mission` (for Mission, TX).
+
+```{r city_id_vec}
+city_id_vec <- unlist(UsCity$city_id)
+city_id_vec <- paste(city_id_vec, sep = "", collapse = " | ")
+```
+
+```r
+[1] "abilene | akron | alameda | albany | albany | albany | albuquerque | 
+alexandria | alexandria | alhambra | aliso viejo | allen | allentown | aloha
+| altadena | altamonte springs | altoona | amarillo | ames | anaheim | 
+anchorage | anderson | andover | ann arbor | annandale | annapolis | antioch
+| apple valley | apple valley | appleton | arcadia | arden-arcade | 
+arlington heights | arlington | arlington | arlington | arvada |..."
+```
+
+## Create `city_id` in `NewsData`
+
+Now I need to make sure the contents of `headline` in `NewsData` are all lower case.
+
+```{r lowercase_headlines}
+NewsData <- NewsData %>% 
+    mutate(headline = stringr::str_to_lower(headline))
+NewsData %$% head(headline, 1)
+```
+
+The trick here is to see which `headline`s in `NewsData` contain cities from `city_id`. I do this by dropping `stringr::str_detect()` inside `dplyr::filter()` to only include the data with a match from `city_id`. The `stringr::str_detect()` function takes string vector (or character column) as an input and check for matches provided by the `pattern` argument.
+
+```{r find_cities_in_headlines}
+MapNewsData <- NewsData %>% 
+    filter(stringr::str_detect(string = headline, 
+                               pattern = city_id_vec)) %>% 
+    dplyr::select(headline, 
+            dplyr::everything())
+MapNewsData %>% dplyr::glimpse(75)
+```
+
+Now that I’ve filtered the data set down to only those 2,322 I’ll be needing to join back to `UsCity`, I need to create a `city_id` variable in `MapNewsData`. I can do this with `stringr::str_extract()`. This function takes a `string` vector, a `pattern` to match on (which I create with `paste(city_id_vec, collapse = "|")`)
+
+```{r}
+MapNewsData <- MapNewsData %>% 
+    mutate(city_id = str_extract(string = MapNewsData$headline, 
+                     pattern = paste(city_id_vec, collapse = "|")),
+           city_id = stringr::str_trim(city_id)) 
+MapNewsData %>% 
+    count(city_id, sort = TRUE) %>% 
+    head(5)
+```
+
+This looks like it’s working. I am going to use `dplyr::inner_join()` to combine `MapNewsData` and `UsCity` by `city_id`. The result should only be observations with data in both tables (hopefully cities in both tables). I can check this with a combination of `dplyr::count()` and `tidyr::spread()`.
+
+```{r city_id_by_city_name}
+dplyr::inner_join(MapNewsData, UsCity, by = "city_id") %>% 
+    utils::head(20) %>% 
+    dplyr::count(city_id, name) %>% 
+    tidyr::spread(name, n)
+```
+
+I can see one potential problem here: `moore` in `MapNewsData` could refer to a person (like Senator Moore) and not a city (like `Moore OK`). The best way to distinguish between cases like this is to know your data. Computers can’t replace brains when it comes to content knowledge (yet).
+
+I am going to go ahead and join these data frames together and clean the dates.
+
+```{r dplyr::inner_joinMapNewsData}
+MapNewsData <- dplyr::inner_join(MapNewsData, UsCity, by = "city_id")
+```
+
+
+## `separate`, `str_sub`, and `make_datetime`
+
+The dates (`datetime`) variable is not in a format I can use. I want to get the date components into a `YYYY-MM-DD` format. I'll start this process with `tidyr::separate()` 
+
+```{r tidyr::separate}
+# test
+tidyr::separate(MapNewsData, 
+         datetime, 
+         into = c("month", "day", "year", "at", "hour", "min")) %>% 
+    dplyr::select(headline,
+                  month:min,
+                  dplyr::everything()) %>% 
+    dplyr::glimpse(75)
+```
+
+Ok now that I've separated the components, I need to convert them all into formats I can use. Follow the comments in the pipeline below to see how these work. 
+
+```{r test_datetime}
+    tidyr::separate(MapNewsData, 
+         datetime, 
+          into = c("month", 
+                  "day", 
+                  "year", 
+                  "at", 
+                  "hour", 
+                  "min")) %>% # I know this works
+    dplyr::mutate( # new variables
+         month = match(month, month.name), # month.name is loaded with R
+           day = as.numeric(day), # make numeric day
+          year = as.numeric(year), # # make numeric year
+      am_or_pm = stringr::str_sub(min, 
+                           start = 3, 
+                             end = 4),  # break up min from AM/PM
+          hour = if_else(am_or_pm %in% "PM", # condition for 24H time
+                 as.numeric(hour) + 12, # 24 hour
+                 as.numeric(hour)),
+        minute = stringr::str_sub(min, 
+                         start = 1, # get the minute elemets
+                           end = 2),
+           min = as.numeric(minute), # format the minutes
+          date = lubridate::make_date(
+                   year = year,
+                  month = month,
+                    day = day), 
+      datetime = lubridate::make_datetime( # create the datetime
+                   year = year, 
+                  month = month, 
+                    day = day, 
+                   hour = hour, 
+                    min = min)) %>% 
+    dplyr::glimpse(75)
+```
+
+Now I will assign these new variables to `MapNewsData` and visualize the occurrence of our new variable `teaser_3_words` over time. 
+
+```{r assign_datetime}
+MapNewsData <- MapNewsData %>% 
+    tidyr::separate(datetime, 
+          into = c("month", 
+                  "day", 
+                  "year", 
+                  "at", 
+                  "hour", 
+                  "min")) %>% # I know this works
+    dplyr::mutate( # new variables
+         month = match(month, month.name), # month.name is loaded with R
+           day = as.numeric(day), # make numeric day
+          year = as.numeric(year), # # make numeric year
+      am_or_pm = str_sub(min, 
+                           start = 3, 
+                             end = 4),  # break up min from AM/PM
+          hour = if_else(am_or_pm %in% "PM", # condition for 24H time
+                 as.numeric(hour) + 12, # 24 hour
+                 as.numeric(hour)),
+        minute = str_sub(min, 
+                         start = 1, # get the minute elemets
+                           end = 2),
+                    min = as.numeric(minute), # format the minutes
+          date = make_date(
+                   year = year,
+                  month = month,
+                    day = day),
+      datetime = lubridate::make_datetime( # create the datetime
+                   year = year, 
+                  month = month, 
+                    day = day, 
+                   hour = hour, 
+                    min = min))
+```
+
+### First Three `teaser` Words Over Time
+
+I want to look at the proportions of the first three words in `teaser`s over time. This can serve as a crude estimate for how much the first three words of a `teaser` vary in proportion to the total number of `teaser`s. I can do this by faceting like I did above, or I can use the `cowplot::plot_grid()` function to separate these graphs by news feed. 
+
+In order to use this function, I need to load the `cowplot` library. Then I want to split the data by the `data_id_fct` to create two plots with the `tease_3rd_prop` on the x axis and `datetime` on the y axis. 
+
+```{r MapNewsData_Prop_Data}
+# create data subset
+MapNewsData_Prop_Data <- MapNewsData %>% 
+    arrange(desc(tease_3rd_prop)) %>% 
+    dplyr::select(data_id_fct, 
+                  tease_3rd_prop,
+                  teaser_3_words,
+                  datetime) 
+MapNewsData_Prop_Data %>% glimpse(75)
+```
+
+Now I am going to create a base line plot. This allows me to set the colors for the text lables in the next geoms.  
+
+```{r MapNewsLinePlotData}
+# create base line plot
+MapNewsLinePlot <- MapNewsData_Prop_Data %>%
+        ggplot2::ggplot(aes(x = datetime, 
+                        y = tease_3rd_prop,
+                        color = data_id_fct,
+                        label = teaser_3_words)) + 
+        ggplot2::geom_line(aes(group = data_id_fct)) 
+MapNewsLinePlot
+```
+
+I want to know what the specific colors are in this plot. It turns out, all that information is stored in a data frame I can access using `ggplot2::ggplot_build()`.
+
+```{r ggplot2::ggplot_build}
+# get colors in this plot
+MapNewsLinePlotData <- ggplot2::ggplot_build(MapNewsLinePlot)$data[[1]]
+MapNewsLinePlotData %>% distinct(colour)
+```
+
+With my two color codes, I can set the `color` argument in the `geom_text()` for the highest occurring proportions. 
+
+```{r MapNewsData_Prop_Plot}
+MapNewsData_Prop_Plot <- MapNewsLinePlot +
+        ggplot2::geom_text(data = filter(MapNewsData,
+                                    tease_3rd_prop >= 0.020 &
+                                    datetime <= "2017-11-15"),
+                                    aes(label = teaser_3_words),
+                                        vjust = 2,
+                                        hjust = 1,
+                                        show.legend = FALSE,
+                                        color = "#F8766D") +
+            ggplot2::geom_text(data = filter(MapNewsData,
+                                    tease_3rd_prop >= 0.020 &
+                                    datetime >= "2017-11-15" & 
+                                    datetime <= "2017-12-7"),
+                                    aes(label = teaser_3_words),
+                                        vjust = 0.7,
+                                        hjust = 0.9,
+                                        show.legend = FALSE,
+                                        color = "#F8766D") +
+            ggplot2::geom_text(data = filter(MapNewsData,
+                                    tease_3rd_prop >= 0.020 &
+                                    datetime >= "2017-12-7"),
+                                    aes(label = teaser_3_words),
+                                        vjust = 2,
+                                        hjust = 0.09,
+                                        show.legend = FALSE,
+                                        color = "#F8766D") +
+            ggplot2::geom_text(data = filter(MapNewsData,
+                                    tease_3rd_prop > 0.015 &
+                                    datetime <= "2017-09-01"),
+                                    aes(label = teaser_3_words),
+                                        vjust = 0.9,
+                                        hjust = 0.1,
+                                        show.legend = FALSE,
+                                        color = "#00BFC4") +
+            ggplot2::geom_text(data = filter(MapNewsData,
+                                    tease_3rd_prop > 0.015 &
+                                    datetime >= "2017-11-01" & 
+                                    data_id_fct == "Kcra"),
+                                    aes(label = teaser_3_words),
+                                        vjust = 0.9,
+                                        hjust = 0.1,
+                                        show.legend = FALSE,
+                                        color = "#00BFC4") +
+            ggplot2::theme(legend.position = "top") +
+            ggplot2::labs(x = "Date",
+                      y = NULL,
+                      color = "News Feed",
+                      caption = "Proportion First Three Words Appeared") + 
+            ggplot2::ggtitle("ABC7 & KCRA Teaser First Three Word Occurrences July 18 to January 16")
+MapNewsData_Prop_Plot
+```
+
+```{r ggsave_MapNewsData_Prop_Plot}
+ggsave("./image/MapNewsData_Prop_Plot.png", width = 7, height = 5, units = "in")
+```
+
+
+This gives us an idea for when a certain `teaser` or headline spiked in coverage between July and January in 2018. 
+
+
+**FOOTER:**
+
+```{r session_info, echo=TRUE}
+devtools::session_info()  # put this at the end of document
+```

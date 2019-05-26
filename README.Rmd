@@ -16,258 +16,336 @@ This is a series of tutorials from Data Journalism in R from [Storybench.org](ht
 crayon::strip_style(tidyverse::tidyverse_logo())
 ```
 
-All tutorials are listed below (in order). Some of these posts have been updated with current package usage/functions. In this case, the code for these tutorials might be different from what is in the original post. 
+All tutorials are listed below (in order). Some of these posts have been updated with current package usage/functions. In this case, the code for these tutorials might be different from what is in the Storybench post. 
 
-## 01-getting-started-with-r-in-rstudio-notebooks
+## 1) Getting Started With R in RStudio Notebooks
 
-Original post: [Getting Started With R in RStudio Notebooks](http://www.storybench.org/getting-started-r-rstudio-notebooks/)
+Slug: 01-getting-started-with-r-in-rstudio-notebooks
 
-Changes: nothing to change on this 
+Storybench post: [Getting Started With R in RStudio Notebooks](http://www.storybench.org/getting-started-r-rstudio-notebooks/)
 
-Current post: NA
+Nothing to change on this--two versions because of typos. 
 
-## 02-getting-started-with-tidyverse-in-r
+Updates: NA
 
-Original post: [Getting Started with tidyverse in R](http://www.storybench.org/getting-started-with-tidyverse-in-r/)
 
-Changes: This has been changed a lot with the new `tidyr` functions
+```{r notebooks, echo=FALSE}
+fs::dir_ls(regexp = "notebooks")
+```
 
-Current post: [Data Journalism with R - Storybench tidyr pivoting](https://github.com/mjfrigaard/storybenchR/tree/master/02.1-data-in-tidyverse)
+## 2) Getting Started with tidyverse in R
 
-## 03-how-to-explore-and-manipulate-a-dataset-from-the-fivethirtyeight-package-in-r
+slug: 02-getting-started-with-tidyverse-in-r
 
-Original post: [How to explore and manipulate a dataset from the fivethirtyeight package in R](http://www.storybench.org/how-to-explore-a-dataset-from-the-fivethirtyeight-package-in-r/)
+Storybench post: [Getting Started with tidyverse in R](http://www.storybench.org/getting-started-with-tidyverse-in-r/)
 
-Changes: changes were made to expand these functions and examples
+This covers the key value pairs in `tidyr` and tidy data. 
+Updates: [Pivoting data from columns to rows (and back!) in the tidyverse](http://www.storybench.org/pivoting-data-from-columns-to-rows-and-back-in-the-tidyverse/)
 
-Current post: [How to explore and manipulate a dataset from the fivethirtyeight package in R](https://github.com/mjfrigaard/storybenchR/tree/master/03.1-tidyr-separate-unite-spread-gather)
+This new post covers the new 
 
-## 04-how-to-manipulate-data-with-dplyr-in-r
+```{r tidyverse, echo=FALSE}
+fs::dir_ls(regexp = "tidy")
+```
 
-Original post: [How to manipulate data with dplyr in R](http://www.storybench.org/how-to-manipulate-data-with-dplyr-in-r/)
 
-Changes: Nothing has changed on this tutorial.
+## 3) How to explore and manipulate a dataset from the fivethirtyeight package in R
 
-Current post: NA
+Slug: 03-how-to-explore-and-manipulate-a-dataset-from-the-fivethirtyeight-package-in-r
 
-## 05-getting-started-with-data-visualization-in-r-using-ggplot2
+Storybench post: [How to explore and manipulate a dataset from the fivethirtyeight package in R](http://www.storybench.org/how-to-explore-a-dataset-from-the-fivethirtyeight-package-in-r/)
 
-Original post: [Getting started with data visualization in R using ggplot2](http://www.storybench.org/getting-started-data-visualization-r-using-ggplot2/)
+Changes were made to expand these functions and examples
 
-Changes: This is now a two-part intro. Part one is on Github (expanded a bit).
+Update: 
 
-Current post(s):
+```{r tidyr, echo=FALSE}
+fs::dir_ls(regexp = "538")
+```
+
+## 4) How to manipulate data with dplyr in R
+
+Slug: 04-how-to-manipulate-data-with-dplyr-in-r
+
+Storybench post: [How to manipulate data with dplyr in R](http://www.storybench.org/how-to-manipulate-data-with-dplyr-in-r/)
+
+
+
+Updates: NA
+
+```{r dplyr, echo=FALSE}
+fs::dir_ls(regexp = "dplyr")
+```
+
+
+
+## 5) Getting started with data visualization in R using ggplot2
+
+Slug: 05-getting-started-with-data-visualization-in-r-using-ggplot2
+
+Storybench post: [Getting started with data visualization in R using ggplot2](http://www.storybench.org/getting-started-data-visualization-r-using-ggplot2/)
+
+ This is now a two-part intro. Part one is on Github (expanded a bit).
+
+updates(s):
+
+```{r ggplot, echo=FALSE}
+fs::dir_ls(regexp = "ggplot")
+```
+
 
 Part 1: [Getting started with data visualization in R using ggplot2 (part 1)](https://github.com/mjfrigaard/storybenchR/tree/master/04.1-ggplot2-intro)
 
 Part 2: is still coming...
 
-## 06-welcome-to-data-journalism-in-r
+## 6) Welcome to Data Journalism in R
 
-Original post: [Welcome to Data Journalism in R](http://www.storybench.org/welcome-to-data-journalism-in-r-2/)
+Slug: 06-welcome-to-data-journalism-in-r
 
-Changes: Post announcing official section on Storybench.
+Storybench post: [Welcome to Data Journalism in R](http://www.storybench.org/welcome-to-data-journalism-in-r-2/)
 
-Current post:
+ Post announcing official section on Storybench.
 
-## 07-twitter-plus-r
+Updates:
 
-Original post: [Twitter + R](http://www.storybench.org/twitter-r/)
+## 7) Twitter + R
 
-Changes: Accessing twitter with old twitter package. Now we use `rtweet`
+Slug: 07-twitter-plus-r
 
-Current post:
+Storybench post: [Twitter + R](http://www.storybench.org/twitter-r/)
 
-## 08-sentiment-analysis-of-donald-trump’s-tweets
+ Accessing twitter with old twitter package. Now we use `rtweet`
 
-Original post: [Sentiment analysis of (you guessed it!) Donald Trump’s tweets](http://www.storybench.org/sentiment-analysis-of-you-guessed-it-donald-trumps-tweets/)
+Updates: 
 
-Changes:
+## 8) Sentiment analysis of (you guessed it!) Donald Trump’s tweets
 
-Current post: 
+Slug: 08-sentiment-analysis-of-donald-trump’s-tweets
 
-## 09-how-to-merge-and-clean-up-multiple-csvs-using-r
+Storybench post: [Sentiment analysis of (you guessed it!) Donald Trump’s tweets](http://www.storybench.org/sentiment-analysis-of-you-guessed-it-donald-trumps-tweets/)
 
-Original post: [How to merge and clean up multiple CSVs using R](http://www.storybench.org/merge-clean-multiple-csvs-using-r/)
+
+
+Updates: 
+
+## 9) How to merge and clean up multiple CSVs using R
+
+Slug: 09-how-to-merge-and-clean-up-multiple-csvs-using-r
+
+Storybench post: [How to merge and clean up multiple CSVs using R](http://www.storybench.org/merge-clean-multiple-csvs-using-r/)
 
 This is the intro to `for` loops and iteration. 
 
-Changes:
 
-Current post:
 
-## 10-working-with-the-new-york-times-api-in-r
+Updates:
 
-Original post: [Working with The New York Times API in R](http://www.storybench.org/working-with-the-new-york-times-api-in-r/)
+## 10) Working with The New York Times API in R
 
-Changes:
+Slug: 10-working-with-the-new-york-times-api-in-r
 
-Current post:
+Storybench post: [Working with The New York Times API in R](http://www.storybench.org/working-with-the-new-york-times-api-in-r/)
 
-## 11-getting-started-with-stringr-for-textual-analysis-in-r
+Updates:
 
-Original post: [Getting started with stringr for textual analysis in R](http://www.storybench.org/getting-started-stringr-textual-analysis-r/)
+## 11) Getting started with stringr for textual analysis in R
 
-Changes:
+Slug: 11-getting-started-with-stringr-for-textual-analysis-in-r
 
-Current post:
+Storybench post: [Getting started with stringr for textual analysis in R](http://www.storybench.org/getting-started-stringr-textual-analysis-r/)
 
-## 12-how-to-plot-state-by-state-data-on-a-map-of-the-us-in-r
+Updates:
 
-Original post: [How to plot state-by-state data on a map of the U.S. in R](http://www.storybench.org/plot-state-state-data-map-u-s-r/)
+## 12) How to plot state-by-state data on a map of the U.S. in R
 
-Changes:
+12-how-to-plot-state-by-state-data-on-a-map-of-the-us-in-r
 
-Current post:
+Storybench post: [How to plot state-by-state data on a map of the U.S. in R](http://www.storybench.org/plot-state-state-data-map-u-s-r/)
 
-## 13-how-to-build-an-animated-map-of-tweets-about-the-nba-finals-in-r
 
-Original post: [How to build an animated map of tweets about the NBA finals in R](http://www.storybench.org/build-animated-map-tweets-nba-finals-r/)
 
-Changes:
+Updates:
 
-Current post:
+## 13) How to build an animated map of tweets about the NBA finals in R
 
-## 14-using-french-wine-reviews-to-understand-tf-idf-a-measure-of-how-unique-a-word-is-to-a-document
+13-how-to-build-an-animated-map-of-tweets-about-the-nba-finals-in-r
 
-Original post: [Using French wine reviews to understand TF-IDF, a measure of how unique a word is to a document](http://www.storybench.org/using-french-wine-reviews-understand-tf-idf-measure-unique-word-document/)
+Storybench post: [How to build an animated map of tweets about the NBA finals in R](http://www.storybench.org/build-animated-map-tweets-nba-finals-r/)
 
-Changes:
 
-Current post:
 
-## 15-mapping-search-data-from-google-trends-in-r
+Updates:
 
-Original post: [Mapping search data from Google Trends in R](http://www.storybench.org/mapping-search-data-from-google-trends-in-r/)
+## 14) Using French wine reviews to understand TF-IDF, a measure of how unique a word is to a document
 
-Changes:
+SLug: 14-using-french-wine-reviews-to-understand-tf-idf-a-measure-of-how-unique-a-word-is-to-a-document
 
-Current post:
+Storybench post: [Using French wine reviews to understand TF-IDF, a measure of how unique a word is to a document](http://www.storybench.org/using-french-wine-reviews-understand-tf-idf-measure-unique-word-document/)
 
-## 16-exploring-beto-o’rourke-and-ted-cruz-ads-on-facebook-using-r
 
-Original post: [Exploring Beto O’Rourke and Ted Cruz ads on Facebook using R](http://www.storybench.org/exploring-beto-orourke-ted-cruz-ads-facebook-using-r/)
 
-Changes:
+Updates:
 
-Current post:
+## 15) Mapping search data from Google Trends in R
 
-## 17-how-to-get-twitter-data-with-rtweet-in-r
+SLug: 15-mapping-search-data-from-google-trends-in-r
 
-Original post: [How to get Twitter data with rtweet in R](http://www.storybench.org/get-twitter-data-rtweet-r/)
+Storybench post: [Mapping search data from Google Trends in R](http://www.storybench.org/mapping-search-data-from-google-trends-in-r/)
 
-Changes:
 
-Current post:
 
-## 18-how-to-install-r-on-a-jupyter-notebook
+Updates:
 
-Original post: [How to install R on a Jupyter notebook](http://www.storybench.org/install-r-jupyter-notebook/)
+## 16) Exploring Beto O’Rourke and Ted Cruz ads on Facebook using R
 
-Changes:
+Slug: 16-exploring-beto-o’rourke-and-ted-cruz-ads-on-facebook-using-r
 
-Current post:
+Storybench post: [Exploring Beto O’Rourke and Ted Cruz ads on Facebook using R](http://www.storybench.org/exploring-beto-orourke-ted-cruz-ads-facebook-using-r/)
 
-## 19-a-data-history-of-popular-hip-hop
 
-Original post: [A Data History of Popular Hip-Hop](http://www.storybench.org/a-data-history-of-popular-hip-hop/)
 
-Changes:
+Updates:
 
-Current post:
+## 17) How to get Twitter data with rtweet in R
 
-## 20-how-to-map-point-data-and-polygon-shapefiles-in-r
+Slug: 17-how-to-get-twitter-data-with-rtweet-in-r
 
-Original post: [How to map point data and polygon shapefiles in R](http://www.storybench.org/how-to-map-point-data-and-polygon-shapefiles-in-r/)
+Storybench post: [How to get Twitter data with rtweet in R](http://www.storybench.org/get-twitter-data-rtweet-r/)
 
-Changes:
 
-Current post:
 
-## 21-bringing-textual-analysis-tools-to-judge-brett-kavanaugh’s-latest-opinion
+Updates:
 
-Original post: [Bringing textual analysis tools to Judge Brett Kavanaugh’s latest opinion](http://www.storybench.org/bringing-textual-analysis-tools-to-judge-brett-kavanaughs-latest-opinion/)
+## 18) How to install R on a Jupyter notebook
 
-Changes:
+Slug: 18-how-to-install-r-on-a-jupyter-notebook
 
-Current post:
+Storybench post: [How to install R on a Jupyter notebook](http://www.storybench.org/install-r-jupyter-notebook/)
 
-## 22-scraping-html-tables-and-downloading-files-with-r
 
-Original post: [Scraping HTML tables and downloading files with R](http://www.storybench.org/scraping-html-tables-and-downloading-files-with-r/)
 
-Changes:
+Updates:
 
-Current post:
+## 19) A Data History of Popular Hip-Hop
 
-## 23-from-deep-learning-to-clean_names-resources-from-data-journalism-in-r
+Slug: 19-a-data-history-of-popular-hip-hop
 
-Original post: [From deep learning to clean_names(), resources from Data Journalism in R](http://www.storybench.org/from-deep-learning-to-clean_names-resources-from-data-journalism-in-r/)
+Storybench post: [A Data History of Popular Hip-Hop](http://www.storybench.org/a-data-history-of-popular-hip-hop/)
 
-Changes:
 
-Current post:
 
-## 24-why-sharon-machlis-wrote-a-book-on-r-for-journalists
+Updates:
 
-Original post: [Why Sharon Machlis wrote a book on R for journalists](http://www.storybench.org/why-sharon-machlis-wrote-a-book-on-r-for-journalists/)
+## 20) How to map point data and polygon shapefiles in R
 
-Changes:
+Slug: 20-how-to-map-point-data-and-polygon-shapefiles-in-r
 
-Current post:
+Storybench post: [How to map point data and polygon shapefiles in R](http://www.storybench.org/how-to-map-point-data-and-polygon-shapefiles-in-r/)
 
-## 25-pivoting-data-from-columns-to-rows-in-the-tidyverse
 
-Original post: [Pivoting data from columns to rows (and back!) in the tidyverse](http://www.storybench.org/pivoting-data-from-columns-to-rows-and-back-in-the-tidyverse/)
 
-Changes:
+Updates:
 
-Current post:
+## 21) Bringing textual analysis tools to Judge Brett Kavanaugh’s latest opinion
 
-## 26-exploring-bike-rental-behavior-using-r
+Slug: 21-bringing-textual-analysis-tools-to-judge-brett-kavanaugh’s-latest-opinion
 
-Original post: [Exploring bike rental behavior using R](http://www.storybench.org/exploring-bike-rental-behavior-using-r/)
+Storybench post: [Bringing textual analysis tools to Judge Brett Kavanaugh’s latest opinion](http://www.storybench.org/bringing-textual-analysis-tools-to-judge-brett-kavanaughs-latest-opinion/)
 
-Changes:
 
-Current post:
 
-## 27-how-to-model-with-gradient-boosting-machine-in-r
+Updates:
 
-Original post: [How to model with gradient boosting machine in R](http://www.storybench.org/tidytuesday-bike-rentals-part-2-modeling-with-gradient-boosting-machine/)
+## 22) Scraping HTML tables and downloading files with R
 
-Changes:
+Slug: 22-scraping-html-tables-and-downloading-files-with-r
 
-Current post:
+Storybench post: [Scraping HTML tables and downloading files with R](http://www.storybench.org/scraping-html-tables-and-downloading-files-with-r/)
 
-## 28-how-to-access-apis-in-r
 
-Original post: [How to access APIs in R](http://www.storybench.org/how-to-access-apis-in-r/)
 
-Changes:
+Updates:
 
-Current post:
+## 23) From deep learning to `clean_names()`, resources from Data Journalism in R
 
-## 29-how-to-build-a-bubble-chart-of-individuals-mentioned-in-the-mueller-report
+23-from-deep-learning-to-clean_names-resources-from-data-journalism-in-r
 
-Original post: [How to build a bubble chart of individuals mentioned in the Mueller report](http://www.storybench.org/how-to-build-a-bubble-chart-of-individuals-mentioned-in-the-mueller-report/)
+Storybench post: [From deep learning to clean_names(), resources from Data Journalism in R](http://www.storybench.org/from-deep-learning-to-clean_names-resources-from-data-journalism-in-r/)
 
-Changes:
 
-Current post:
 
-## 29-how-to-build-a-website-with-blogdown-in-r
+Updates:
 
-Original post: [How to build a website with Blogdown in R](http://www.storybench.org/how-to-build-a-website-with-blogdown-in-r/)
+## 24) Why Sharon Machlis wrote a book on R for journalists
 
-Changes:
+24-why-sharon-machlis-wrote-a-book-on-r-for-journalists
 
-Current post:
+Storybench post: [Why Sharon Machlis wrote a book on R for journalists](http://www.storybench.org/why-sharon-machlis-wrote-a-book-on-r-for-journalists/)
 
-## 30-exploring-chicago-rideshare-data-in-r
 
-Original post: [Exploring Chicago rideshare data in R](http://www.storybench.org/exploring-chicago-rideshare-data/)
 
-Changes:
+Updates:
 
-Current post:
+## 25) Pivoting data from columns to rows (and back!) in the tidyverse
+
+25-pivoting-data-from-columns-to-rows-in-the-tidyverse
+
+Storybench post: [Pivoting data from columns to rows (and back!) in the tidyverse](http://www.storybench.org/pivoting-data-from-columns-to-rows-and-back-in-the-tidyverse/)
+
+
+
+Updates:
+
+## 26) Exploring bike rental behavior using R
+
+Slug: 26-exploring-bike-rental-behavior-using-r
+
+Storybench post: [Exploring bike rental behavior using R](http://www.storybench.org/exploring-bike-rental-behavior-using-r/)
+
+
+
+Updates:
+
+## 27) How to model with gradient boosting machine in R
+
+27-how-to-model-with-gradient-boosting-machine-in-r
+
+Storybench post: [How to model with gradient boosting machine in R](http://www.storybench.org/tidytuesday-bike-rentals-part-2-modeling-with-gradient-boosting-machine/)
+
+
+
+Updates:
+
+## 28) How to access APIs in R
+
+Slug: 28-how-to-access-apis-in-r
+
+Storybench post: [How to access APIs in R](http://www.storybench.org/how-to-access-apis-in-r/)
+
+Updates:
+
+## 29) How to build a bubble chart of individuals mentioned in the Mueller report
+
+Slug: 29-how-to-build-a-bubble-chart-of-individuals-mentioned-in-the-mueller-report
+
+Storybench post: [How to build a bubble chart of individuals mentioned in the Mueller report](http://www.storybench.org/how-to-build-a-bubble-chart-of-individuals-mentioned-in-the-mueller-report/)
+
+Updates:
+
+## 30) How to build a website with Blogdown in R
+
+Slug: 30-how-to-build-a-website-with-blogdown-in-r
+
+Storybench post: [How to build a website with Blogdown in R](http://www.storybench.org/how-to-build-a-website-with-blogdown-in-r/)
+
+
+Updates:
+
+## 31) Exploring Chicago rideshare data in R
+
+Slug: 31-exploring-chicago-rideshare-data-in-r
+
+Storybench post: [Exploring Chicago rideshare data in R](http://www.storybench.org/exploring-chicago-rideshare-data/)
+
+
+Updates:
