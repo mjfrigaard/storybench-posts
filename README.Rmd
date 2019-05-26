@@ -5,7 +5,6 @@ date: "compiled on `r Sys.Date()`"
 output: 
   github_document: 
     toc: yes
-    toc_depth: 5
 ---
 
 # Welcome to `StorybenchR`

@@ -70,6 +70,7 @@ compiled on 2019-05-25
         R](#how-to-build-a-website-with-blogdown-in-r)
       - [31) Exploring Chicago rideshare data in
         R](#exploring-chicago-rideshare-data-in-r)
+      - [32) Web scraping with Python](#web-scraping-with-python)
 
 # Welcome to `StorybenchR`
 
@@ -385,6 +386,12 @@ Updates:
 Storybench post: [How to model with gradient boosting machine in
 R](http://www.storybench.org/tidytuesday-bike-rentals-part-2-modeling-with-gradient-boosting-machine/)
 
+``` r
+fs::dir_ls(regexp = "rideshare")
+```
+
+    ## 15.0-rideshare-data.Rmd
+
 Updates:
 
 ## 28\) How to access APIs in R
@@ -393,6 +400,12 @@ Slug: 28-how-to-access-apis-in-r
 
 Storybench post: [How to access APIs in
 R](http://www.storybench.org/how-to-access-apis-in-r/)
+
+``` r
+fs::dir_ls(regexp = "api")
+```
+
+    ## 13.0-working-with-api-data-r.Rmd
 
 Updates:
 
@@ -414,6 +427,12 @@ Slug: 30-how-to-build-a-website-with-blogdown-in-r
 Storybench post: [How to build a website with Blogdown in
 R](http://www.storybench.org/how-to-build-a-website-with-blogdown-in-r/)
 
+``` r
+fs::dir_ls(regexp = "blogdown")
+```
+
+    ## 14.0-creating-a-static-site-with-blogdown.Rmd
+
 Updates:
 
 ## 31\) Exploring Chicago rideshare data in R
@@ -422,5 +441,19 @@ Slug: 31-exploring-chicago-rideshare-data-in-r
 
 Storybench post: [Exploring Chicago rideshare data in
 R](http://www.storybench.org/exploring-chicago-rideshare-data/)
+
+Updates:
+
+## 32\) Web scraping with Python
+
+``` r
+fs::dir_ls(regexp = "python")
+```
+
+    ## 17.0-web-scraper-python.md
+
+Slug:
+
+Storybench post:
 
 Updates:
