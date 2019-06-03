@@ -1,0 +1,222 @@
+---
+title: "How to explore and manipulate a dataset from the fivethirtyeight package in R"
+author: "Martin Frigaard"
+date: "`r Sys.Date()`"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      tidy = FALSE,
+                      fig.path = "images/",
+                      size = "small")
+library(tidyverse)
+library(magrittr)
+library(markdowntemplates)
+```
+
+```{r tidyr-cover-jpg, echo=FALSE}
+# fs::dir_ls("images")
+knitr::include_graphics(path = "images/tidyr-cover.jpg")
+```
+
+
+
+The `fivethirtyeight` R package – released by Albert Y. Kim, Chester Ismay, and Jennifer Chunn last March – contains dozens of datasets used in FiveThirtyEight news articles like [“A Handful Of Cities Are Driving 2016’s Rise In Murders,”](https://fivethirtyeight.com/features/a-handful-of-cities-are-driving-2016s-rise-in-murders/) [“The Best MLB All-Star Teams Ever,”](https://fivethirtyeight.com/features/the-best-mlb-all-star-teams-ever/) and [“The Dallas Shooting Was Among The Deadliest For Police In U.S. History.”](https://fivethirtyeight.com/features/the-dallas-shooting-was-among-the-deadliest-for-police-in-u-s-history/) 
+
+This tutorial will explore the `murder_2015_final` dataset using `tidyr` functions like `tibble`, `gather`, `arrange` and `separate` from our tidyverse tutorial.
+
+## Install and load the package
+
+Using RStudio, we’ll install and then load the `fivethirtyeight` package, as well as `tidyr`, `tibble` and `dplyr` and then call `murder_2015_final`
+
+
+```{r packages}
+library(fivethirtyeight)
+library(tidyr)
+library(tibble)
+library(dplyr)
+murder_2015_final
+```
+
+
+Look at the dataset’s column names
+
+Use `names(murder_2015_final)` to list out the dataset’s column names.
+
+```{r names-murder_2015_final}
+names(murder_2015_final)
+```
+
+```{r 03-01-names538, echo=FALSE}
+knitr::include_graphics(path = "images/03-01-names538.png")
+```
+
+
+### Gather variables into a single column
+
+Lets gather up the two year variables, `murders_2014` and `murders_2015` into a single year column we’ll name `murder_year`. We’ll store the number of murders in a column titled murders and call this new object `murders_gathered`.
+
+```{r murders_gathered, results='hide'}
+murders_gathered <- murder_2015_final %>% 
+    gather(
+        murder_year,
+        murders,
+        murders_2014:murders_2015,
+        na.rm = TRUE)
+murders_gathered
+```
+
+```{r 03-02-names538, echo=FALSE}
+knitr::include_graphics(path = "images/03-02-names538.png")
+```
+
+
+### Arrange data alphabetically by state and city
+
+Now let’s `arrange` these data alphabetically by state and city. We can do this with `dplyr::arrange()` from the `dplyr` package. (We’ll learn more about `dplyr` in the next tutorial!)
+
+
+```{r murders_arranged, results='hide'}
+murders_arranged <- murders_gathered %>% 
+    arrange(
+        state, 
+        city)
+murders_arranged
+```
+
+So now we have the two years in a single column (`murder_year`), but the repeating `murder_` text is redundant. I want to get the year in a column by itself.
+
+```{r 03-03-names538, echo=FALSE}
+knitr::include_graphics(path = "images/03-03-names538.png")
+```
+
+### Separate “murder_year” column into “text” and “year”
+
+Now I want to put the murder years (`2014` & `2015`) back into two different columns. I’ll do this with `tidyr::separate()`.
+
+The `separate()` command uses a name of the existting column we want to separate (`murder_year`), and the names of the columns that will contain the separated values (`c("text", "year")`).
+
+```{r murders_separate}
+murders_separate <- murders_arranged %>%
+    tidyr::separate(
+        murder_year,
+            into = c("text", 
+                     "year"))
+murders_separate
+```
+
+Great. Now I can use `tidyr::spread()` to put the year back into two different columns, 2014 & 2015. But I will combine this with `dplyr::arrange()` so the output is easier to read.
+
+```{r murders_spread, results='hide'}
+murders_spread <- murders_separate %>% 
+    spread(
+        year,
+        murders
+        ) %>% 
+        arrange(
+            state,
+            city)
+murders_spread
+```
+
+```{r 03-04-names538, echo=FALSE}
+knitr::include_graphics(path = "images/03-04-names538.png")
+```
+
+What if I want to combine city and state into a single column `city_state`?
+
+### Using unite to paste one column into another
+
+The final command, `tidyr::unite()`, lets me paste the contents of columns onto one another. It requires the name of the new column `city_state` and the columns I want to combine city and state. But I want to sort this new tibble in descending order of change, and I want to remove the text variable.
+
+I can combine all of these together with the pipe (`%>%`).
+
+```{r murders_final}
+murders_final <- murders_spread %>%
+unite(
+    city_state, 
+    city, 
+    state) %>% 
+        arrange(
+            city_state
+            ) %>% 
+            select(
+                -(text)
+                )
+murders_final
+```
+
+## Output the new table as a csv
+
+Use `readr::write_csv(as_data_frame(murders_final), "murders_final.csv")` and voilá, you have a csv.
+
+```{r 03-05-names538, echo=FALSE}
+knitr::include_graphics(path = "images/03-05-names538.png")
+```
+
+### A recap of what we learned
+
+We used the pipe operator to string together various `tidyr` and `dplyr` functions for structuring our data (in tibbles). Remember that:
+
+`gather()` collects data across columns and puts it into into rows
+`arrange()` sorts the data in each column
+`separate()` divides the contents of a column apart into new columns
+`spread()` distributes data from rows into columns
+`unite()` attaches the contents from one column onto the contents of another column
+
+
+```{r 03-tidyr-image-full, echo=FALSE}
+# fs::dir_ls("images")
+knitr::include_graphics(path = "images/03-tidyr-image-full.png")
+```
+
+### A quick barplot
+
+By typing `barplot(murders_final$change)`, you can create a quick barplot of the change in murders by city.
+
+```{r barplot}
+graphics::barplot(murders_final$change)
+```
+
+Obviously, the barplot is not visualizing the “change” column sorted low to high. To do that, try your hand with `arrange()`.
+
+```{r murders_final_sort}
+murders_final  %>% 
+  dplyr::arrange(change) -> murders_final_sort
+```
+
+Then, plotting `barplot(murders_final_sort$change)` will produce this:
+
+```{r murders_final_sort-change}
+barplot(murders_final_sort$change)
+```
+
+To extend the y-axis to -20, add:
+
+```{r add-yaxis}
+barplot(murders_final_sort$change,
+        ylim = c(-20, 120))
+```
+
+
+Finally, we’ll add some labels. There are many different ways to add labels in R. Here’s one way:
+
+
+```{r midpts}
+midpts <- barplot(murders_final_sort$change,
+                  cex.axis = 1.0, cex.names = 0.6,
+                  ylim = c(-20, 120), main = "Change in murders from 2014 to 2015"
+)
+
+text(murder_2015_final$city,
+     x = midpts,
+     offset = -0.1,
+     y = -20,
+     cex = 0.5,
+     srt = 60,
+     xpd = TRUE,
+     pos = 2
+) 
+```
+

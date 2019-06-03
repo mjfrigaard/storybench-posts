@@ -5,7 +5,7 @@ date: "compiled on `r Sys.Date()`"
 output: github_document
 ---
 
-# Welcome to `StorybenchR`
+# Welcome to `StorybenchR` 
 
 This is a series of tutorials from Data Journalism in R from [Storybench.org](http://www.storybench.org/category/data-journalism-in-r/) using the `tidyverse`. 
 
@@ -22,7 +22,7 @@ All tutorials are listed below (in order). Some of these posts have been updated
 
 ## 1) Getting Started With R in RStudio Notebooks
 
-Slug: 01-getting-started-with-r-in-rstudio-notebooks
+Slug: `getting-started-with-r-in-rstudio-notebooks`
 
 Storybench post: [Getting Started With R in RStudio Notebooks](http://www.storybench.org/getting-started-r-rstudio-notebooks/)
 
@@ -30,9 +30,8 @@ Nothing to change on this--two versions because of typos.
 
 Updates: NA
 
-
 ```{r notebooks, echo=FALSE}
-fs::dir_ls(regexp = "notebooks")
+fs::dir_ls(regexp = "01")
 ```
 
 ## 2) Getting Started with tidyverse in R
@@ -47,7 +46,7 @@ Updates: [Pivoting data from columns to rows (and back!) in the tidyverse](http:
 This new post covers the new 
 
 ```{r tidyverse, echo=FALSE}
-fs::dir_ls(regexp = "tidy")
+fs::dir_ls(regexp = "02")
 ```
 
 
@@ -70,8 +69,6 @@ fs::dir_ls(regexp = "538")
 Slug: 04-how-to-manipulate-data-with-dplyr-in-r
 
 Storybench post: [How to manipulate data with dplyr in R](http://www.storybench.org/how-to-manipulate-data-with-dplyr-in-r/)
-
-
 
 Updates: NA
 
