@@ -386,7 +386,6 @@ FandangoSkim
 knitr::include_graphics(path = "images/skim-to-wide.gif")
 ```
 
-
 Now that I can see the miny histograms for both variables, it looks like `fandango_ratingvalue` is 
 
 ```{r}

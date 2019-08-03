@@ -215,7 +215,7 @@ The key-value pairs are the indexes we can use to rearrange the data to make it 
 
 Which version of the `key_value` is tidy? We stated that tidy data means, “one variable per column, one observation per row,” so the arrangement that satisfied this condition is the `key_gathered` data set. But I want to stress that without knowledge of what these variables and observations actually contain, we can’t really know if these data are tidy.
 
-```{r tidyverse.R, eval=FALSE}
+```{r tidyverse.R, eval=TRUE}
 # Getting Started with tidyverse in R
 
 library(tidyr)

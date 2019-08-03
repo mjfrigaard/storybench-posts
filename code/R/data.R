@@ -63,9 +63,10 @@ LomaFightsWide <- LomaFightsWide %>%
                                   "fight_3", "fight_4", "fight_5",
                                   "fight_6", "fight_7", "fight_8", 
                                   "fight_9", "fight_10", "fight_11",
-                                  "fight_12", "fight_13", "fight_14"))
+                                  "fight_12", "fight_13", "fight_14",
+                                  "fight_15"))
 
-LomaFightsWide <- LomaFightsWide %>% 
+LomaFightsWide <- LomaFightsWide %>%
     dplyr::select(
         opponent,
         location,
@@ -105,8 +106,10 @@ LomaDatesWide <- LomaFights %>%
 
 # LomaDatesWide %>% dplyr::glimpse(78)
 
-# write_excel_csv(x = as.data.frame(LomaDatesWide),
-                # path = "data/LomaDatesWide.csv", na = "")
+readr::write_rds(x = LomaDatesWide, path = paste0(
+    "data/",
+    base::noquote(lubridate::today()),
+    "-LomaDatesWide.rds"))
 
 # Indexed ---------------------------------------------------------------
 

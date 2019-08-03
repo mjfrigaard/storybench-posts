@@ -1,7 +1,7 @@
 How to manipulate data with dplyr in R
 ================
 Martin Frigaard
-2019-06-03
+2019-08-03
 
 ![](images/04.1-pliers.png)<!-- -->
 
@@ -508,14 +508,14 @@ hiphop %>%
     #>  # A tibble: 8 x 2
     #>    theme              n
     #>    <chr>          <int>
-    #>  1 <NA>              79
-    #>  2 hotel             68
-    #>  3 money            107
-    #>  4 personal          47
-    #>  5 political         52
-    #>  6 power              2
-    #>  7 sexual             4
-    #>  8 The Apprentice    18
+    #>  1 hotel             68
+    #>  2 money            107
+    #>  3 personal          47
+    #>  4 political         52
+    #>  5 power              2
+    #>  6 sexual             4
+    #>  7 The Apprentice    18
+    #>  8 <NA>              79
 
 [Jenny Bryan](https://twitter.com/JennyBryan) was nice enough to compile
 a list of methods from a

@@ -2,9 +2,9 @@ How to explore and manipulate a dataset from the fivethirtyeight package
 in R
 ================
 Martin Frigaard
-2019-05-26
+2019-08-03
 
-![](images/tidyr-cover.jpg)<!-- -->
+![](images/00-tidyr-cover.jpg)<!-- -->
 
 The `fivethirtyeight` R package – released by Albert Y. Kim, Chester
 Ismay, and Jennifer Chunn last March – contains dozens of datasets used

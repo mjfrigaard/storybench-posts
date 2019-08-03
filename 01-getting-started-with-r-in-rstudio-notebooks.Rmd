@@ -36,7 +36,7 @@ The IDE environment has four panes (seen below),
 
 
 ```{r 01-studio-setup, echo=FALSE}
-# fs::dir_ls(".")
+# fs::dir_ls(".", regexp = "rstudio_setup")
 knitr::include_graphics(path = "images/01-rstudio_setup.png")
 ```
 

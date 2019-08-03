@@ -28,6 +28,14 @@ Storybench post: [Getting Started With R in RStudio Notebooks](http://www.storyb
 
 Nothing to change on this--two versions because of typos. 
 
+### Rpub
+
+https://rpubs.com/mjfrigaard/getting-started-r-rstudio-notebooks 
+
+### Issues
+
+- images are ok, loaded into wp
+
 Updates: NA
 
 ```{r notebooks, echo=FALSE}
@@ -38,45 +46,57 @@ fs::dir_ls(regexp = "01")
 
 slug: 02-getting-started-with-tidyverse-in-r
 
+### RPub
+
+https://rpubs.com/mjfrigaard/getting-started-with-tidyverse-in-r
+
 Storybench post: [Getting Started with tidyverse in R](http://www.storybench.org/getting-started-with-tidyverse-in-r/)
 
 This covers the key value pairs in `tidyr` and tidy data. 
 Updates: [Pivoting data from columns to rows (and back!) in the tidyverse](http://www.storybench.org/pivoting-data-from-columns-to-rows-and-back-in-the-tidyverse/)
 
-This new post covers the new 
+This new post covers the new pivoting functions.
 
 ```{r tidyverse, echo=FALSE}
 fs::dir_ls(regexp = "02")
 ```
 
-
 ## 3) How to explore and manipulate a dataset from the fivethirtyeight package in R
 
 Slug: 03-how-to-explore-and-manipulate-a-dataset-from-the-fivethirtyeight-package-in-r
+
+### Rpub
+
+https://rpubs.com/mjfrigaard/how-to-explore-a-dataset-from-the-fivethirtyeight-package-in-r
 
 Storybench post: [How to explore and manipulate a dataset from the fivethirtyeight package in R](http://www.storybench.org/how-to-explore-a-dataset-from-the-fivethirtyeight-package-in-r/)
 
 Changes were made to expand these functions and examples
 
-Update: 
-
-```{r tidyr, echo=FALSE}
-fs::dir_ls(regexp = "538")
-```
+Update: NA
 
 ## 4) How to manipulate data with dplyr in R
 
 Slug: 04-how-to-manipulate-data-with-dplyr-in-r
 
+### RPub
+
+https://rpubs.com/mjfrigaard/how-to-manipulate-data-with-dplyr-in-r
+
 Storybench post: [How to manipulate data with dplyr in R](http://www.storybench.org/how-to-manipulate-data-with-dplyr-in-r/)
 
-Updates: NA
+### Updates: 
+
+This is the version that focuses on variables:
+
+https://rpubs.com/mjfrigaard/dplyr-vars-storybench
+
+
+
 
 ```{r dplyr, echo=FALSE}
 fs::dir_ls(regexp = "dplyr")
 ```
-
-
 
 ## 5) Getting started with data visualization in R using ggplot2
 
@@ -84,7 +104,17 @@ Slug: 05-getting-started-with-data-visualization-in-r-using-ggplot2
 
 Storybench post: [Getting started with data visualization in R using ggplot2](http://www.storybench.org/getting-started-data-visualization-r-using-ggplot2/)
 
- This is now a two-part intro. Part one is on Github (expanded a bit).
+### PDF version 
+
+```{r ggplot-pdf, echo=FALSE}
+fs::dir_ls(path = "pdf", regexp = "ggplot")
+```
+
+This is now a two-part intro. Part one is on Github (expanded a bit).
+
+### RPub version
+
+https://rpubs.com/mjfrigaard/getting-started-data-visualization-r-using-ggplot2
 
 updates(s):
 
@@ -95,7 +125,25 @@ fs::dir_ls(regexp = "ggplot")
 
 Part 1: [Getting started with data visualization in R using ggplot2 (part 1)](https://github.com/mjfrigaard/storybenchR/tree/master/04.1-ggplot2-intro)
 
-Part 2: is still coming...
+Part 2: 
+
+#### Part 2: Getting started with qplot()
+
+- `05.1-ggplot2-qplot.Rmd`
+
+https://rpubs.com/mjfrigaard/517339
+
+#### Part 3: ggplot2 extras
+
+- `05.2-ggplot2-extras.Rmd`
+
+https://rpubs.com/mjfrigaard/ggplot2-version-2
+
+#### Part 4: Getting started with data visualization in R using ggplot2 (short) 
+
+- `05.3-ggplot2-intro-to-visualizations.Rmd`
+
+- 
 
 ## 6) Welcome to Data Journalism in R
 
@@ -287,10 +335,13 @@ Updates:
 
 ## 25) Pivoting data from columns to rows (and back!) in the tidyverse
 
-25-pivoting-data-from-columns-to-rows-in-the-tidyverse
-
 Storybench post: [Pivoting data from columns to rows (and back!) in the tidyverse](http://www.storybench.org/pivoting-data-from-columns-to-rows-and-back-in-the-tidyverse/)
 
+There are two versions of this file, 2.1 and 2.4.
+
+```{r pivot}
+fs::dir_ls(regexp = "pivot")
+```
 
 
 Updates:

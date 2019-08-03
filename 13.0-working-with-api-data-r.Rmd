@@ -247,14 +247,14 @@ opensec_candContrib18JSON
 
 Now I will include the API key, which was given to me when I signed up on opensecrets. This API key should be stored in a separate file, so it doesn't get unintentionally shared or distributed. 
 
-```{r aki-key}
+```{r aki-key, eval=TRUE, echo=FALSE}
 # fs::dir_ls("code")
-source("code/api-key.R")
+source("~/RLib/opensecrets-api-key.R")
 ```
 
-The `api-key.R` file contains my API key in a string `opensecrets_api_key` that I can combine with `opensec_candContrib18JSON`
+A `opensecrets-api-key.R` file contains my API key in a string `opensecrets_api_key` that I can combine with `opensec_candContrib18JSON`
 
-```{r opensec_candContrib18JSONapi}
+```{r opensec_candContrib18JSONapi, eval=FALSE}
 opensec_candContrib18JSONapi <- stringr::str_c(
   opensec_candContrib18JSON,
   "&apikey=",
@@ -306,7 +306,7 @@ knitr::include_graphics("images/open-secrets-url-booker-cid.png")
 
 I can include the `cid=N00035267` in my string vector. 
 
-```{r opensecrets_candContrib18JSON}
+```{r opensecrets_candContrib18JSON, eval=FALSE}
 opensecrets_candContribCall <- stringr::str_c(
   opensec_candContrib18JSONapi,
   "&cid=N00035267"

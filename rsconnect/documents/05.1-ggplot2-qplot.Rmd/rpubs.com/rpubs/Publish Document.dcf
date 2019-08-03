@@ -1,0 +1,10 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/517339/336eb466d93a4b37a33b2c30a394233e
+bundleId: https://api.rpubs.com/api/v1/document/517339/336eb466d93a4b37a33b2c30a394233e
+url: http://rpubs.com/mjfrigaard/517339
+when: 1564873570.26469

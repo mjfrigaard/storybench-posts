@@ -16,8 +16,8 @@ library(markdowntemplates)
 ```
 
 ```{r tidyr-cover-jpg, echo=FALSE}
-# fs::dir_ls("images")
-knitr::include_graphics(path = "images/tidyr-cover.jpg")
+# fs::dir_ls("images", regexp = "tidyr")
+knitr::include_graphics(path = "images/00-tidyr-cover.jpg")
 ```
 
 

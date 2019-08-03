@@ -1,27 +1,11 @@
 ---
 title: "String Manipulation in R"
 author: "Martin Frigaard"
-date: '2018-02-15'
-output:
-  pdf_document:
-    latex_engine: xelatex
+date: "September 22, 2017"
+output: 
+  github_document: 
     toc: yes
-    toc_depth: 6
-  html_notebook:
-    fig_height: 5
-    fig_width: 7
-    highlight: tango
-    theme: yeti
-    toc: yes
-    toc_depth: 6
-editor_options:
-  chunk_output_type: inline
-  fig_crop: no
-  fig_height: 3
-  fig_width: 2
-  highlight: tango
-  toc: yes
-  toc_depth: 5
+    toc_depth: 5
 ---
 
 
@@ -116,8 +100,8 @@ library(magrittr) # Pipes %>%, %T>% and equals(), extract().
 We will be using 6 months of news article data from ABC7NY and KCRA (from Sacramento), spanning July 18 to January 16 (headline, date-time, teaser, url). All times are Eastern Standard Time. 
 
 ```{r news_data, message=FALSE, warning=FALSE}
-Abc7 <- read_csv("Data/abc7ny.csv")
-Kcra <- read_csv("Data/kcra.csv")
+Abc7 <- read_csv("data/abc7ny.csv")
+Kcra <- read_csv("data/kcra.csv")
 ```
 
 
@@ -288,8 +272,6 @@ The `tidyverse` comes with `stringr`, a handy package for handling string manipu
 
 `stringr` (like other packages in the `tidyverse`) is very convenient because all of the functions have a common prefix, `str_`
 
-![str_.png](./image/stringr_str_.png)
-
 Everything we just did with base R is possible with `stringr`, so I'm going to go through some of this package's lesser-known functions. 
 
 ***
@@ -430,7 +412,10 @@ NewsDataTeaserClevelandPlot
 ```
 
 ```{r ggsave_NewsDataTeaserClevelandPlot}
-ggsave("./image/NewsDataTeaserClevelandPlot.png", width = 7, height = 5, units = "in")
+ggsave("images/NewsDataTeaserClevelandPlot.png", 
+       width = 7, 
+       height = 5, 
+       units = "in")
 ```
 
 
@@ -633,7 +618,8 @@ If I wanted to check and see if the regular expression pattern match I created w
 I want to match on `allen` (not `allendale`)
 
 ```{r stringr::str_view}
-stringr::str_view_all(string = "woody allen from allendale and Jimmy Fallen", pattern = "allen")
+stringr::str_view_all(string = "woody allen from allendale and Jimmy Fallen", 
+                      pattern = "allen")
 ```
 
 I need to tweak this slightly. 
@@ -1085,17 +1071,11 @@ MapNewsData_Prop_Plot
 ```
 
 ```{r ggsave_MapNewsData_Prop_Plot}
-ggsave("./image/MapNewsData_Prop_Plot.png", width = 7, height = 5, units = "in")
+ggsave("images/MapNewsData_Prop_Plot.png", width = 7, height = 5, units = "in")
 ```
 
 
 This gives us an idea for when a certain `teaser` or headline spiked in coverage between July and January in 2018. 
-
-## Map the Cities Mentioned in Headlines
-
-
-
-
 
 **FOOTER:**
 

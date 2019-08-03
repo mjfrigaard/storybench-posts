@@ -154,6 +154,7 @@ Use `write_csv(as.data.frame(x = Data, file = "path/to/file.csv"))` and voilá, 
 readr::write_csv(as.data.frame(MadMen), path = "data/MadMen.csv")
 ```
 
+<!---
 ## A recap of what we learned
 
 We used the pipe operator to string together various `tidyr` and `dplyr` functions for structuring our data (in tibbles). Remember that:
@@ -168,8 +169,10 @@ We used the pipe operator to string together various `tidyr` and `dplyr` functio
 - `tidyr::spread()` distributes indexed data from rows into columns  
 
 - using `geom`s in `ggplot2::qplot()` 
+
 - `base::summary()` to get the five number (and mean) 
 
 In the next tutorial we will expand our `ggplot2` abilities. 
 
 ### End
+--->

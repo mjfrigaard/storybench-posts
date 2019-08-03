@@ -12,22 +12,26 @@ library(mosaic)
 library(skimr)
 # create image folder ----
 if (!file.exists("images/")) {
-    dir.create("images/")
+  dir.create("images/")
 }
 # create data folder ----
 if (!file.exists("data/")) {
-    dir.create("data/")
+  dir.create("data/")
 }
 # knitr settings ------
 knitr::opts_chunk$set(
-    echo = TRUE, # show all code
-    tidy = FALSE, # cleaner code printing
-    size = "small",
-    fig.path = "images/") # smaller code
+  echo = TRUE, # show all code
+  tidy = FALSE, # cleaner code printing
+  size = "small",
+  fig.path = "images/"
+) # smaller code
 knitr::opts_knit$set(
-    width = 78)
-base::options(tibble.print_max = 25,
-              tibble.width = 78)
+  width = 78
+)
+base::options(
+  tibble.print_max = 25,
+  tibble.width = 78
+)
 ```
 
 
@@ -77,23 +81,27 @@ We can get under the hood of these functions by looking at the `layer` function.
 ```{r}
 p <- ggplot(data = diamonds, mapping = aes(x = carat))
 p2 <- p + layer(
-    geom = "bar",
-    params = list(binwidth = 0.5, 
-                  fill = "white", 
-                  color = "steelblue"),
-    stat = "bin",
-    position = "identity")
+  geom = "bar",
+  params = list(
+    binwidth = 0.5,
+    fill = "white",
+    color = "steelblue"
+  ),
+  stat = "bin",
+  position = "identity"
+)
 p2
 ```
 
 
 ```{r}
 bad_drivers_df_aes + layer(
-     mapping = NULL, # already specified
-     data = NULL, # already specified
-     geom = "point",
-     stat = "identity",
-     position = "identity")
+  mapping = NULL, # already specified
+  data = NULL, # already specified
+  geom = "point",
+  stat = "identity",
+  position = "identity"
+)
 ```
 
 We can see `"point"` is the `geom` for a scatter plot, and that `"identity"` (which leaves the data unchanged) is the default `stat` and `position`. But we can lesson the typing by just using the shortcut `geom_point()`. 
@@ -109,7 +117,7 @@ The `position` argument adjusts the geometric objects to provide a clearer image
 
 ```{r}
 gg_bad_drivers <- bad_drivers_df_aes_stat_geom +
-     geom_jitter(width = 10, height = 10)
+  geom_jitter(width = 10, height = 10)
 gg_bad_drivers
 ```
 
@@ -122,33 +130,33 @@ Now that we have the basics down, we can start adding more layers to build bette
 Lets look at the relationship between `perc_alcohol` (the percentage of drivers involved in fatal collisions who were alcohol-impaired) and `losses` (financial losses incurred by insurance companies for collisions per insured driver), but add the color aesthetic.   
 
 ```{r}
-bad_drivers_df %>% ggplot(aes(x = perc_alcohol, y = losses)) + 
-                   geom_point(aes(color = state)) 
+bad_drivers_df %>% ggplot(aes(x = perc_alcohol, y = losses)) +
+  geom_point(aes(color = state))
 ```
 
 The legend makes the plot hard to see, so I will use the `theme(legend.position = "none")` function to remove the legend altogether. 
 
 ```{r}
-bad_drivers_df %>% ggplot(aes(x = perc_alcohol, y = losses)) + 
-                   geom_point(aes(color = state)) + 
-                   theme(legend.position = "none")
+bad_drivers_df %>% ggplot(aes(x = perc_alcohol, y = losses)) +
+  geom_point(aes(color = state)) +
+  theme(legend.position = "none")
 ```
 
 That's better. But I want to the point to represent the number of `num_drives` (the number of drivers involved in fatal collisions per billion miles).
 
 ```{r}
-bad_drivers_df %>% ggplot(aes(x = perc_alcohol, y = losses)) + 
-                   geom_point(aes(color = state, size = num_drivers)) + 
-                   theme(legend.position = "none")
+bad_drivers_df %>% ggplot(aes(x = perc_alcohol, y = losses)) +
+  geom_point(aes(color = state, size = num_drivers)) +
+  theme(legend.position = "none")
 ```
 
 It's a little hard to tell which state is which without labels, so I'll add a `geom_text` and apply the `size` of the text to `num_drivers`.
 
 ```{r}
-bad_drivers_df %>% ggplot(aes(x = perc_alcohol, y = losses)) + 
-                   geom_point(aes(color = state)) + 
-                   geom_text(aes(label = state, color = state, size = num_drivers)) +
-                   theme(legend.position = "none")
+bad_drivers_df %>% ggplot(aes(x = perc_alcohol, y = losses)) +
+  geom_point(aes(color = state)) +
+  geom_text(aes(label = state, color = state, size = num_drivers)) +
+  theme(legend.position = "none")
 ```
 
 ## Adding region
@@ -156,10 +164,20 @@ bad_drivers_df %>% ggplot(aes(x = perc_alcohol, y = losses)) +
 Lets break this down further by region. Below are vectors for each US state region. 
 
 ```{r american_midwest}
-american_midwest <- c("Illinois", "Indiana", "Iowa", "Kansas", "Michigan", "Minnesota", "Missouri", "Nebraska", "North Dakota", "Ohio", "South Dakota", "Wisconsin")
-american_northeast <- c("Connecticut", "Maine", "Massachusetts", "New Hampshire", "Rhode Island", "Vermont", "New Jersey", "New York", "Pennsylvania")
-american_south <- c("Delaware", "Florida", "Georgia", "Maryland", "North Carolina", "South Carolina", "Virginia", "District of Columbia", "West Virginia", "Alabama", "Kentucky", "Mississippi", "Tennessee", "Arkansas", "Louisiana", "Oklahoma", "Texas")
-american_west <- c("Arizona", "Colorado", "Idaho", "Montana", "Nevada", "New Mexico", "Utah", "Wyoming", "Alaska", "California", "Hawaii", "Oregon", "Washington")
+american_midwest <- c("Illinois", "Indiana", "Iowa", "Kansas", "Michigan", 
+                      "Minnesota", "Missouri", "Nebraska", "North Dakota", 
+                      "Ohio", "South Dakota", "Wisconsin")
+american_northeast <- c("Connecticut", "Maine", "Massachusetts", 
+                        "New Hampshire", "Rhode Island", "Vermont", 
+                        "New Jersey", "New York", "Pennsylvania")
+american_south <- c("Delaware", "Florida", "Georgia", "Maryland", 
+                    "North Carolina", "South Carolina", "Virginia", 
+                    "District of Columbia", "West Virginia", "Alabama", 
+                    "Kentucky", "Mississippi", "Tennessee", "Arkansas", 
+                    "Louisiana", "Oklahoma", "Texas")
+american_west <- c("Arizona", "Colorado", "Idaho", "Montana", "Nevada", 
+                   "New Mexico", "Utah", "Wyoming", "Alaska", "California", 
+                   "Hawaii", "Oregon", "Washington")
 ```
 
 I want to create a new variable `region`, in the `bad_drivers_df` data frame, and then `facet` the graphs according to this new variable. 
@@ -167,19 +185,21 @@ I want to create a new variable `region`, in the `bad_drivers_df` data frame, an
 Let's do this is one pipeline
 
 ```{r case_when_pipeline}
-bad_drivers_df %>% 
-mutate(
-     region = 
-          case_when(
-               state %in% american_midwest ~ "midwest",
-               state %in% american_northeast ~ "northeast",
-               state %in% american_south ~ "south",
-               state %in% american_west ~ "west", 
-               TRUE                      ~  "other")) %>% 
-                    ggplot(aes(x = perc_alcohol, y = losses)) + 
-                    geom_point(aes(color = region, size = num_drivers)) +
-                    geom_text(aes(label = state, size = 8)) + 
-                    facet_grid(. ~ region) 
+bad_drivers_df %>%
+  mutate(
+    region =
+      case_when(
+        state %in% american_midwest ~ "midwest",
+        state %in% american_northeast ~ "northeast",
+        state %in% american_south ~ "south",
+        state %in% american_west ~ "west",
+        TRUE ~ "other"
+      )
+  ) %>%
+  ggplot(aes(x = perc_alcohol, y = losses)) +
+  geom_point(aes(color = region, size = num_drivers)) +
+  geom_text(aes(label = state, size = 8)) +
+  facet_grid(. ~ region)
 ```
 
 This graph combines the positions, colors, size, labels, and facets to display the relationship between the amount of money lost by insurance companies for collisions per insured driver and the percentage of alcohol-impaired drivers involved in fatal collisions. 
@@ -189,12 +209,7 @@ library(babynames)
 ```
 
 
-
-
 Now that we know the basics for a `ggplot2` graph, we can start to build on these foundations to get more interesting representations of the data. 
-
-
-
 
 We will start with the native `diamonds` data set from the `ggplot2` package. 
 
@@ -213,13 +228,14 @@ We will start by breaking down the components of a basic `ggplot` call. Before w
 
 ```{r carat_sum}
 knitr::kable(
-dmnds_gg %>% 
-     dplyr::select(carat) %>% 
-     summarise(
-          min_carat = min(carat),
-          max_carat = max(carat),
-          med_carat = median(carat),
-          mean_carat = mean(carat))
+  dmnds_gg %>%
+    dplyr::select(carat) %>%
+    summarise(
+      min_carat = min(carat),
+      max_carat = max(carat),
+      med_carat = median(carat),
+      mean_carat = mean(carat)
+    )
 )
 ```
 
@@ -228,29 +244,30 @@ dmnds_gg %>%
 
 ```{r price_sum}
 knitr::kable(
-dmnds_gg %>% 
-     dplyr::select(price) %>% 
-     summarise(
-          min_price = min(price),
-          max_price = max(price),
-          med_price = median(price),
-          mean_price = mean(price))
+  dmnds_gg %>%
+    dplyr::select(price) %>%
+    summarise(
+      min_price = min(price),
+      max_price = max(price),
+      med_price = median(price),
+      mean_price = mean(price)
+    )
 )
 ```
 
 Ok now that we have an idea for each of these variables individually, lets see how they looks in a graph plotted against each other. 
 
 ```{r}
-dmnds_gg %>% ggplot( 
-               aes(  
-                 x = carat, 
-                 y = price)) + 
-                   geom_point() 
+dmnds_gg %>% ggplot(
+  aes(
+    x = carat,
+    y = price
+  )
+) +
+  geom_point()
 ```
 
 What do we see? This graph looks like a scatter plot between `price` and `caret`. There seems to be a pattern in this relationship (which we will discuss more later), but is this what we would expect to see?
-
-
 
 ## the geoms
 
@@ -270,17 +287,17 @@ I like to capitalize on English's flat branching structure, because each clause 
 
 ```{r}
 ggplot() +
-    layer(
-    data = diamonds,                       # 1 THE DATA SET
-            mapping = aes(                 # 2 MAPPINGS
-                x = carat,                 # x axis 
-                y = price),                # y axis 
-                    geom = "point",        # 3 GEOM_FUNCTION
-                    stat = "identity",     # 4 STAT
-                    position = "identity") # 5 POSITION
+  layer(
+    data = diamonds, # 1 THE DATA SET
+    mapping = aes( # 2 MAPPINGS
+      x = carat, # x axis
+      y = price
+    ), # y axis
+    geom = "point", # 3 GEOM_FUNCTION
+    stat = "identity", # 4 STAT
+    position = "identity"
+  ) # 5 POSITION
 ```
-
-
 
 
 The reason we don't have to state each part explicitly is the beauty of the `ggplot2` package. The grammar comes loaded with smart defaults for many of the graph components, so we don't have to remember what `stat` goes with each `geom`. 
@@ -328,8 +345,8 @@ The `ggplot2` package (and all others in the `tidyverse`) work best with tidy da
 ```{r celeb_heights}
 # fs::dir_ls("data")
 celeb_heights <- read_csv("data/celeb_heights.csv")
-celeb_heights %>% 
-    dplyr::glimpse()
+celeb_heights %>%
+  dplyr::glimpse()
 ```
 
 
@@ -337,13 +354,11 @@ For example, let's say I want to look at the relationship in `child` and `parent
 
 ```{r HistData, message=FALSE, warning=FALSE}
 library(HistData)
-hts_df <-  PearsonLee %>% tbl_df
-hts_df %>% 
-     ggplot(aes(x = parent, y = child)) +
-     geom_point()
+hts_df <- PearsonLee %>% tbl_df()
+hts_df %>%
+  ggplot(aes(x = parent, y = child)) +
+  geom_point()
 ```
-
-
 
 
 ```{r NHANES}
@@ -354,7 +369,7 @@ nhanes <- NHANES::NHANES
 
 ```{r}
 knitr::kable(
-favstats(nhanes$Weight)
+  favstats(nhanes$Weight)
 )
 ```
 
@@ -362,7 +377,7 @@ Get the summary for `Weight`.
 
 ```{r}
 knitr::kable(
-favstats(nhanes$Height)
+  favstats(nhanes$Height)
 )
 ```
 
@@ -372,38 +387,38 @@ Now with a little bit of summary info I can start to imagine what this scatter p
 If this is a linear relationship, **I should expect to see a bunch of dots grouped together on the diagonal (lower-left to upper-right)**. I am going to create a scatter plot with these two variables, but first I am going to filter out the missing `Height` and `Weight` values.
 
 ```{r scatter}
-nhanes %>% 
-  filter(!is.na(Weight) & !is.na(Height)) %>% 
-  ggplot(aes(x = Weight, y = Height)) + 
-    geom_point() 
+nhanes %>%
+  filter(!is.na(Weight) & !is.na(Height)) %>%
+  ggplot(aes(x = Weight, y = Height)) +
+  geom_point()
 ```
 
 The relationship between these variables looks fairly linear (i.e. diagonal), but it also seems to have a bit of a curve. We also have a fair amount of overplotting (points sitting on top of one another). We can clean this up in a couple different ways. The first is to impose a `size` value in the `geom_point()`. 
 
 ```{r size}
-nhanes %>% 
-  filter(!is.na(Weight) & !is.na(Height)) %>% 
-  ggplot(aes(x = Weight, y = Height)) + 
-    geom_point(size = 0.6) 
+nhanes %>%
+  filter(!is.na(Weight) & !is.na(Height)) %>%
+  ggplot(aes(x = Weight, y = Height)) +
+  geom_point(size = 0.6)
 ```
 
 The `size` argument is in reference to the size of the points. We could also change the tranparency of the points using the `alpha` aesthetic.
 
 ```{r}
-nhanes %>% 
-  filter(!is.na(Weight) & !is.na(Height)) %>% 
-  ggplot(aes(x = Weight, y = Height)) + 
-    geom_point(alpha = 1/10)
+nhanes %>%
+  filter(!is.na(Weight) & !is.na(Height)) %>%
+  ggplot(aes(x = Weight, y = Height)) +
+  geom_point(alpha = 1 / 10)
 ```
 
 Finally, we could also not use all of the data (i.e. take a random sample of `50` observations from the `nhanes` data set)
 
 ```{r random_sample}
-nhanes %>% 
-     sample_n(size = 500) %>% 
-          filter(!is.na(Weight) & !is.na(Height)) %>% 
-               ggplot(aes(x = Weight, y = Height)) + 
-                    geom_point()
+nhanes %>%
+  sample_n(size = 500) %>%
+  filter(!is.na(Weight) & !is.na(Height)) %>%
+  ggplot(aes(x = Weight, y = Height)) +
+  geom_point()
 ```
 
 All of these solutions work, but I would use the `size` or `alpha` options because we don't have to choose how many observations to keep. 
@@ -411,22 +426,22 @@ All of these solutions work, but I would use the `size` or `alpha` options becau
 So does this relationship look linear? We can use the `geom_smooth()` function to see what line best fits these data. We'll reduce the tranparency to `1/10` for clarity, too. 
 
 ```{r geom_smooth}
-nhanes %>% 
-  filter(!is.na(Weight) & !is.na(Height)) %>% 
-  ggplot(aes(x = Weight, y = Height)) + 
-    geom_point(alpha = 1/10) + 
-     geom_smooth()
+nhanes %>%
+  filter(!is.na(Weight) & !is.na(Height)) %>%
+  ggplot(aes(x = Weight, y = Height)) +
+  geom_point(alpha = 1 / 10) +
+  geom_smooth()
 ```
 
 It looks like the `geom_smooth()` function fit a line using `method = "gam"`, and not `method = "lm"`. This is another default in `ggplot2`--plots with 1000+ observations use the `"gam"` method. We can specify the linear method by simply adding another `geom_smooth()`, but we should make sure to specify a different line color (`color = "red"`).
 
 ```{r 2x_geom_smooth}
-nhanes %>% 
-  filter(!is.na(Weight) & !is.na(Height)) %>% 
-  ggplot(aes(x = Weight, y = Height)) + 
-    geom_point(alpha = 1/10) + 
-     geom_smooth() +
-     geom_smooth(method = "lm", color = "red")
+nhanes %>%
+  filter(!is.na(Weight) & !is.na(Height)) %>%
+  ggplot(aes(x = Weight, y = Height)) +
+  geom_point(alpha = 1 / 10) +
+  geom_smooth() +
+  geom_smooth(method = "lm", color = "red")
 ```
 ***NOTE***: the `alpha` aesthetic can take fractions (`1/10`) or decimals (`0.1`).
 
@@ -436,14 +451,15 @@ Scatter plots (`geom_point()`) are a great way to show the relationship data fro
 
 I want to know how the variable `Age` varies across `Gender` in the `nhanes` data set. I can get some quick summary statistics by using `group_by` from `dplyr`: 
 ```{r}
-nhanes %>% 
-     group_by(Gender) %>% 
-     summarise(
-          min = min(Age),
-          max = max(Age),
-          median = median(Age),
-          mean = mean(Age),
-          Mode = mode(Age))
+nhanes %>%
+  group_by(Gender) %>%
+  summarise(
+    min = min(Age),
+    max = max(Age),
+    median = median(Age),
+    mean = mean(Age),
+    Mode = mode(Age)
+  )
 ```
 
 Ok my summary statistics let me know that I should be expecting a graph that ranges from `0` to `80` on the `x`. Can we tell what the most common age is? The statistical term for this is the **mode**, and unfortunately R doesn't have a quick and easy way to get the mode for variables in data frames. No problem though
@@ -451,7 +467,7 @@ Ok my summary statistics let me know that I should be expecting a graph that ran
 ```{r}
 my_mode <- function(x, na.rm = FALSE) {
   if (na.rm) {
-    x = x[!is.na(x)]
+    x <- x[!is.na(x)]
   }
   ux <- unique(x)
   return(ux[which.max(tabulate(match(x, ux)))])
@@ -461,28 +477,26 @@ my_mode <- function(x, na.rm = FALSE) {
 
 
 ```{r}
-nhanes %>% 
-     group_by(Gender) %>% 
-     summarise(
-          min = min(Age),
-          max = max(Age),
-          median = median(Age),
-          mean = mean(Age),
-          mode = my_mode(Age))
+nhanes %>%
+  group_by(Gender) %>%
+  summarise(
+    min = min(Age),
+    max = max(Age),
+    median = median(Age),
+    mean = mean(Age),
+    mode = my_mode(Age)
+  )
 ```
-
 
 
 A stacked bar chart uses the `fill` aesthetic to separate the levels of a categorical or factor variable by color. 
 
 ```{r}
 nhanes %>%
-     ggplot(aes(x = Age, fill = Gender)) +
-          geom_bar()
+  ggplot(aes(x = Age, fill = Gender)) +
+  geom_bar()
 ```
 
 The `y` axis is a count of number of observations in each bar. `ggplot2` also automatically provides a legend to keep track of each level. 
-
-
 
 This was a very brief tutorial of the `ggplot2` package, so I recommend learning more about the package by typing `library(help = "ggplot2")` into your R console, checking out the [ggplot2](http://ggplot2.tidyverse.org/reference/ggplot2-package.html) tidyverse page, or purchasing the [ggplot2 book](https://www.amazon.com/ggplot2-Elegant-Graphics-Data-Analysis/dp/331924275X/ref=sr_1_1?s=books&ie=UTF8&qid=1504615645&sr=1-1&keywords=ggplot2). 
