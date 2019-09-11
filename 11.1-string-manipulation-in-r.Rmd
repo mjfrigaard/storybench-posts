@@ -16,7 +16,9 @@ require(magrittr)
 knitr::opts_chunk$set(
     echo = TRUE, # show all code
     tidy = FALSE, # cleaner code printing
-    size = "small") # smaller code
+    eval = TRUE, # evaluate all code
+    size = "small", # smaller code
+    fig.path = "images/") 
 options(width = 80)
 ```
 
@@ -131,7 +133,10 @@ I say *somewhat* because `dplyr::bind_rows()` sticks two data frames together **
 
 But if I want to combine data frames together **side-by-side**, they will be matched on their row position (so I would need to make sure the same number of rows are in each data frame). 
 
-![](./image/dplyr_binds.png)
+```{r dplyr_binds.png, echo=FALSE}
+knitr::include_graphics("./images/dplyr_binds.png")
+```
+
 
 **NOTE:** The tiny object in the rows are chairs, because for some reason, whenever I think of rows, I think of a row of chairs. The same goes for columns (except I think about a Roman pillar).
 

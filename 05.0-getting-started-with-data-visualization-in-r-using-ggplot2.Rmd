@@ -17,9 +17,9 @@ if (!file.exists("images/")) {
 knitr::opts_chunk$set(
     echo = TRUE, # show all code
     tidy = FALSE, # cleaner code printing
-    eval = TRUE,
-    size = "small",
-    fig.path = "images/") # smaller code
+    eval = TRUE, # evaluate all code
+    size = "small", # smaller code
+    fig.path = "images/") 
 ```
 
 > More information has been added to this post from R4DS. The updates should add clarity to the grammar of graphics.
@@ -44,7 +44,7 @@ Spending some time thinking about the structure/arrangement of your data set wil
 
 The best place to start with any visualization is with a pen and paper sketch. I’ve found removing the confines of any particular software or program and brainstorming on paper helps get the first bad ideas out of the way. After I get an outline or sketch of the visualization I want to create, I figure out the details within whatever computer/software environment I’m using. I find this much more helpful than jumping in and programming from scratch – it’s much harder to end up in the right place if you have no idea where you’re going.
 
-Graphs and comedy
+## Graphs and comedy
 
 My goal when I create a graph or visualization is to communicate an idea or some information about the underlying data (i.e., the differences, patterns, etc.) with a minimal amount additional explanation. In many ways, good graphics are like well-written jokes; if I have to explain my joke, it loses the desired effect. You’ve heard the phrase, “a picture is worth a thousand words.” Well, if I want the picture (i.e. the visualization) I create to be worth 1,000 words, any additional explanation I have to provide diminishes that word-value.
 
