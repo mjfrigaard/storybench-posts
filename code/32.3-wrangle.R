@@ -26,8 +26,8 @@ library(skimr)
 
 # previous code -----------------------------------------------------------
 
-source("code/17.1-import.R")
-source("code/17.2-tidy.R")
+source("code/32.1-import.R")
+source("code/32.2-tidy.R")
 
 # change id variable
 YouTubeComedyData <- YouTubeComedyDataRaw %>%

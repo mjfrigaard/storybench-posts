@@ -1,5 +1,5 @@
 ---
-title: "17 - Linear regression models"
+title: "32 - Linear regression models"
 output: github_document
 ---
 
@@ -38,20 +38,6 @@ base::options(
   max.print = "1000",
   scipen = 100000000
 )
-library(skimr)
-skim_numeric <- function(data) {
-    data_skim <- data %>% skim()
-    num_skim <- skimr::yank(data = data_skim, 
-                skim_type = "numeric") 
-    clean_skin_num <- num_skim %>% 
-        dplyr::select(skim_variable:sd,
-                      min = p0,
-                      median = p50,
-                      max = p100,
-                      hist) %>% 
-        as.data.frame()
-    clean_skin_num
-}
 options(max.print = 999999)
 ```
 
@@ -121,13 +107,13 @@ Generally, the important part about linear relationships is what the line repres
 The code chunk below downloads and imports the data for this post:
 
 ```{r import-comedy-data-github, message=FALSE, warning=FALSE, echo=FALSE, results='hide'}
-source("code/17.1-import.R")
+source("code/32.1-import.R")
 # ls()
 ```
 
 Let's graph the `outcome` on the `x`, and the `predictor_1` on the `y`, and draw a line that passes through the mean of the outcome variable. We can use `skimr` to summarize the `SimData` dataset. 
 
-```{r skim_numeric}
+```{r skim_numeric, results='asis'}
 skim(SimDat)
 ```
 
@@ -242,11 +228,13 @@ As we can see, the swarm of points for these two variables looks very different 
 
 ## YouTube comedy sketch data 
 
-Key and Peele are...
+We will be looking at data from YouTube's API for this tutorial.
 
-Amy Schumer is...
+[Key and Peele](https://en.wikipedia.org/wiki/Key_%26_Peele) are a comedy duo that have been performing since about 2012. Their playlist on [Comedy Central's YouTube channel](https://www.youtube.com/playlist?list=PL83DDC2327BEB616D) has 221 videos. 
 
-Now that we have an idea for what a linear relationship between these two variable might look like, we can start graphing the data and see if it meets our expectations. The data If we read the [README](https://github.com/richardcornish/sketch-comedy-data), we discover both datasets have the following variables:
+[Inside Amy Schumer](https://en.wikipedia.org/wiki/Inside_Amy_Schumer) was a series that ran from April 30, 2013 until June 16, 2016. The special is available on [Comedy Central's YouTube channel](https://www.youtube.com/playlist?list=PLD7nPL1U-R5o_GHb3XEx8XKCjzgCFCTuF) and consists of 126 videos. 
+
+Now that we have an idea for what a linear relationship between these two variable might look like, we can start graphing the data and see if it meets our expectations. The data that we'll be using is from this [repository](https://github.com/richardcornish/sketch-comedy-data) on Github. If we do a litle reading of the documentation, we discover both datasets have the following variables:
 
 <!--
 ```json
@@ -283,15 +271,16 @@ These data don't need much wrangling, but I like to break out wrangling into two
 If I frame it this way, it forces me to think about the global changes that need to happen for me to create the variables I need. Below are two scripts I use for the two wrangling steps I described above: 1) remove the Private videos (there are no metrics for these) from both data sets, 2) then create a new variable that helps me identify the `comedian`. The final step and format the variable names.  
 
 ```{r tidy-import-data, message=FALSE, warning=FALSE, results='hide', include=FALSE, echo=TRUE}
-source("code/17.2-tidy.R")
-source("code/17.3-wrangle.R")
+# fs::dir_ls("code")
+source("code/32.2-tidy.R")
+source("code/32.3-wrangle.R")
 ```
 
-```{r AmySchumer}
+```{r AmySchumer, results='asis'}
 skim(AmySchumer)
 ```
 
-```{r KeyAndPeele}
+```{r KeyAndPeele, results='asis'}
 skim(KeyAndPeele)
 ```
 
@@ -299,7 +288,7 @@ I also bind the datasets together and add the following variable to keep track o
 
 - `comedian` = comedian name 
 
-```{r YouTubeComedyData}
+```{r YouTubeComedyData, results='asis'}
 skim(YouTubeComedyData)
 ```
 
