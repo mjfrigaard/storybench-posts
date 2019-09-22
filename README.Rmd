@@ -143,11 +143,16 @@ https://rpubs.com/mjfrigaard/ggplot2-version-2
 
 - `05.3-ggplot2-intro-to-visualizations.Rmd`
 
-- 
-
 ## 6) Welcome to Data Journalism in R
 
 Slug: 06-welcome-to-data-journalism-in-r
+
+```{r create-06-welcome-to-data-journalism-in-r.Rmd}
+if (!file.exists("06-welcome-to-data-journalism-in-r.Rmd")) {
+    file.create("06-welcome-to-data-journalism-in-r.Rmd")
+}
+```
+
 
 Storybench post: [Welcome to Data Journalism in R](http://www.storybench.org/welcome-to-data-journalism-in-r-2/)
 
@@ -155,22 +160,31 @@ Storybench post: [Welcome to Data Journalism in R](http://www.storybench.org/wel
 
 Updates:
 
+
+
 ## 7) Twitter + R
 
 Slug: 07-twitter-plus-r
 
+```{r create-06-welcome-to-data-journalism-in-r.Rmd}
+if (!file.exists("07-twitter-plus-r.Rmd")) {
+    file.create("07-twitter-plus-r.Rmd")
+}
+```
+
 Storybench post: [Twitter + R](http://www.storybench.org/twitter-r/)
 
- Accessing twitter with old twitter package. Now we use `rtweet`
+Accessing twitter with old twitter package. Now we use `rtweet`
 
 Updates: 
+
+
 
 ## 8) Sentiment analysis of (you guessed it!) Donald Trump’s tweets
 
 Slug: 08-sentiment-analysis-of-donald-trump’s-tweets
 
 Storybench post: [Sentiment analysis of (you guessed it!) Donald Trump’s tweets](http://www.storybench.org/sentiment-analysis-of-you-guessed-it-donald-trumps-tweets/)
-
 
 
 Updates: 
@@ -182,7 +196,6 @@ Slug: 09-how-to-merge-and-clean-up-multiple-csvs-using-r
 Storybench post: [How to merge and clean up multiple CSVs using R](http://www.storybench.org/merge-clean-multiple-csvs-using-r/)
 
 This is the intro to `for` loops and iteration. 
-
 
 
 Updates:
@@ -210,7 +223,6 @@ Updates:
 Storybench post: [How to plot state-by-state data on a map of the U.S. in R](http://www.storybench.org/plot-state-state-data-map-u-s-r/)
 
 
-
 Updates:
 
 ## 13) How to build an animated map of tweets about the NBA finals in R
@@ -218,7 +230,6 @@ Updates:
 13-how-to-build-an-animated-map-of-tweets-about-the-nba-finals-in-r
 
 Storybench post: [How to build an animated map of tweets about the NBA finals in R](http://www.storybench.org/build-animated-map-tweets-nba-finals-r/)
-
 
 
 Updates:
@@ -230,7 +241,6 @@ SLug: 14-using-french-wine-reviews-to-understand-tf-idf-a-measure-of-how-unique-
 Storybench post: [Using French wine reviews to understand TF-IDF, a measure of how unique a word is to a document](http://www.storybench.org/using-french-wine-reviews-understand-tf-idf-measure-unique-word-document/)
 
 
-
 Updates:
 
 ## 15) Mapping search data from Google Trends in R
@@ -240,7 +250,6 @@ SLug: 15-mapping-search-data-from-google-trends-in-r
 Storybench post: [Mapping search data from Google Trends in R](http://www.storybench.org/mapping-search-data-from-google-trends-in-r/)
 
 
-
 Updates:
 
 ## 16) Exploring Beto O’Rourke and Ted Cruz ads on Facebook using R
@@ -248,7 +257,6 @@ Updates:
 Slug: 16-exploring-beto-o’rourke-and-ted-cruz-ads-on-facebook-using-r
 
 Storybench post: [Exploring Beto O’Rourke and Ted Cruz ads on Facebook using R](http://www.storybench.org/exploring-beto-orourke-ted-cruz-ads-facebook-using-r/)
-
 
 
 Updates:
@@ -261,14 +269,13 @@ Storybench post: [How to get Twitter data with rtweet in R](http://www.storybenc
 
 
 
-Updates:
+Updates: this is an improvement on the previous twitteR package in post 7. 
 
 ## 18) How to install R on a Jupyter notebook
 
 Slug: 18-how-to-install-r-on-a-jupyter-notebook
 
 Storybench post: [How to install R on a Jupyter notebook](http://www.storybench.org/install-r-jupyter-notebook/)
-
 
 
 Updates:
@@ -280,7 +287,6 @@ Slug: 19-a-data-history-of-popular-hip-hop
 Storybench post: [A Data History of Popular Hip-Hop](http://www.storybench.org/a-data-history-of-popular-hip-hop/)
 
 
-
 Updates:
 
 ## 20) How to map point data and polygon shapefiles in R
@@ -288,7 +294,6 @@ Updates:
 Slug: 20-how-to-map-point-data-and-polygon-shapefiles-in-r
 
 Storybench post: [How to map point data and polygon shapefiles in R](http://www.storybench.org/how-to-map-point-data-and-polygon-shapefiles-in-r/)
-
 
 
 Updates:
@@ -300,7 +305,6 @@ Slug: 21-bringing-textual-analysis-tools-to-judge-brett-kavanaugh’s-latest-opi
 Storybench post: [Bringing textual analysis tools to Judge Brett Kavanaugh’s latest opinion](http://www.storybench.org/bringing-textual-analysis-tools-to-judge-brett-kavanaughs-latest-opinion/)
 
 
-
 Updates:
 
 ## 22) Scraping HTML tables and downloading files with R
@@ -308,7 +312,6 @@ Updates:
 Slug: 22-scraping-html-tables-and-downloading-files-with-r
 
 Storybench post: [Scraping HTML tables and downloading files with R](http://www.storybench.org/scraping-html-tables-and-downloading-files-with-r/)
-
 
 
 Updates:

@@ -100,7 +100,9 @@ These could also be linear, but in the other direction:
 knitr::include_graphics(path = "images/17.1-linear-regression-sketch-02.png")
 ```
 
-Generally, the important part about linear relationships is what the line represents. But in order to explore this more, we will need some actual data! 
+Generally speaking, the important part about a linear relationship is what that line represents. What does it mean if an explanatory or predictor variable changes value, and the outcome or response changes along with it?
+
+In order to explore this question (and more), we will need some actual data! 
 
 ## Download and import data 
 
@@ -108,16 +110,26 @@ The code chunk below downloads and imports the data for this post:
 
 ```{r import-comedy-data-github, message=FALSE, warning=FALSE, echo=FALSE, results='hide'}
 source("code/32.1-import.R")
-# ls()
+ls()
 ```
 
-Let's graph the `outcome` on the `x`, and the `predictor_1` on the `y`, and draw a line that passes through the mean of the outcome variable. We can use `skimr` to summarize the `SimData` dataset. 
+The `32.1-import.R` script imports three data sets: 
 
+1. "`AmySchumerRaw`" = data from comedy central's YouTube channel featuring Amy Schumer  
+2. "`KeyAndPeeleRaw`"  = data from comedy central's YouTube channel featuring Key and Peele  
+3. "`SimDat`" = Simulated data for exploring linear regression assumptions  
+
+### the simulated data 
+
+ We can use `skimr` to summarize the `SimData` dataset. 
+ 
 ```{r skim_numeric, results='asis'}
 skim(SimDat)
 ```
 
-We can see the means for the `outcome` and both `predictor_` variables. Below we're going to plot the means of `outcome` and `predictor_1` on a graph using `ggplot2`. First we'll create a custom `theme` with `ggplot2::theme_set()` and `hrbrthemes::theme_ipsum_tw()`.
+This dataset has three variables (`outcome`, `predictor_1`, and `predictor_2`). We can see the means for the `outcome` and both `predictor_` variables. 
+
+Let's graph the `outcome` on the `x`, and the `predictor_1` on the `y`, and draw a line that passes through the mean of the outcome variable. First we'll create a custom `theme` with `ggplot2::theme_set()` and `hrbrthemes::theme_ipsum_tw()`.
 
 ```{r set-theme}
 # set the theme to theme_light
@@ -127,7 +139,7 @@ ggplot2::theme_set(theme_ipsum_tw(base_family = "Titillium Web",
                          axis_title_size = 15))
 ```
 
-Now we can plot the means. 
+Below we're going to plot the means of `outcome` and `predictor_1` on a graph using our new `ggplot2` theme. 
 
 ```{r 01-plot_MeanOutcomePredictor1}
 # define labs first
@@ -171,6 +183,16 @@ plot_MeanOutcomePredictor1v2
 The intersection for these lines looks like it's right in the middle of all the points, right? Next we'll see how well we can predict the `outcome` with a given value of the `predictor_1`.  
 
 I like building plots like this with `ggplot2` because I can understand how the variables relate to each other iteratively (to learn more about ggplot2 check out our tutorial [here](http://www.storybench.org/getting-started-data-visualization-r-using-ggplot2/)).
+
+### Visualizing correlations
+
+Now that we have an idea of what a linear relationship looks like, we can talk about how to measure the *strength of the relationship*. This is usually done with a 
+
+```{r network-plot}
+SimDat %>%
+  dplyr::select(outcome, predictor_1) %>% 
+  corrr::correlate()
+```
 
 ## Linear models 
 
@@ -326,7 +348,7 @@ The relationship looks linear, but this graph isn't showing us both sets of come
 ```{r 02-plot_AmySchumerViewVsLikes}
 # start with labels
 amys_labs <- ggplot2::labs(
-        title = "Views VS Likes of Amy Schumer's YouTube Videos",
+        title = "Views VS Likes: Amy Schumer's YouTube Videos",
             x = "Views of Amy Schumer comedy sketches",
             y = "Likes of Amy Schumer comedy sketches") 
 
@@ -359,7 +381,7 @@ plot_AmySchumerViewVsLikes
 ```{r 03-plot_KeyAndPeeleViewVsLikes}
 # start with labs
 kandp_labs <- ggplot2::labs(
-  title = "Views VS Likes of Key & Peele's YouTube Videos",
+  title = "Views VS Likes: Key & Peele's YouTube Videos",
     x = "Views of Key and Peele comedy sketches on YouTube",
     y = "Likes of Key and Peele comedy sketches on YouTube")
 # plot 2

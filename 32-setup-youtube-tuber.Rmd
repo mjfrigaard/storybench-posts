@@ -1,7 +1,7 @@
 ---
 title: "32 - tuber-licious! setting up the YouTube API in R"
 author: "Martin Frigaard"
-output: github_document
+output: markdown_document
 ---
 
 ```{r setup, include=FALSE, warning=FALSE, message=FALSE}
@@ -43,7 +43,6 @@ options(max.print = 999999)
 ```
 
 
-
 ```{r packages, include=FALSE, warning=FALSE, message=FALSE}
 # Load packages below
 library(magrittr) # Pipes %>%, %T>% and equals(), extract().
@@ -54,9 +53,11 @@ library(tuber) # youtube API
 
 # Setting up access to the YouTube API
 
-Head over to the [`tuber`](https://soodoku.github.io/tuber/articles/tuber-ex.html) package website. Make sure you install the package and load it with `library()`
+It's even easier to access YouTube's metadata (views, likes, dislikes, comments, etc.) thanks to the [`tuber`](https://soodoku.github.io/tuber/articles/tuber-ex.html) package by [Gaurav Sood](https://www.gsood.com/). 
 
-```{r install-tuber, eval=FALSE}
+Make sure you `install` the package and load it with `library()`
+
+```{r install-tuber-packages, eval=FALSE}
 install.packages("tuber")
 library(tuber) # youtube API
 library(magrittr) # Pipes %>%, %T>% and equals(), extract().
@@ -64,11 +65,9 @@ library(tidyverse) # all tidyverse packages
 library(hrbrthemes) # themes for graphs
 ```
 
-[Gaurav Sood](https://www.gsood.com/) wrote an excellent, easy-to-use package for accessing YouTube data. If you're like me, you love screenshots for setting up new tools like this. 
+Sood wrote an excellent, easy-to-use package for accessing the YouTube data API. If you're like me, you love screenshots for setting up new tools like this. Below is a quick outline for the steps to get your application id and password set up in R.
 
-Below is a quick outline for the steps to get your application id and password set up in R.
-
-## Get the application 
+## 1) Enable the APIs
 
 First head over to your [Google APIs dashboard](https://console.developers.google.com/apis/dashboard) (you'll need an account for this). Click on "ENABLE APIS AND SERVICES".
 
@@ -77,17 +76,18 @@ First head over to your [Google APIs dashboard](https://console.developers.googl
 knitr::include_graphics(path = "figs/32-00-google-api.png")
 ```
 
-Click on the search bar and type in YouTube and you should see four options. Enable all of them.
+This will bring up a laundry list of APIs, but we only need the four pertaining to YouTube (see below) and the Freebase API. 
 
+Click on the search bar and type in YouTube and you should see four options. Enable all of them.
 
 ```{r 32-01-youtube-api, echo=FALSE}
 # fs::dir_tree("figs", regex = "32")
 knitr::include_graphics(path = "figs/32-01-youtube-api.png")
 ```
 
-**IMPORTANT** you will also have to enable the Freebase API.
+**IMPORTANT** you'll also have to search for and enable the Freebase API.
 
-## Create credentials 
+## 2) Create your credentials 
 
 After these have been enabled, you'll need to create credentials for the API. Click on the Credentials label on the left side of your Google dashboard (there should be a little key icon next to it).
 
@@ -105,59 +105,84 @@ knitr::include_graphics(path = "figs/32-03-create-credentials.png")
 # 32-03-create-credentials.png
 ```
 
-### Name your application
+### Create your OAuth 
 
-This is where we name the app and indicate it is an "Other" Application type. 
+This next step is where we'll name OAuth client ID and select the option for "Other" application type. 
 
 ```{r 32-04-create-youtube-api-r, echo=FALSE}
 # fs::dir_tree("figs", regex = "32")
 knitr::include_graphics(path = "figs/32-04-create-youtube-api-r.png")
 ```
 
-We are told we are limited to 100 sensitive scope log ins unit the OAuth consent screen is published. 
+We're told we're limited to 100 sensitive scope logins until the OAuth consent screen is published. That's not a problem for us, so we'll go ahead and copy both the client ID and client secret.
 
 ```{r 32-05-oauth-cred-google, echo=FALSE}
 # fs::dir_tree("figs", regex = "32")
 knitr::include_graphics(path = "figs/32-05-oauth-cred-google.png")
 ```
 
-Click on the copy icons and save them as 
+After clicking on the copy icons, we will save both into two objects in RStudio (`client_id` and `client_secret`).
 
 ```r
 client_id <- "20939048240-snjuunf5kp1n788b4gvi84khk553u36f.apps.googleusercontent.com"
 client_secret <- "O9eT8Q_ldnivnvopqkvJd32Hv"
 ```
 
-## Authenticate your application
+## 3) Authenticate the application
 
-Now you can run the `tuber::yt_oauth()` function to authenticate the application. I included the token as a blank string because it kept looking for the `.httr-oauth` in my local directory. 
+Now we can run `tuber`'s `yt_oauth()` function to authenticate the application. We've included the token as a blank string (`token = ''`) because the function kept looking for the `.httr-oauth` file in our local directory (but we didn't create one).
 
 ```{r yt_oauth, eval=FALSE}
 # use the youtube oauth 
-yt_oauth(app_id = client_id,
+tuber::yt_oauth(app_id = client_id,
          app_secret = client_secret,
          token = '')
 ```
 
-This will open your browser and ask you to sign into the Google account you set everything up with. You should see the name of your application in place of "*Your application name*".
+Provided we did everything correct, `tuber::yt_oauth()` *should* prompt the following message in the R console: 
+
+```
+Use a local file ('.httr-oauth'), to cache OAuth access credentials between R sessions?
+
+1: Yes
+2: No
+```
+
+Select `2` and your internet browser should open up and ask you to sign into the Google account you set everything up with (see the images below). You'll see the name of your application in place of "*Your application name*".
 
 ```{r 32-06-sign-in-with-youtube, echo=FALSE}
 # fs::dir_tree("figs", regex = "32")
 knitr::include_graphics(path = "figs/32-06-sign-in-with-youtube.png")
 ```
 
-After signing in, you'll be asked if the YouTube application your created can access your Google account. If you approve, click "Allow".
+After signing in, you'll be asked if the YouTube application you created can access your Google account. If you approve, click "Allow".
 
 ```{r 32-07-google-credentials-allow.png, echo=FALSE}
 # fs::dir_tree("figs", regex = "32")
 knitr::include_graphics(path = "figs/32-07-google-credentials-allow.png")
 ```
 
-This should give you a blank page with a cryptic, `Authentication complete. Please close this page and return to R.` message.
+After clicking "Allow", the browser should give you a blank page with a cryptic, `Authentication complete. Please close this page and return to R.` message.
 
-## Accessing YouTube data
+***
 
-Be sure to check out the [reference page](https://soodoku.github.io/tuber/reference/index.html) and the [YouTube API reference docs](https://developers.google.com/youtube/v3/docs/) on how to access various meta data from YouTube videos.
+# Accessing YouTube data
+
+Great! Now that we're all set up, we will download some data into RStudio. Be sure to check out the [reference page](https://soodoku.github.io/tuber/reference/index.html) and the [YouTube API reference docs](https://developers.google.com/youtube/v3/docs/) on how to access various meta data from YouTube videos.
+
+We'll download some example data from [Dave Chappelle's comedy central playlist](https://www.youtube.com/playlist?list=PLG6HoeSC3raE-EB8r_vVDOs-59kg3Spvd) and [Bill Burr's Monday Morning Podcast](https://www.youtube.com/playlist?list=PLJMuYl1_E0hdNQC_OYE-hMo1_p-xGyieE), two of my favorite comedians. 
+
+## Subsetting data from lists
+
+In order to use the `tuber` package to access data, we need to read a bit about how the YouTube data are exported from the API. In the next section, we will briefly cover some best practices for subsetting (i.e. getting data out of) lists, another common R object. 
+
+Lists are like the catch-all for all objects in R. 
+
+
+```{r , eval=FALSE}
+
+```
+
 
 Also check out the [previous post on using APIs](http://www.storybench.org/how-to-access-apis-in-r/). 
 
