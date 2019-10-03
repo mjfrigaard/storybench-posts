@@ -1,0 +1,820 @@
+<!-- wp:paragraph -->
+<p>This post will cover how to measure the relationship between two numeric variables with the <a href="https://cran.r-project.org/web/packages/corrr/vignettes/using-corrr.html"><code>corrr</code> package</a>. We will look at how to assess a variable’s distribution using <a href="https://en.wikipedia.org/wiki/Skewness">skewness</a> and <a href="https://en.wikipedia.org/wiki/Normal_distribution">normality</a>. Then we’ll examine the relationship between two variables by looking at the <a href="https://en.wikipedia.org/wiki/Covariance">covariance</a> and the <a href="https://en.wikipedia.org/wiki/Correlation_coefficient">correlation coefficient</a>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>Load the packages</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The packages we’ll be using in this tutorial is below:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>library(egg) # for ggarrange
+library(inspectdf) # check entire data.frame for variable types, etc.
+library(visdat) # visualize missing data
+library(skimr) # eda for entire data.frame
+library(corrr) # correlations
+library(skimr) # summaries 
+library(hrbrthemes) # themes for graphs
+library(tidyverse) # all tidyverse packages
+library(tidymodels) # meta package for modeling
+library(psych) # for skewness and kurtosis
+library(socviz) # for %nin%</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:heading -->
+<h2>Set a graph theme</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>This will give us a little customization for the graphs we’ll be producing. If you want to learn more about <code>ggplot2</code>, check out <a href="http://www.storybench.org/getting-started-data-visualization-r-using-ggplot2/">our tutorial here</a>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code># set the theme to theme_light
+ggplot2::theme_set(theme_ipsum_tw(base_family = "Titillium Web",
+                         base_size = 9, 
+                         plot_title_family = "Poppins",
+                         axis_title_size = 13))</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:heading {"level":1} -->
+<h1>Import the data</h1>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>We covered how to access data using the <code><a href="https://cran.r-project.org/web/packages/tuber/vignettes/tuber-ex.html">tuber</a></code> in a <a href="http://www.storybench.org/how-to-download-youtube-data-in-r-using-tuber-and-purrr/">previous tutorial</a>. For this tutorial, we will be using the YouTube videos in two playlists:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list {"ordered":true} -->
+<ol><li><a href="https://www.youtube.com/playlist?list=PLD7nPL1U-R5poNaQDb9HqN4eJiY1aXF6c">The Daily Show with Trevor Noah - 148
+videos</a></li><li><a href="https://www.youtube.com/playlist?list=PL084A0469320C57B1">The Daily Show with Jon Stewart - 117
+videos</a></li></ol>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>If you’d like to see the script for how we downloaded and imported these data, they’re in a <a href="https://gist.github.com/mjfrigaard/f239619762f466ce947aabea00379e99">gist here</a>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code># fs::dir_tree("data", regex = "DailyShow")
+DailyShowYouTube &lt;- readr::read_csv("data/2019-09-30-DailyShowYouTube.csv")
+DailyShowYouTube %>% dplyr::glimpse(78)</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>#>  Observations: 251
+#>  Variables: 9
+#>  $ published_at  &lt;dttm> 2015-10-05 23:57:09, 2014-12-05 17:01:33, 2014-09-23…
+#>  $ dislike_count &lt;dbl> 11184, 1065, 722, 2469, 654, 917, 547, 2846, 1449, 22…
+#>  $ url           &lt;chr> "https://i.ytimg.com/vi/yEPSJF7BYOo/default.jpg", "ht…
+#>  $ id            &lt;chr> "yEPSJF7BYOo", "AHO1a1kvZGo", "lPgZfhnCAdI", "9pOiOhx…
+#>  $ comment_count &lt;dbl> 8130, 2486, 3616, 17629, 2689, 2704, 1887, 3422, 6229…
+#>  $ title         &lt;chr> "The Daily Show - Admiral General Aladeen", "The Dail…
+#>  $ view_count    &lt;dbl> 19159013, 5624319, 5223787, 5134669, 4920942, 4347723…
+#>  $ like_count    &lt;dbl> 161732, 38442, 39755, 47906, 25499, 30986, 25640, 492…
+#>  $ host          &lt;chr> "Jon", "Jon", "Jon", "Jon", "Jon", "Jon", "Jon", "Jon…</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:heading {"level":1} -->
+<h1>Wrangle</h1>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>I want to split the <code>DailyShowYouTube</code> on the <code>host</code> variable, creating a <code>JonDailyShow</code> and <code>TrevorDailyShow</code> dataset.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code># create JonDailyShow with only Jon Stewart
+JonDailyShow &lt;- DailyShowYouTube %>% 
+    dplyr::filter(host == "Jon")
+
+# create TrevorDailyShow with only Trevor Noah
+TrevorDailyShow &lt;- DailyShowYouTube %>% 
+    dplyr::filter(host == "Trevor")</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:heading {"level":1} -->
+<h1>Visualizations</h1>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The <code>DailyShowYouTube</code> contains 9 variables. Some of these are meta data for the videos in the playlist (<code>id</code>, <code>url</code>, and <code>published_at</code>), others contain information on the video related to viewership (<code>dislike_count</code>, <code>comment_count</code>, <code>view_count</code>, and <code>like_count</code>). For more information on these variables, check out the <a href="https://developers.google.com/youtube/v3/getting-started">YouTube API documentation</a>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>In this section, we’re going to use visualizations to help us understand how much two numeric variables are related, or how much they are <em>correlated</em>. We’ll start by visualizing variables by themselves, then move into bivariate (two-variable) graphs. The <a href="https://ropensci.github.io/skimr/"><code>skimr</code></a> and <a href="https://alastairrushworth.github.io/inspectdf/"><code>inspectdf</code></a> packages allow us to take a quick look at an entire data frame or sets of variables.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Below is a <code>skimr::skim()</code> of the <code>DailyShowYouTube</code> <code>data.frame</code>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>skimr::skim(DailyShowYouTube)</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:table -->
+<table class="wp-block-table"><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>Name</td><td>DailyShowYouTube</td></tr><tr><td>Number of rows</td><td>251</td></tr><tr><td>Number of columns</td><td>9</td></tr><tr><td>_______________________</td><td></td></tr><tr><td>Column type frequency:</td><td></td></tr><tr><td>character</td><td>4</td></tr><tr><td>numeric</td><td>4</td></tr><tr><td>POSIXct</td><td>1</td></tr><tr><td>________________________</td><td></td></tr><tr><td>Group variables</td><td>None</td></tr></tbody></table>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p>Data summary</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Variable type: character</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<table class="wp-block-table"><thead><tr><th>skim_variable</th><th>n_missing</th><th>complete_rate</th><th>min</th><th>max</th><th>empty</th><th>n_unique</th><th>whitespace</th></tr></thead><tbody><tr><td>url</td><td>0</td><td>1</td><td>46</td><td>46</td><td>0</td><td>251</td><td>0</td></tr><tr><td>id</td><td>0</td><td>1</td><td>11</td><td>11</td><td>0</td><td>251</td><td>0</td></tr><tr><td>title</td><td>0</td><td>1</td><td>22</td><td>96</td><td>0</td><td>251</td><td>0</td></tr><tr><td>host</td><td>0</td><td>1</td><td>3</td><td>6</td><td>0</td><td>2</td><td>0</td></tr></tbody></table>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p><strong>Variable type: numeric</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<table class="wp-block-table"><thead><tr><th>skim_variable</th><th>n_missing</th><th>complete_rate</th><th>mean</th><th>sd</th><th>p0</th><th>p25</th><th>p50</th><th>p75</th><th>p100</th><th>hist</th></tr></thead><tbody><tr><td>dislike_count</td><td>0</td><td>1</td><td>805.33</td><td>1705.74</td><td>3</td><td>68.5</td><td>290</td><td>831.5</td><td>19236</td><td>▇▁▁▁▁</td></tr><tr><td>comment_count</td><td>0</td><td>1</td><td>1356.73</td><td>2206.23</td><td>2</td><td>159.5</td><td>706</td><td>1473.0</td><td>17919</td><td>▇▁▁▁▁</td></tr><tr><td>view_count</td><td>0</td><td>1</td><td>1454472.85</td><td>1830174.80</td><td>35414</td><td>272979.5</td><td>1011540</td><td>2011034.5</td><td>19159013</td><td>▇▁▁▁▁</td></tr><tr><td>like_count</td><td>0</td><td>1</td><td>13113.58</td><td>18170.41</td><td>182</td><td>2131.5</td><td>8392</td><td>16586.0</td><td>161732</td><td>▇▁▁▁▁</td></tr></tbody></table>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p><strong>Variable type: POSIXct</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<table class="wp-block-table"><thead><tr><th>skim_variable</th><th>n_missing</th><th>complete_rate</th><th>min</th><th>max</th><th>median</th><th>n_unique</th></tr></thead><tbody><tr><td>published_at</td><td>0</td><td>1</td><td>2013-04-24 10:02:53</td><td>2016-11-09 02:32:36</td><td>2015-10-23 15:39:54</td><td>250</td></tr></tbody></table>
+<!-- /wp:table -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Variation</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The amount a variable varies represents the amount of uncertainty we  have in a particular phenomena or measurement. We use numbers like variance, standard deviation, and interquartile range to represent the ‘spread’ or the <a href="https://en.wikipedia.org/wiki/Statistical_dispersion">dispertion</a> of values for a particular variable. In contrast to the ‘spread’, a variable’s ‘middle’ is represented using numbers like the mean, median, and mode. These measure the <a href="https://en.wikipedia.org/wiki/Central_tendency">central tendency</a> (i.e.&nbsp;the<br>middle) of a variable’s distribution. We’ll explore these topics further below in visualizations.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Skewness &amp; Kurtosis</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>We want to use specific terms to describe what a variable distribution looks like because this will give us some precision in what we’re seeing. The <code>skimr::skim()</code> output above shows us four numeric variables (<code>dislike_count</code>, <code>comment_count</code>, <code>view_count</code>, and <code>like_count</code>), and the <code>hist</code> variable tells us these variables are skewed.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><a href="https://en.wikipedia.org/wiki/Skewness">Skewness refers</a> to the distribution of a variable that is not symmetrical. It’s hard to see in the <code>hist</code> column above because it’s small, so we’ll use the <code>inspectdf::inspect_num()</code> to look at the skewness and kurtosis of these<br> numeric <code>_count</code> variables.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code># define labs first so we are thinking about what to expect on the graph!
+hist_labs &lt;- ggplot2::labs(
+    title = "Comments, Dislikes, Likes, &amp; Views of Daily Show videos",
+    x = "Counts",
+    y = "Probability distribution",
+    subtitle = "Numeric variables in Daily Show YouTube meta data",
+    caption = "Includes both hosts (Jon Stewart &amp; Trevor Noah)"
+)
+# Now we plot!
+inspectdf::inspect_num(DailyShowYouTube) %>% 
+                      inspectdf::show_plot(x = ., 
+                                           plot_layout = c(2, 2)) + # this gives 
+                                                                    # us a 2x2
+                      hist_labs</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:image {"id":11426} -->
+<figure class="wp-block-image"><img src="http://www.storybench.org/wp-content/uploads/2019/10/inspect_num-1.png" alt="" class="wp-image-11426"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>The graphs above display variables that are ‘positively skewed’, which means the bulk of the data are piled up near the lower values. The compliment to skewness is <a href="https://en.wikipedia.org/wiki/Kurtosis">kurtosis</a>, which is used to measure how the data is distributed in the tail of a distribution. Both skewness and kurtosis can be calculated using the <code>psych::describe()</code> function. I limit the output below to the <code>mean</code>, <code>sd</code>, <code>min</code>, <code>median</code>,<code>max</code>, <code>skew</code>, and <code>kurtosis</code>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>knitr::kable(
+DailyShowYouTube %>% 
+    dplyr::select(like_count, 
+                  view_count) %>% 
+    psych::describe(x = .) %>% 
+    dplyr::select(mean, sd, min, median, 
+                  max, skew, kurtosis)
+)</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:table -->
+<table class="wp-block-table"><thead><tr><th></th><th>mean</th><th>sd</th><th>min</th><th>median</th><th>max</th><th>skew</th><th>kurtosis</th></tr></thead><tbody><tr><td>like_count</td><td>13113.58</td><td>18170.41</td><td>182</td><td>8392</td><td>161732</td><td>4.432921</td><td>29.75917</td></tr><tr><td>view_count</td><td>1454472.85</td><td>1830174.80</td><td>35414</td><td>1011540</td><td>19159013</td><td>4.353605</td><td>34.17134</td></tr></tbody></table>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p>These numbers tell us the skewness and kurtosis are both positive, but that doesn’t mean much until we discuss normality.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Normality</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><a href="https://en.wikipedia.org/wiki/Normal_distribution">Normality</a> is another tool we can use to help describe a variables distribution. Normal in this case refers to how bell-shaped the distribution looks. Normally distributed variables have a skewness and kurtosis of <code>0</code>. As we can imagine, variables with high values for skewness and kurtosis won’t be normal because those values are telling us the distribution isn’t symmetrical.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><em>Why are we doing this?</em></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>The more we understand about each variable’s distribution, the more equipped we’ll be in predicting how the values in one variable correspond to the values in another variable.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Let’s narrow our dataset down to just two variables: YouTube video views and likes. Examine the graphs below.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code># define labs first!
+hist_labs_v2 &lt;- ggplot2::labs(
+    title = "Likes and Views of Daily Show YouTube videos",
+    x = "Counts",
+    y = "Probability distribution",
+    subtitle = "Numeric variables in Daily Show YouTube meta data",
+    caption = "Includes both hosts (Jon Stewart &amp; Trevor Noah)"
+)
+# Now we plot!
+DailyShowYouTube %>% 
+    dplyr::select(like_count, 
+                  view_count) %>% 
+    inspectdf::inspect_num(df1 = .) %>% 
+                      inspectdf::show_plot(x = .) + # this gives 
+                      hist_labs_v2                  # us a 2x2</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:gallery {"ids":[11427]} -->
+<ul class="wp-block-gallery columns-1 is-cropped"><li class="blocks-gallery-item"><figure><img src="http://www.storybench.org/wp-content/uploads/2019/10/inspect_num-v2-1.png" alt="" data-id="11427" data-link="http://www.storybench.org/?attachment_id=11427" class="wp-image-11427"/></figure></li></ul>
+<!-- /wp:gallery -->
+
+<!-- wp:paragraph -->
+<p>We know both <code>view_count</code> and <code>like_count</code> are have positive skewness and kurtosis, but to what degree are these two variables related?</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>The relationship between views and likes</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><em>How do we measure relationships between variables?</em></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>When two variables are related, that means changes in one variable result with similar changes in the second variable. In math terms, this is referred to as <strong>covariance.</strong> If variance is how much a single variable <em>varies from the mean</em>, then covariance is how much <em>two variables vary together</em>. I really like Wickham and Grolemund's description of <a href="https://r4ds.had.co.nz/exploratory-data-analysis.html#covariation">covariation in R for Data Science</a>,</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:quote -->
+<blockquote class="wp-block-quote"><p>Covariation is the tendency for the values of two or more variables to vary together in a related way. - Wickham and Grolemund</p></blockquote>
+<!-- /wp:quote -->
+
+<!-- wp:paragraph -->
+<p>If you think about it, the variation of a single variable is not very helpful by itself. But if we can <em>describe</em> or <em>account</em> for ‘spread’ in one variable with the ‘spread’ from another, we can make estimations about one number when we have information on the other.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>So if we want to know if the videos that have a high number of views are the same videos that also have a high number of likes? We couldn’t tell from the histograms, but we can combine the two variables on a single plot to answer this question.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Scatter plots</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Recall that most of the values for views and likes are low, but this does not necessarily mean they are similar. For example, the mean value for <code>view_count</code> is much higher than the mean value for <code>like_count</code> (<code>13,113.58</code> vs. <code>1,454,472.85</code>). If we compare the maximum values (i.e. the extreme values at the tails), we can see the maximum value for <code>view_count</code> is <code>19,159,013</code> vs. a maximum value of <code>161,732</code> for <code>like_count</code>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>The scatter plot below will show us if there is a pattern between Daily Show YouTube video views and likes.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code># labels 
+point_labs_v1 &lt;- ggplot2::labs(
+    title = "Likes vs. Views of Daily Show YouTube videos",
+    x = "YouTube Video Views",
+    y = "YouTube Video Likes",
+    subtitle = "Daily Show videos on Comedy Central's YouTube Channel",
+    caption = "Includes both hosts (Jon Stewart &amp; Trevor Noah)")
+# scatter plot
+ggp_scatter_v1 &lt;- DailyShowYouTube %>% 
+    ggplot2::ggplot(aes(x = view_count, 
+                        y = like_count)) + 
+    ggplot2::geom_point(alpha = 3/5) + 
+    point_labs_v1
+ggp_scatter_v1</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:gallery {"ids":[11428]} -->
+<ul class="wp-block-gallery columns-1 is-cropped"><li class="blocks-gallery-item"><figure><img src="http://www.storybench.org/wp-content/uploads/2019/10/ggp_scatter_v1-1.png" alt="" data-id="11428" data-link="http://www.storybench.org/?attachment_id=11428" class="wp-image-11428"/></figure></li></ul>
+<!-- /wp:gallery -->
+
+<!-- wp:paragraph -->
+<p>This pattern looks like we might be able to predict some of the values of <code>like_count</code> with values from <code>view_count</code>, but how well? We need to explore these data more with additional visualizations. For example, let’s add labels to the two videos with more than 150,000 likes to identify the extreme values on the graph.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Outliers</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>First we will filter these data out, then we plot them using another layer from <code>ggplot2</code>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code># first we create some data sets for the top views and likes 
+TopDailyShowLikes &lt;- DailyShowYouTube %>% 
+    dplyr::filter(like_count >= 150000)
+
+# then we plot the point with some text 
+ggp_scatter_v2 &lt;- ggp_scatter_v1 +
+  # add labels to states
+  geom_text_repel(
+    data = TopDailyShowLikes, 
+    aes(label = title),
+    # size of text
+    size = 2.1,
+    # opacity of the text
+    alpha = 7 / 10,
+    # in case there is overplotting
+    arrow = arrow(
+      length = unit(0.05, "inches"),
+      type = "open",
+      ends = "last"
+    ),
+    show.legend = FALSE
+  ) 
+ggp_scatter_v2</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:gallery {"ids":[11429]} -->
+<ul class="wp-block-gallery columns-1 is-cropped"><li class="blocks-gallery-item"><figure><img src="http://www.storybench.org/wp-content/uploads/2019/10/ggp_scatter_v2-1.png" alt="" data-id="11429" data-link="http://www.storybench.org/?attachment_id=11429" class="wp-image-11429"/></figure></li></ul>
+<!-- /wp:gallery -->
+
+<!-- wp:paragraph -->
+<p>It looks like <em>“The Daily Show - Admiral General Aladeen”</em> and <em>Confused Islamophobes Target American Sikhs: The Daily Show</em> videos are outliers in terms of views and likes. Should we keep these videos in the data  set? Well, we can be pretty sure these data haven’t been entered incorrectly. So if the values are legitimate, is there something about the videos that makes them different from the population (the other videos) we’re investigating?</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Recall that we’re still including videos of the Daily Show with two different hosts (<code>Jon</code> and <code>Trevor</code>). What happens when we facet the scatter plot about the two <code>host</code>s?</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code># labels 
+point_labs_v3 &lt;- ggplot2::labs(
+    title = "Likes vs. views of Daily Show YouTube videos by host",
+    x = "YouTube Video Views",
+    y = "YouTube Video Likes",
+    subtitle = "Daily Show videos on Comedy Central's YouTube Channel",
+    caption = "Includes both hosts (Jon Stewart &amp; Trevor Noah)")
+# scatter with facet
+ggp_scatter_v3 &lt;- DailyShowYouTube %>% 
+    ggplot2::ggplot(aes(x = view_count, 
+                        y = like_count,
+                        group = host)) + 
+    ggplot2::geom_point(aes(color = host), 
+                        alpha = 3/5, 
+                        show.legend = FALSE) + 
+    # add labels to states
+    geom_text_repel(
+    data = TopDailyShowLikes, 
+    aes(label = title),
+    # size of text
+    size = 2.1,
+    # opacity of the text
+    alpha = 7 / 10,
+    # in case there is overplotting
+    arrow = arrow(
+      length = unit(0.05, "inches"),
+      type = "open",
+      ends = "last")) + 
+    facet_wrap(. ~ host) + 
+    point_labs_v3
+ggp_scatter_v3</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:gallery {"ids":[11430]} -->
+<ul class="wp-block-gallery columns-1 is-cropped"><li class="blocks-gallery-item"><figure><img src="http://www.storybench.org/wp-content/uploads/2019/10/ggp_scatter_v3-1.png" alt="" data-id="11430" data-link="http://www.storybench.org/?attachment_id=11430" class="wp-image-11430"/></figure></li></ul>
+<!-- /wp:gallery -->
+
+<!-- wp:paragraph -->
+<p>Now we can see that each host has their own extreme value. We can also see that the relationship between views and likes appear similar (as one goes up, so does the other) for both hosts.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>I think we can assume these two videos are different in a meaningful way  from the rest of the videos in the playlists (and we can explore the details of why this might be later). But for now, we’ll remove the videos and look at the relationship between views and likes without them.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code># labels 
+point_labs_v4 &lt;- ggplot2::labs(
+    title = "Likes vs. views of Daily Show YouTube videos by host",
+    x = "YouTube Video Views",
+    y = "YouTube Video Likes",
+    subtitle = "Daily Show videos on Comedy Central's YouTube Channel",
+    caption = "Removed outlier videos (> 150,000 likes)")
+# outliers
+outliers &lt;- c("yEPSJF7BYOo", "RskvZgc_s9g")
+# create correlation data 
+DailyShowCorr &lt;- DailyShowYouTube %>% 
+    dplyr::filter(id %nin% outliers)
+# scatter
+ggp_scatter_v4 &lt;- DailyShowCorr %>% 
+    ggplot2::ggplot(aes(x = view_count, 
+                        y = like_count,
+                        group = host)) + 
+    ggplot2::geom_point(aes(color = host), 
+                        alpha = 3/5, 
+                        show.legend = FALSE) + 
+    facet_wrap(. ~ host) + 
+    point_labs_v4
+ggp_scatter_v4</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:gallery {"ids":[11431]} -->
+<ul class="wp-block-gallery columns-1 is-cropped"><li class="blocks-gallery-item"><figure><img src="http://www.storybench.org/wp-content/uploads/2019/10/ggp_scatter_v4-1.png" alt="" data-id="11431" data-link="http://www.storybench.org/?attachment_id=11431" class="wp-image-11431"/></figure></li></ul>
+<!-- /wp:gallery -->
+
+<!-- wp:paragraph -->
+<p>This shows a pattern that indicates a positive relationship between viewing a video and liking a video. Can we show this numerically? How about if we calculate the covariance for each host?</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Covariance</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>We will calculate the level of covariation between the two variables using <code>mosaic::cov()</code>. but after we’ve split the data frame by <code>host</code> into two datasets.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code># split these data by host
+daily_split_list &lt;- DailyShowCorr %>% 
+    dplyr::group_split(host, keep = TRUE)
+daily_split_list[[1]] -> JonDailyShowCorr 
+daily_split_list[[2]] -> TrevorDailyShowCorr
+# calculate covariance for Trevor
+mosaic::cov(x = TrevorDailyShowCorr$view_count, 
+            y = TrevorDailyShowCorr$like_count)</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>#>  [1] 17812574567</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code># calculate covariance for Jon
+mosaic::cov(x = JonDailyShowCorr$view_count, 
+            y = JonDailyShowCorr$like_count)</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>#>  [1] 14484129962</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph -->
+<p>These large positive numbers tell us that as <code>view_count</code> deviates from it’s mean, <code>like_count</code> deviates from it’s mean in the same direction. However, using the covariance can get us into trouble because it assumes both variables are on the same scale. In practice, we typically want to know how two variables on <em>different</em> scales relate to one another–that’s where calculating a correlation coefficient comes in handy.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>Correlation coefficients</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>We will cover two types of correlation coefficients (there are more), but both of these values lie between <code>− 1</code> and <code>+ 1</code>. The first measure we’ll cover, the <a href="https://en.wikipedia.org/wiki/Pearson_correlation_coefficient">Pearson correlation coefficient</a>, is the most common, but also has some assumptions that need to be met in order for the results to be reliable.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>If the assumptions of normality are violated (as they are in our data) the <a href="https://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient">Spearman’s correlation coefficient</a> can be used because it doesn’t have the same assumptions for both variables.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Using <code>corrr</code></h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The <a href="https://github.com/tidymodels/corrr"><code>corrr</code> package from <code>tidymodels</code></a> let’s us explore correlations using <code>tidyverse</code> principles. We’ll start with the <code>JonDailyShowCorr</code> data, which is all the videos in the playlist (minus the <em>“The Daily Show - Admiral General Aladeen”</em> video).</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>JonDailyShowCorr %>% glimpse(78)</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>#>  Observations: 110
+#>  Variables: 9
+#>  $ published_at  &lt;dttm> 2014-12-05 17:01:33, 2014-09-23 22:12:10, 2013-04-24…
+#>  $ dislike_count &lt;dbl> 1065, 722, 2469, 654, 917, 547, 2846, 1449, 2295, 102…
+#>  $ url           &lt;chr> "https://i.ytimg.com/vi/AHO1a1kvZGo/default.jpg", "ht…
+#>  $ id            &lt;chr> "AHO1a1kvZGo", "lPgZfhnCAdI", "9pOiOhxujsE", "aqzzWr3…
+#>  $ comment_count &lt;dbl> 2486, 3616, 17629, 2689, 2704, 1887, 3422, 6229, 4522…
+#>  $ title         &lt;chr> "The Daily Show - Spot the Africa", "The Daily Show -…
+#>  $ view_count    &lt;dbl> 5624319, 5223787, 5134669, 4920942, 4347723, 4160610,…
+#>  $ like_count    &lt;dbl> 38442, 39755, 47906, 25499, 30986, 25640, 49200, 4794…
+#>  $ host          &lt;chr> "Jon", "Jon", "Jon", "Jon", "Jon", "Jon", "Jon", "Jon…</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph -->
+<p>To use <code>corrr::correlate()</code>, we select only those two variables we want to calculate a correlation coefficient for and stored the output in <code>JonPearsonCorDf</code></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>JonPearsonCorDf &lt;- JonDailyShowCorr %>% 
+    dplyr::select(c(view_count, 
+                    like_count)) %>% 
+    corrr::correlate(x = .) </code></pre>
+<!-- /wp:code -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>#>  
+#>  Correlation method: 'pearson'
+#>  Missing treated using: 'pairwise.complete.obs'</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph -->
+<p>The message we get from the output tells us the following:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul><li><code>Correlation method: 'pearson'</code> = The reason we spent all that time looking at the variable distributions is because the Pearson correlation coefficient assumes normality. The Pearson method has some assumptions which we will address below.</li><li><code>Missing treated using: 'pairwise.complete.obs'</code> = This is telling us how the missing values are going to dealt with. If we recall the <code>skimr::skim()</code> output, we have no missing data, so this doesn’t apply.</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Pearson’s correlation assumptions</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The most commonly used correlation coefficient is the ‘Pearson product-moment correlation coefficient’ or ‘Pearson correlation coefficient’ or just <em>r</em>. One of the assumptions of this test is that the sampling distribution is normally distributed (or that our sample is normally distributed). Neither of these are true. Fortunately, we have another option for calculating a correlation.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>One option is to log transform both variables using <code>dplyr::mutate()</code>. Log transforming will make positively skewed variables more normally distributed, as we demonstrate in descriptive statistics below.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>DailyShowYouTubeCorr &lt;- DailyShowYouTube %>% 
+    dplyr::mutate(log_view_count = log(view_count), 
+                  log_like_count = log(like_count))</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>knitr::kable(
+DailyShowYouTubeCorr %>% 
+    dplyr::select(log_view_count,
+                  view_count,
+                  log_like_count,
+                  like_count) %>% 
+    psych::describe(x = .) %>% 
+    dplyr::select(mean, sd, min, median, 
+                  max, skew, kurtosis))</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:table -->
+<table class="wp-block-table"><thead><tr><th></th><th>mean</th><th>sd</th><th>min</th><th>median</th><th>max</th><th>skew</th><th>kurtosis</th></tr></thead><tbody><tr><td>log_view_count</td><td>13.459371</td><td>1.381061</td><td>10.474863</td><td>13.826985</td><td>16.76828</td><td>-0.4486365</td><td>-0.7596921</td></tr><tr><td>view_count</td><td>1454472.852590</td><td>1830174.800671</td><td>35414.000000</td><td>1011540.000000</td><td>19159013.00000</td><td>4.3536048</td><td>34.1713438</td></tr><tr><td>log_like_count</td><td>8.673024</td><td>1.464940</td><td>5.204007</td><td>9.035034</td><td>11.99370</td><td>-0.5084212</td><td>-0.5494696</td></tr><tr><td>like_count</td><td>13113.577689</td><td>18170.413169</td><td>182.000000</td><td>8392.000000</td><td>161732.00000</td><td>4.4329210</td><td>29.7591664</td></tr></tbody></table>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p>Although the numbers for <code>skew</code> and <code>kurtosis</code> became negative, they are closer to 0 (which represents a normally distributed variable). We can see the results of this transformation when we create a scatter plot of the transformed variables.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code># labels 
+point_labs_v5 &lt;- ggplot2::labs(
+    title = "Likes vs. Views of Daily Show YouTube videos",
+    x = "Log Transformed YouTube Video Views",
+    y = "Log Transformed YouTube Video Likes",
+    subtitle = "Daily Show videos on Comedy Central's YouTube Channel",
+    caption = "Log transformed variables")
+# scatter plot
+ggp_scatter_v5 &lt;- DailyShowYouTubeCorr %>% 
+    ggplot2::ggplot(aes(x = log_view_count, 
+                        y = log_like_count)) + 
+    ggplot2::geom_point(alpha = 3/5) + 
+    point_labs_v5
+ggp_scatter_v5</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:gallery {"ids":[11432]} -->
+<ul class="wp-block-gallery columns-1 is-cropped"><li class="blocks-gallery-item"><figure><img src="http://www.storybench.org/wp-content/uploads/2019/10/ggp_scatter_v5-1.png" alt="" data-id="11432" data-link="http://www.storybench.org/?attachment_id=11432" class="wp-image-11432"/></figure></li></ul>
+<!-- /wp:gallery -->
+
+<!-- wp:paragraph -->
+<p>We can see this is a much clearer pattern (the line appears more straight), and the outliers have disappeared.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><em>Why shouldn’t you transform your variables?</em></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>First off, taking the logarithm of a variable changes the question you’re asking (i.e. "<em>is there a relationship between </em><code>log transformed variable x</code> <em>and</em> <code>log transformed y</code>?) , and you’ll have to be very careful about interpreting the results. Fortunately there are other options.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Spearman’s Rho</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The <a href="https://en.wikipedia.org/wiki/Spearman's_rank_correlation_coefficient">Spearman’s rank correlation coefficient</a> or Spearman’s Rho is essentially the same calculation as the Pearson correlation coefficient, only it ranks all of the values first. Ranking removes some of the extreme distances between values, essentially removing any underlying concerns of variable distributions.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>We’ll apply the <code>corrr::correlate()</code> function to <code>view_count</code> and <code>like_count</code> in the <code>JonDailyShowCorr</code> and <code>TrevorDailyShowCorr</code> <code>data.frame</code>s and specify the <code>"method = spearman"</code>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>JonSpearmanCorDf &lt;- JonDailyShowCorr %>% 
+    dplyr::select(c(view_count, 
+                    like_count)) %>% 
+    corrr::correlate(x = ., 
+                     method = "spearman") </code></pre>
+<!-- /wp:code -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>#>  
+#>  Correlation method: 'spearman'
+#>  Missing treated using: 'pairwise.complete.obs'</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:table -->
+<table class="wp-block-table"><thead><tr><th>rowname</th><th>view_count</th><th>like_count</th></tr></thead><tbody><tr><td>view_count</td><td>NA</td><td>0.9788202</td></tr><tr><td>like_count</td><td>0.9788202</td><td>NA</td></tr></tbody></table>
+<!-- /wp:table -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>TrevorSpearmanCorDf &lt;- TrevorDailyShowCorr %>% 
+    dplyr::select(c(view_count, 
+                    like_count)) %>% 
+    corrr::correlate(x = ., 
+                     method = "spearman") </code></pre>
+<!-- /wp:code -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>#>  
+#>  Correlation method: 'spearman'
+#>  Missing treated using: 'pairwise.complete.obs'</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:table -->
+<table class="wp-block-table"><thead><tr><th>rowname</th><th>view_count</th><th>like_count</th></tr></thead><tbody><tr><td>view_count</td><td>NA</td><td>0.9554851</td></tr><tr><td>like_count</td><td>0.9554851</td><td>NA</td></tr></tbody></table>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p>We can see there is a very high correlation between viewing and liking videos for both hosts. It looks like the correlation between views and likes in Jon Stewart’s videos is slightly higher (<code>0.9788202</code>) than the correlation coefficient in Trevor Noah’s videos (<code>0.9554851</code>).</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Correlations for &gt; 2 variables</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>We just looked at bivariate correlations between views and likes, but what if we wanted to check the correlations between <em>all</em> four numeric variables (<code>dislike_count</code>, <code>comment_count</code>, <code>view_count</code>, and<code>like_count</code>)?</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>We can do that by passing all the numeric variables to <code>corrr::correlate()</code>, only this time we will add <code>quiet = TRUE</code> to leave the message out. We’ll also add the <code>corrr::rearrange()</code> and sort the table contents according to the highest correlations with (<code>method = "MDS"</code> and <code>absolute = FALSE</code>).</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>JonDailyShowCorrDfAll &lt;- JonDailyShowCorr %>% 
+    dplyr::select_if(is.numeric) %>% 
+    corrr::correlate(x = ., 
+                     method = "spearman", 
+                     quiet = TRUE) %>% 
+    corrr::rearrange(x = ., 
+                     method = "MDS", 
+                     absolute = FALSE)</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>#>  Registered S3 method overwritten by 'seriation':
+#>    method         from 
+#>    reorder.hclust gclus</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:table -->
+<table class="wp-block-table"><thead><tr><th>rowname</th><th>view_count</th><th>like_count</th><th>comment_count</th><th>dislike_count</th></tr></thead><tbody><tr><td>view_count</td><td>NA</td><td>0.9788202</td><td>0.8665394</td><td>0.8684701</td></tr><tr><td>like_count</td><td>0.9788202</td><td>NA</td><td>0.8911861</td><td>0.8809044</td></tr><tr><td>comment_count</td><td>0.8665394</td><td>0.8911861</td><td>NA</td><td>0.9477941</td></tr><tr><td>dislike_count</td><td>0.8684701</td><td>0.8809044</td><td>0.9477941</td><td>NA</td></tr></tbody></table>
+<!-- /wp:table -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>TrevorDailyShowCorrDfAll &lt;- TrevorDailyShowCorr %>% 
+    dplyr::select_if(is.numeric) %>% 
+    corrr::correlate(x = ., 
+                     method = "spearman", 
+                     quiet = TRUE) %>% 
+    corrr::rearrange(x = ., 
+                     method = "MDS", 
+                     absolute = FALSE)</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:table -->
+<table class="wp-block-table"><thead><tr><th>rowname</th><th>dislike_count</th><th>comment_count</th><th>like_count</th><th>view_count</th></tr></thead><tbody><tr><td>dislike_count</td><td>NA</td><td>0.9574204</td><td>0.8981760</td><td>0.8657234</td></tr><tr><td>comment_count</td><td>0.9574204</td><td>NA</td><td>0.9330886</td><td>0.8767787</td></tr><tr><td>like_count</td><td>0.8981760</td><td>0.9330886</td><td>NA</td><td>0.9554851</td></tr><tr><td>view_count</td><td>0.8657234</td><td>0.8767787</td><td>0.9554851</td><td>NA</td></tr></tbody></table>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p>The highest correlation for Jon Stewart’s YouTube videos was between the views and likes (<code>0.9788202</code>), while the highest correlation for Trevor Noah’s videos was between dislikes and comments (<code>0.9574204</code>).</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Graphing correlations</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The <code>corrr</code> package has a few graphing options for visualizing correlations. These are additional to the graphs we created with<code>ggplot2</code> above.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":4} -->
+<h4>The rplot</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The <code>rplot</code> plots a correlation <code>data.frame</code> using <code>ggplot2</code> (and we can add labels to it). This graph has x and y axes, and plots the intersection for the variables from the <code>cor_df</code> (a correlation <code>data.frame</code>).</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code># labels 
+rplot_labs_v1 &lt;- ggplot2::labs(
+    title = "Correlations between Jon Stewart's likes, dislikes, comments, and views",
+    subtitle = "YouTube videos of The Daily Show playlist",
+    caption = "Data accessed from YouTube API")
+JonDailyShowCorrDfAll %>% 
+  corrr::rplot(rdf = ., shape = 19,
+               colors = c("yellow", 
+                          "purple")) + 
+    rplot_labs_v1</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:gallery {"ids":[11433]} -->
+<ul class="wp-block-gallery columns-1 is-cropped"><li class="blocks-gallery-item"><figure><img src="http://www.storybench.org/wp-content/uploads/2019/10/rplot_labs_v1-1.png" alt="" data-id="11433" data-link="http://www.storybench.org/?attachment_id=11433" class="wp-image-11433"/></figure></li></ul>
+<!-- /wp:gallery -->
+
+<!-- wp:paragraph -->
+<p>As we can see, the hue of the color and the size of the point indicate the level of the correlation. We can also remove the redundant correlations from the table with <code>corrr::shave()</code>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>knitr::kable(
+JonDailyShowCorrDfAll %>% 
+    corrr::shave(x = .)
+)</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:table -->
+<table class="wp-block-table"><thead><tr><th>rowname</th><th>view_count</th><th>like_count</th><th>comment_count</th><th>dislike_count</th></tr></thead><tbody><tr><td>view_count</td><td>NA</td><td>NA</td><td>NA</td><td>NA</td></tr><tr><td>like_count</td><td>0.9788202</td><td>NA</td><td>NA</td><td>NA</td></tr><tr><td>comment_count</td><td>0.8665394</td><td>0.8911861</td><td>NA</td><td>NA</td></tr><tr><td>dislike_count</td><td>0.8684701</td><td>0.8809044</td><td>0.9477941</td><td>NA</td></tr></tbody></table>
+<!-- /wp:table -->
+
+<!-- wp:heading {"level":4} -->
+<h4>Network plot</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The second graph options from <code>corrr</code> is the <code>corrr::network_plot()</code> which takes a <code>cor_df</code> and returns a graph where “<em>variables that are more highly correlated appear closer together and are joined by stronger paths.</em>”</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code># labels 
+network_labs_v1 &lt;- ggplot2::labs(
+    title = "Correlations between Trevor Noah's likes, dislikes, comments, and views",
+    subtitle = "YouTube videos of The Daily Show playlist",
+    caption = "Data accessed from YouTube API")
+network_plot_v1 &lt;- TrevorDailyShowCorr %>% 
+    dplyr::select_if(is.numeric) %>% 
+    corrr::correlate(x = ., 
+                     method = "spearman", 
+                     quiet = TRUE) %>% 
+    corrr::network_plot(rdf = ., 
+                        colors = c("firebrick", "white", "dodgerblue"),
+                        min_cor = .5) + 
+    network_labs_v1
+network_plot_v1</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:gallery {"ids":[11434]} -->
+<ul class="wp-block-gallery columns-1 is-cropped"><li class="blocks-gallery-item"><figure><img src="http://www.storybench.org/wp-content/uploads/2019/10/network_plot_v1-1.png" alt="" data-id="11434" data-link="http://www.storybench.org/?attachment_id=11434" class="wp-image-11434"/></figure></li></ul>
+<!-- /wp:gallery -->
+
+<!-- wp:paragraph -->
+<p>This shows us that the strongest correlations are between <code>view_count</code>s and <code>like_count</code>s, and the <code>comment_count</code>s and <code>dislike_count</code>s. The <code>corrr::fashion()</code> function gives us more fancy print options, too.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>knitr::kable(
+JonDailyShowCorrDfAll %>% 
+    corrr::fashion(x = ., 
+                   decimals = 3, 
+                   na_print = 0)
+)</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:table -->
+<table class="wp-block-table"><thead><tr><th>rowname</th><th>view_count</th><th>like_count</th><th>comment_count</th><th>dislike_count</th></tr></thead><tbody><tr><td>view_count</td><td>0</td><td>.979</td><td>.867</td><td>.868</td></tr><tr><td>like_count</td><td>.979</td><td>0</td><td>.891</td><td>.881</td></tr><tr><td>comment_count</td><td>.867</td><td>.891</td><td>0</td><td>.948</td></tr><tr><td>dislike_count</td><td>.868</td><td>.881</td><td>.948</td><td>0</td></tr></tbody></table>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
