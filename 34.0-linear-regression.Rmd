@@ -191,7 +191,7 @@ Now that we have an idea of what a linear relationship looks like, we can talk a
 ```{r network-plot}
 SimDat %>%
   dplyr::select(outcome, predictor_1) %>% 
-  corrr::correlate()
+  corrr::correlate(x = .,)
 ```
 
 ## Linear models 
@@ -252,9 +252,9 @@ As we can see, the swarm of points for these two variables looks very different 
 
 We will be looking at data from YouTube's API for this tutorial.
 
-[Key and Peele](https://en.wikipedia.org/wiki/Key_%26_Peele) are a comedy duo that have been performing since about 2012. Their playlist on [Comedy Central's YouTube channel](https://www.youtube.com/playlist?list=PL83DDC2327BEB616D) has 221 videos. 
+<!-- [Key and Peele](https://en.wikipedia.org/wiki/Key_%26_Peele) are a comedy duo that have been performing since about 2012. Their playlist on [Comedy Central's YouTube channel](https://www.youtube.com/playlist?list=PL83DDC2327BEB616D) has 221 videos.  -->
 
-[Inside Amy Schumer](https://en.wikipedia.org/wiki/Inside_Amy_Schumer) was a series that ran from April 30, 2013 until June 16, 2016. The special is available on [Comedy Central's YouTube channel](https://www.youtube.com/playlist?list=PLD7nPL1U-R5o_GHb3XEx8XKCjzgCFCTuF) and consists of 126 videos. 
+<!-- [Inside Amy Schumer](https://en.wikipedia.org/wiki/Inside_Amy_Schumer) was a series that ran from April 30, 2013 until June 16, 2016. The special is available on [Comedy Central's YouTube channel](https://www.youtube.com/playlist?list=PLD7nPL1U-R5o_GHb3XEx8XKCjzgCFCTuF) and consists of 126 videos.  -->
 
 Now that we have an idea for what a linear relationship between these two variable might look like, we can start graphing the data and see if it meets our expectations. The data that we'll be using is from this [repository](https://github.com/richardcornish/sketch-comedy-data) on Github. If we do a litle reading of the documentation, we discover both datasets have the following variables:
 
