@@ -1,0 +1,61 @@
+---
+title: "Functions for plotting linear regression models (facetRegression)"
+output: github_document
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+library(knitr)
+library(rmdformats)
+library(tidyverse)
+library(devtools)
+# figs folder
+if (!file.exists("figs")) {
+  dir.create("figs")
+}
+# chunk options
+knitr::opts_chunk$set(
+  echo = TRUE, # show/hide all code
+  results = "hide", # hide results
+  tidy = FALSE, # cleaner code printing
+  comment = "#> ", # better console printing
+  eval = TRUE, # turn this to FALSE stop code chunks from running
+  message = TRUE, # show messages
+  warning = FALSE, # show warnings
+  size = "small", # size of the text
+  fig.path = "figs/", # location of files
+  fig.height = 5.5, # height of figures
+  fig.width = 8 # width of figures
+) # width of figures
+# knit options
+knitr::opts_knit$set(
+  width = 78,
+  progress = FALSE
+)
+# base options
+base::options(
+  tibble.print_max = 25,
+  tibble.width = 78,
+  max.print = "1000",
+  scipen = 100000000
+)
+options(max.print = 999999)
+```
+
+Load packages below. 
+
+```{r packages, message=FALSE, warning=FALSE}
+library(magrittr) # Pipes %>%, %T>% and equals(), extract().
+library(tidyverse) # all tidyverse packages
+library(fs) # file management functions
+library(fivethirtyeight)
+library(mdsr) # modern data science with R
+library(broom) # tidying models
+library(modelr) # modelr package
+library(ggrepel) # repel text overlay in graphs
+library(gridExtra) # arrange multiple plots
+library(grid) # text for graph title
+library(egg) # for ggarrange
+library(corrr) # correlations
+library(skimr) # summaries 
+library(hrbrthemes) # themes for graphs
+```

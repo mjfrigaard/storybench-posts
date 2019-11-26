@@ -98,7 +98,7 @@ These two portions make up the domain and directory URI.
 
 ```{r uniform-resource-identifier, echo=FALSE}
 # fs::dir_ls("images")
-knitr::include_graphics(path = "images/uniform-resource-identifier.png")
+knitr::include_graphics(path = "images/13.0-uniform-resource-identifier.png")
 ```
 
 Now we'll combine these using `stringr::str_c()` into a `dusa_api_attr_geo`.
@@ -165,7 +165,7 @@ Below is a schematic of a basic JSON object.
 
 ```{r JSON-object, echo=FALSE, fig.cap="https://www.json.org/object.gif"}
 # fs::dir_ls("images")
-knitr::include_graphics(path = "images/JSON-object.png")
+knitr::include_graphics(path = "images/13.0-JSON-object.png")
 ```
 
 
@@ -206,7 +206,7 @@ After you've signed up and have an API access key, you'll need to read up on the
 In the documentation, an example API query is presented and I've represented each component in the figure below:
 
 ```{r query-parameters.png, echo=FALSE}
-knitr::include_graphics(path = "images/query-parameters.png")
+knitr::include_graphics(path = "images/13.0-query-parameters.png")
 ```
 
 API queries follow a general syntax (called [query parameters](https://en.wikipedia.org/wiki/Query_string)) for accessing various resources on the web server. We will build a new request using the same method as above,but with a few additional specifications. 
@@ -247,9 +247,9 @@ opensec_candContrib18JSON
 
 Now I will include the API key, which was given to me when I signed up on opensecrets. This API key should be stored in a separate file, so it doesn't get unintentionally shared or distributed. 
 
-```{r aki-key, eval=TRUE, echo=FALSE}
+```{r aki-key, eval=TRUE, echo=FALSE, include=FALSE}
 # fs::dir_ls("code")
-source("~/RLib/opensecrets-api-key.R")
+source("~/RLib/key.R")
 ```
 
 A `opensecrets-api-key.R` file contains my API key in a string `opensecrets_api_key` that I can combine with `opensec_candContrib18JSON`
@@ -258,7 +258,7 @@ A `opensecrets-api-key.R` file contains my API key in a string `opensecrets_api_
 opensec_candContrib18JSONapi <- stringr::str_c(
   opensec_candContrib18JSON,
   "&apikey=",
-  opensecrets_api_key
+  api_key
 )
 ```
 
@@ -287,21 +287,21 @@ This shows a `Tykiem Booker`, but this isn't who I am looking for. Fortunately, 
 
 ```{r open-secrets-search}
 # fs::dir_ls("images")
-knitr::include_graphics("images/open-secrets-search.png")
+knitr::include_graphics("images/13.0-open-secrets-search.png")
 ```
 
 This gives us the following search results, and I want to choose the second result down titled, "Sen. Cory Booker - Campaign Finance Summary • OpenSecrets". 
 
 ```{r open-secrets-search-booker, echo=FALSE}
 # fs::dir_ls("images")
-knitr::include_graphics("images/open-secrets-search-booker.png")
+knitr::include_graphics("images/13.0-open-secrets-search-booker.png")
 ```
 
 I chose this option because I can see `cid` is listed in the url. After clicking on the link, I can see that the url contains syntax that looks like the query parameters I've been building. 
 
 ```{r open-secrets-url-booker-cid, echo=FALSE}
 # fs::dir_ls("images")
-knitr::include_graphics("images/open-secrets-url-booker-cid.png")
+knitr::include_graphics("images/13.0-open-secrets-url-booker-cid.png")
 ```
 
 I can include the `cid=N00035267` in my string vector. 
@@ -343,7 +343,7 @@ This is where RStudio comes in handy. I can use `dplyr::glimpse()` in an Rmarkdo
 
 ```{r explore-embedded-list.gif, echo=FALSE}
 # fs::dir_ls("images")
-knitr::include_graphics("images/explore-embedded-list.gif")
+knitr::include_graphics("images/13.0-explore-embedded-list.gif")
 ```
 
 
